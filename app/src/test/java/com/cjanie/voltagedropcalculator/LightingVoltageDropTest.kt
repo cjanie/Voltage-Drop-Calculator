@@ -36,33 +36,57 @@ class Copper(sectionInMillimeterSquare: Float, lengthInKilometer: Float) :
         return RESISTANCE_IN_OHM_PER_MILLIMETER_SQUARE_SECTION_AND_KILOMETER_LENGTH
     }
 
+}
+
+class Aluminium(sectionInMillimeterSquare: Float,
+                lengthInKilometer: Float
+) : Conductor(sectionInMillimeterSquare, lengthInKilometer) {
+
+    companion object {
+        private val RESISTANCE_IN_OHM_PER_MILLIMETER_SQUARE_SECTION_AND_KILOMETER_LENGTH = 37.6f
+    }
+
+    override fun RESISTANCE_IN_OHM_PER_MILLIMETER_SQUARE_SECTION_AND_KILOMETER_LENGTH(): Float {
+        return RESISTANCE_IN_OHM_PER_MILLIMETER_SQUARE_SECTION_AND_KILOMETER_LENGTH
+    }
 
 }
 
 class Current(val intensityInAmpere: Float)
 
 abstract class Line(
-    val conductor: Conductor,
-    val current: Current,
-    val functionnalContext: FunctionnalContext
+    private val conductor: Conductor,
+    private val current: Current,
+    private val functionalContext: FunctionalContext
 ) {
 
-    protected val I = this.current.intensityInAmpere
-    protected val L = this.conductor.lengthInKilometer
-    protected val R = this.conductor.RESISTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH()
-    protected val X = this.conductor.REACTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH()
+    private val I = this.current.intensityInAmpere
+
+    private val L = this.conductor.lengthInKilometer
+    private val R = this.conductor.RESISTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH()
+    private val X = this.conductor.REACTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH()
 
     private val phaseShift: PhaseShift by lazy {
-        when(this.functionnalContext) {
-            FunctionnalContext.LIGHTING -> PhaseShiftLighting()
+        when(this.functionalContext) {
+            FunctionalContext.LIGHTING -> PhaseShiftLighting()
         }
     }
-    protected val COS_PHI = this.phaseShift.COS_PHI()
-    protected val SIN_PHI = this.phaseShift.SIN_PHI()
+    private val COS_PHI = this.phaseShift.COS_PHI()
+    private val SIN_PHI = this.phaseShift.SIN_PHI()
+
+    protected val R_COS_PHI_PLUS_X_SIN_PHI = R * COS_PHI + X * SIN_PHI
+    private val K = this.K()
 
 
 
     abstract fun calculateVoltageDropInVolt(): Float
+
+    protected abstract fun K(): Float
+
+    protected fun voltageDropInVoltBetweenPhases(): Float {
+        return K * I * L
+    }
+
     fun supplies(lines: Array<Line>) {
         // TODO
     }
@@ -87,17 +111,15 @@ class PhaseShiftLighting: PhaseShift() {
     }
 }
 
-enum class FunctionnalContext {
+enum class FunctionalContext {
     LIGHTING
 }
 
 class LineThreePhase(
     conductor: Conductor,
     current: Current,
-    functionnalContext: FunctionnalContext
+    functionnalContext: FunctionalContext
 ) : Line(conductor, current, functionnalContext) {
-
-    private val K = sqrt(NUMBER_OF_PHASES.toFloat()) * (R * COS_PHI + X * SIN_PHI)
 
     companion object {
         private val NUMBER_OF_PHASES = 3
@@ -107,31 +129,37 @@ class LineThreePhase(
         return this.voltageDropInVoltBetweenPhasesAndNeutral()
     }
 
+    override fun K(): Float {
+        return sqrt(NUMBER_OF_PHASES.toFloat()) * R_COS_PHI_PLUS_X_SIN_PHI
+    }
+
     private fun voltageDropInVoltBetweenPhasesAndNeutral(): Float {
         return this.voltageDropInVoltBetweenPhases() / sqrt(NUMBER_OF_PHASES.toFloat())
     }
 
-    private fun voltageDropInVoltBetweenPhases(): Float {
-        return K * I * L
-    }
 }
 
 class LineSinglePhase(
     conductor: Conductor,
     current: Current,
-    functionnalContext: FunctionnalContext,
+    functionnalContext: FunctionalContext,
 ) : Line(conductor, current, functionnalContext) {
 
-    val K = 2 * (R * COS_PHI + X * SIN_PHI)
+    companion object {
+        private val NUMBER_OF_PHASES = 2 // 2 phases or 1 phase and neutral
+    }
 
     override fun calculateVoltageDropInVolt(): Float {
-        return K * I * L
+        return this.voltageDropInVoltBetweenPhases()
+    }
+
+    override fun K(): Float {
+        return NUMBER_OF_PHASES * R_COS_PHI_PLUS_X_SIN_PHI
     }
 }
 
 class LightingVoltageDropTest {
-    // Context Eclairage
-    val phaseShift = PhaseShiftLighting()
+    // Contexte éclairage
     // Ligne triphasée
     // en cuivre
     // 70 mm2
@@ -143,7 +171,7 @@ class LightingVoltageDropTest {
             sectionInMillimeterSquare = 70f,
             lengthInKilometer = 0.050f),
         current = Current(intensityInAmpere =  150f),
-        functionnalContext = FunctionnalContext.LIGHTING
+        functionnalContext = FunctionalContext.LIGHTING
     )
 
     // Alimente 3 circuits monophasés
@@ -158,7 +186,7 @@ class LightingVoltageDropTest {
                 sectionInMillimeterSquare = 2.5f,
                 lengthInKilometer = 0.020f),
             current = Current(intensityInAmpere = 20f),
-            functionnalContext = FunctionnalContext.LIGHTING
+            functionnalContext = FunctionalContext.LIGHTING
         )
     }
 
