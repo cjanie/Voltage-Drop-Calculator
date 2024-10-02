@@ -6,8 +6,10 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-abstract class Conductor(val sectionInMillimeterSquare: Float,
-                         val lengthInKilometer: Float) {
+abstract class Conductor(
+    private val sectionInMillimeterSquare: Float,
+    val lengthInKilometer: Float
+) {
 
     companion object {
         private val REACTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH = 0.08f
@@ -42,7 +44,7 @@ class Current(val intensityInAmpere: Float)
 abstract class Line(
     val conductor: Conductor,
     val current: Current,
-    val phaseShift: PhaseShift
+    val functionnalContext: FunctionnalContext
 ) {
 
     protected val I = this.current.intensityInAmpere
@@ -50,8 +52,15 @@ abstract class Line(
     protected val R = this.conductor.RESISTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH()
     protected val X = this.conductor.REACTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH()
 
+    private val phaseShift: PhaseShift by lazy {
+        when(this.functionnalContext) {
+            FunctionnalContext.LIGHTING -> PhaseShiftLighting()
+        }
+    }
     protected val COS_PHI = this.phaseShift.COS_PHI()
     protected val SIN_PHI = this.phaseShift.SIN_PHI()
+
+
 
     abstract fun calculateVoltageDropInVolt(): Float
     fun supplies(lines: Array<Line>) {
@@ -78,10 +87,15 @@ class PhaseShiftLighting: PhaseShift() {
     }
 }
 
+enum class FunctionnalContext {
+    LIGHTING
+}
+
 class LineThreePhase(
     conductor: Conductor,
-    current: Current, phaseShift: PhaseShift,
-) : Line(conductor, current, phaseShift) {
+    current: Current,
+    functionnalContext: FunctionnalContext
+) : Line(conductor, current, functionnalContext) {
 
     private val K = sqrt(NUMBER_OF_PHASES.toFloat()) * (R * COS_PHI + X * SIN_PHI)
 
@@ -104,8 +118,9 @@ class LineThreePhase(
 
 class LineSinglePhase(
     conductor: Conductor,
-    current: Current, phaseShift: PhaseShift,
-) : Line(conductor, current, phaseShift) {
+    current: Current,
+    functionnalContext: FunctionnalContext,
+) : Line(conductor, current, functionnalContext) {
 
     val K = 2 * (R * COS_PHI + X * SIN_PHI)
 
@@ -128,7 +143,7 @@ class LightingVoltageDropTest {
             sectionInMillimeterSquare = 70f,
             lengthInKilometer = 0.050f),
         current = Current(intensityInAmpere =  150f),
-        phaseShift = phaseShift
+        functionnalContext = FunctionnalContext.LIGHTING
     )
 
     // Alimente 3 circuits monophasés
@@ -143,7 +158,7 @@ class LightingVoltageDropTest {
                 sectionInMillimeterSquare = 2.5f,
                 lengthInKilometer = 0.020f),
             current = Current(intensityInAmpere = 20f),
-            phaseShift = phaseShift
+            functionnalContext = FunctionnalContext.LIGHTING
         )
     }
 
