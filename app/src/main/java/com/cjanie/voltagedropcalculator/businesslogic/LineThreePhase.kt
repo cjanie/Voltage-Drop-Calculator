@@ -5,8 +5,10 @@ import kotlin.math.sqrt
 class LineThreePhase(
     conductor: Conductor,
     current: Current,
-    functionalContext: FunctionalContext, lengthInKilometer: Float
-) : Line(conductor, current, functionalContext, lengthInKilometer) {
+    functionalContext: FunctionalContext,
+    lengthInKilometer: Float,
+    tensionNominalInVolt: Float
+) : Line(conductor, current, functionalContext, lengthInKilometer, tensionNominalInVolt) {
 
     companion object {
         private val NUMBER_OF_PHASES = 3

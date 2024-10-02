@@ -3,11 +3,12 @@ package com.cjanie.voltagedropcalculator.businesslogic
 import kotlin.math.cos
 import kotlin.math.sin
 
-abstract class Line(
+abstract class Line (
     private val conductor: Conductor,
     private val current: Current,
     private val functionalContext: FunctionalContext,
-    private val lengthInKilometer: Float
+    private val lengthInKilometer: Float,
+    private val tensionNominalInVolt: Float
 ) {
 
     private val I = this.current.intensityInAmpere
@@ -28,9 +29,25 @@ abstract class Line(
 
     private val K = this.phaseShiftRatio() * phaseShift
 
+    companion object {
+        fun isVoltageDropAcceptable(voltageDropInPercentage: Float, functionalContext: FunctionalContext): Boolean {
+            val maxVoltageDropAcceptableInPercentage = when(functionalContext) {
+                FunctionalContext.LIGHTING -> 6f
+            }
+            return voltageDropInPercentage < maxVoltageDropAcceptableInPercentage
+        }
+    }
 
     open fun calculateVoltageDropInVolt(): Float {
         return K * I * L
+    }
+
+    fun voltageDropInPercentage() : Float {
+        return 100 * calculateVoltageDropInVolt() / this.tensionNominalInVolt
+    }
+
+    fun isVoltageDropAcceptable(): Boolean {
+        return isVoltageDropAcceptable(voltageDropInPercentage(), this.functionalContext)
     }
 
 }

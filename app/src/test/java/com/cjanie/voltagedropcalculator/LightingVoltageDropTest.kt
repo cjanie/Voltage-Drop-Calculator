@@ -7,6 +7,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.Line
 import com.cjanie.voltagedropcalculator.businesslogic.LineSinglePhase
 import com.cjanie.voltagedropcalculator.businesslogic.LineThreePhase
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LightingVoltageDropTest {
@@ -21,7 +22,8 @@ class LightingVoltageDropTest {
         conductor = Copper(sectionInMillimeterSquare = 70f),
         current = Current(intensityInAmpere =  150f),
         functionalContext = FunctionalContext.LIGHTING,
-        lengthInKilometer = 0.050f
+        lengthInKilometer = 0.050f,
+        tensionNominalInVolt = 230f
     )
 
     // Alimente 3 circuits monophasés
@@ -35,7 +37,8 @@ class LightingVoltageDropTest {
             conductor = Copper(sectionInMillimeterSquare = 2.5f),
             current = Current(intensityInAmpere = 20f),
             functionalContext = FunctionalContext.LIGHTING,
-            lengthInKilometer = 0.020f
+            lengthInKilometer = 0.020f,
+            tensionNominalInVolt = 230f
         )
     }
 
@@ -49,6 +52,16 @@ class LightingVoltageDropTest {
     fun voltageDropCalculationForTheSingleLines() {
         val delta_U = singlePhaseLines[0].calculateVoltageDropInVolt()
         assertEquals(7.584f, delta_U)
+    }
+
+    @Test
+    fun percentageOnCompleteInstallation() {
+        val cable = lineThreePhase
+        val circuit = singlePhaseLines[0]
+        val voltageDropInPercentage = cable.voltageDropInPercentage() + circuit.voltageDropInPercentage()
+
+        assertEquals(4.4014287f, voltageDropInPercentage)
+        assertTrue(Line.isVoltageDropAcceptable(voltageDropInPercentage, FunctionalContext.LIGHTING))
     }
 
 }
