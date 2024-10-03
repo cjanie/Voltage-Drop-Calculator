@@ -7,13 +7,10 @@ abstract class Line (
     private val conductor: Conductor,
     private val current: Current,
     private val functionalContext: FunctionalContext,
-    private val lengthInKilometer: Float,
     private val tensionNominalInVolt: Float
 ) {
 
     private val I = this.current.intensityInAmpere
-
-    private val L = this.lengthInKilometer
     private val R = this.conductor.RESISTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH()
     private val X = this.conductor.REACTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH()
 
@@ -38,16 +35,16 @@ abstract class Line (
         }
     }
 
-    open fun calculateVoltageDropInVolt(): Float {
-        return K * I * L
+    open fun voltageDropInVolt(lengthInKilometer: Float): Float {
+        return K * I * lengthInKilometer
     }
 
-    fun voltageDropInPercentage() : Float {
-        return 100 * calculateVoltageDropInVolt() / this.tensionNominalInVolt
+    fun voltageDropInPercentage(lengthInKilometer: Float) : Float {
+        return 100 * this.voltageDropInVolt(lengthInKilometer) / this.tensionNominalInVolt
     }
 
-    fun isVoltageDropAcceptable(): Boolean {
-        return isVoltageDropAcceptable(voltageDropInPercentage(), this.functionalContext)
+    fun isVoltageDropAcceptable(lengthInKilometer: Float): Boolean {
+        return isVoltageDropAcceptable(this.voltageDropInPercentage(lengthInKilometer), this.functionalContext)
     }
 
 }

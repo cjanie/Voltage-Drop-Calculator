@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">Voltage Drop Calculator</string>
+    <string name="functional_context_label">Functional Context</string>
+    <string name="line_type_label">Line Type</string>
+    <string name="line_type_single_phase">Single-Phase</string>
+    <string name="line_type_three_phase">Three-Phase</string>
+    <string name="functional_context_lighting">Lighting</string>
+    <string name="conductor_label">Conductor</string>
+    <string name="conductor_copper">Copper</string>
+    <string name="section_label">Section in Millimeter Square</string>
+    <string name="conductor_section_unit">mm²</string>
+    <string name="current_intensity_label">Current Intensity in Ampere</string>
+    <string name="current_intensity_unit">A</string>
+    <string name="tension_label">Tension in Volt</string>
+    <string name="tension_unit">V</string>
+    <string name="line_length_label">Line Length in Kilometer</string>
+    <string name="line_length_unit">km</string>
+
+    <string name="calculate_voltage_drop_label">Calculate Voltage Drop</string>
+
+    <string name="voltage_drop_in_volt_label">Voltage Drop in Volt</string>
+    <string name="voltage_drop_percentage_label">Voltage Drop Percentage</string>
+    <string name="percentage_sign">%</string>
+    <string name="voltage_drop_acceptable_result">Voltage Drop Acceptable</string>
+    <string name="voltage_drop_not_acceptable_result">Voltage Drop Not acceptable</string>
+
 </resources>

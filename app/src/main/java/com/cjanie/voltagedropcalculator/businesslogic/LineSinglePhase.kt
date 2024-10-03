@@ -4,9 +4,8 @@ class LineSinglePhase(
     conductor: Conductor,
     current: Current,
     functionalContext: FunctionalContext,
-    lengthInKilometer: Float,
     tensionNominalInVolt: Float,
-) : Line(conductor, current, functionalContext, lengthInKilometer, tensionNominalInVolt) {
+) : Line(conductor, current, functionalContext, tensionNominalInVolt) {
 
     companion object {
         private val NUMBER_OF_PHASES = 2 // 2 phases or 1 phase and neutral

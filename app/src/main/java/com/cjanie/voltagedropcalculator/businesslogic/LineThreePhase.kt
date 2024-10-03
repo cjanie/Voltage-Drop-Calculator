@@ -6,9 +6,8 @@ class LineThreePhase(
     conductor: Conductor,
     current: Current,
     functionalContext: FunctionalContext,
-    lengthInKilometer: Float,
     tensionNominalInVolt: Float
-) : Line(conductor, current, functionalContext, lengthInKilometer, tensionNominalInVolt) {
+) : Line(conductor, current, functionalContext, tensionNominalInVolt) {
 
     companion object {
         private val NUMBER_OF_PHASES = 3
@@ -19,9 +18,9 @@ class LineThreePhase(
         return PHASE_SHIFT_RATIO
     }
 
-    override fun calculateVoltageDropInVolt(): Float {
+    override fun voltageDropInVolt(lengthInKilometer: Float): Float {
         // Between Phases and neutral
-        return super.calculateVoltageDropInVolt() / PHASE_SHIFT_RATIO
+        return super.voltageDropInVolt(lengthInKilometer) / PHASE_SHIFT_RATIO
     }
 
 }
