@@ -18,3 +18,6 @@ val onGreenWarningColor = Color.White
 
 val redWarningColor = Color(0xFFC03D29)
 val onRedWarningColor = Color.White
+
+val whiteColor = Color.White
+val onWhiteColor = Color.Black

@@ -11,14 +11,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LabeledText(label: String, text: String, color: Color? = null) {
+fun LabeledText(label: String, text: String, textColor: Color? = null) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Label(name = label, color = color)
-        Text(text = text, color = if(color != null) color else Color.Unspecified)
+        Label(name = label, color = textColor)
+        Text(text = text, color = if(textColor != null) textColor else Color.Unspecified)
     }
 }

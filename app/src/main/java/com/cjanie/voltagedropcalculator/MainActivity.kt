@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,17 +24,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cjanie.voltagedropcalculator.ui.composables.Dropdown
 import com.cjanie.voltagedropcalculator.ui.composables.Header
-import com.cjanie.voltagedropcalculator.ui.composables.Label
 import com.cjanie.voltagedropcalculator.ui.composables.LabeledText
 import com.cjanie.voltagedropcalculator.ui.composables.NumberInput
 import com.cjanie.voltagedropcalculator.ui.composables.SubmitButton
+import com.cjanie.voltagedropcalculator.ui.composables.Title
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
-import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
-import com.cjanie.voltagedropcalculator.ui.theme.onCopperColor
 import com.cjanie.voltagedropcalculator.ui.theme.onGreenWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.onRedWarningColor
+import com.cjanie.voltagedropcalculator.ui.theme.onWhiteColor
 import com.cjanie.voltagedropcalculator.ui.theme.redWarningColor
+import com.cjanie.voltagedropcalculator.ui.theme.whiteColor
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,53 +169,42 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Result(resultPresenter: ResultPresenter, voltageDropResult: CalculatorModel.VoltageDropResult) {
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(if (voltageDropResult.isVoltageDropAcceptable) greenWarningColor else redWarningColor),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
-                .background(copperColor),
+                .padding(24.dp)
+                .background(whiteColor),
             horizontalAlignment = Alignment.CenterHorizontally
         )  {
             LabeledText(
                 label = resultPresenter.voltageDropInVoltLabel,
                 text = resultPresenter.voltageDropInVoltAsString(voltageDropResult.inVolt),
-                color = onCopperColor
+                textColor = onWhiteColor
             )
             LabeledText(
                 label = resultPresenter.voltageDropPercentageLabel,
                 text = resultPresenter.percentageAsString(voltageDropResult.percentage),
-                color = onCopperColor
+                textColor = onWhiteColor
             )
         }
-        Warning(
-            resultPresenter = resultPresenter,
-            isVoltageDropAcceptable = voltageDropResult.isVoltageDropAcceptable,
-            maxVoltageDropAcceptablePercentage = voltageDropResult.maxVoltageDropAcceptablePercentage
-        )
-    }
 
-}
+        val textColor = if (voltageDropResult.isVoltageDropAcceptable) onGreenWarningColor else onRedWarningColor
 
-@Composable
-fun Warning(resultPresenter: ResultPresenter, isVoltageDropAcceptable: Boolean, maxVoltageDropAcceptablePercentage: Float) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(if (isVoltageDropAcceptable!!) greenWarningColor else redWarningColor),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        val textColor = if (isVoltageDropAcceptable!!) onGreenWarningColor else onRedWarningColor
-        Label(
-            name = resultPresenter.isVoltageDropAcceptableAsString(isVoltageDropAcceptable!!),
-            color = textColor
+        Title(
+            name = resultPresenter.isVoltageDropAcceptableAsString(voltageDropResult.isVoltageDropAcceptable),
+            textColor = textColor
         )
 
         LabeledText(
             label = resultPresenter.maxVoltageDropAcceptablePercentageLabel,
-            text = resultPresenter.percentageAsString(maxVoltageDropAcceptablePercentage),
-            color = textColor
+            text = resultPresenter.percentageAsString(voltageDropResult.maxVoltageDropAcceptablePercentage),
+            textColor = textColor
         )
 
     }

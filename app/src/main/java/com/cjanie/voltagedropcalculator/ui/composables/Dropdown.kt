@@ -56,6 +56,7 @@ fun Dropdown(name: String, options: Array<String>, select: (itemPosition: Int) -
         DropdownMenu(
             expanded = isDropDownExpanded,
             onDismissRequest = { isDropDownExpanded = false },
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
         ) {
             options.forEachIndexed { index, option ->
                 DropdownMenuItem(
