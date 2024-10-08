@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -18,7 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun NumberInput(name: String, select: (value: Float) -> Unit) {
+fun NumberInput(name: String, select: (value: Float) -> Unit, enabled: Boolean) {
     var value by remember {
         mutableStateOf("")
     }
@@ -36,6 +37,7 @@ fun NumberInput(name: String, select: (value: Float) -> Unit) {
         keyboardActions = KeyboardActions(onDone = {
             println("done")
         }),
-        colors = OutlinedTextFieldDefaults.colors()
+        colors = OutlinedTextFieldDefaults.colors(),
+        enabled = enabled
     )
 }

@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Dropdown(name: String, options: Array<String>, select: (itemPosition: Int) -> Unit) {
+fun Dropdown(name: String, options: Array<String>, select: (itemPosition: Int) -> Unit, enabled: Boolean) {
     var isDropDownExpanded by remember {
         mutableStateOf(false)
     }
@@ -32,14 +32,16 @@ fun Dropdown(name: String, options: Array<String>, select: (itemPosition: Int) -
     if (itemPosition != null) select(itemPosition!!)
 
     Column(modifier = Modifier.padding(8.dp)) {
+        val modifier = if (enabled) Modifier.fillMaxWidth()
+            .clickable(
+                onClick = {isDropDownExpanded = true })
+        else Modifier.fillMaxWidth()
         TextField(
             label = { Label(name = name) },
             value = if (itemPosition == null) "" else options[itemPosition!!],
             onValueChange = { },
             enabled = false,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = { isDropDownExpanded = true }),
+            modifier = modifier,
             colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = if (isDropDownExpanded) OutlinedTextFieldDefaults.colors().focusedTextColor else MaterialTheme.colorScheme.onSurface,
                 disabledBorderColor = if (isDropDownExpanded) OutlinedTextFieldDefaults.colors().focusedLabelColor else MaterialTheme.colorScheme.outline,

@@ -10,7 +10,6 @@ import com.cjanie.voltagedropcalculator.businesslogic.LineThreePhase
 import com.cjanie.voltagedropcalculator.businesslogic.Material
 import com.cjanie.voltagedropcalculator.businesslogic.Section
 import com.cjanie.voltagedropcalculator.businesslogic.Tension
-import com.cjanie.voltagedropcalculator.businesslogic.VoltageDrop
 
 enum class LineType {
     SINGLE_PHASE, THREE_PHASE
@@ -109,22 +108,33 @@ class CalculatorModel {
         )
     }
 
-    fun calculateVoltageDropInVolt(): Float {
+    class VoltageDropResult(val inVolt: Float, val percentage: Float, val isVoltageDropAcceptable: Boolean, val maxVoltageDropAcceptablePercentage: Float)
+
+    fun calculateVoltageDrop(): VoltageDropResult {
+        return VoltageDropResult(
+            inVolt = calculateVoltageDropInVolt(),
+            percentage = calculateVoltageDropInPercentage()!!,
+            isVoltageDropAcceptable = isVoltageDropAcceptable()!!,
+            maxVoltageDropAcceptablePercentage = maxVoltageDropPercentageAcceptable()!!
+        )
+    }
+
+    private fun calculateVoltageDropInVolt(): Float {
         if (line == null) initLine()
         return line?.voltageDropInVolt()!!
     }
 
-    fun calculateVoltageDropInPercentage(): Float? {
+    private fun calculateVoltageDropInPercentage(): Float? {
         if (line == null) initLine()
         return line?.voltageDropPercentage()
     }
 
-    fun isVoltageDropAcceptable(): Boolean? {
+    private fun isVoltageDropAcceptable(): Boolean? {
         if (line == null) initLine()
         return line?.isVoltageDropAcceptable()
     }
 
-    fun maxVoltageDropPercentageAcceptable(): Float? {
+    private fun maxVoltageDropPercentageAcceptable(): Float? {
         if (line == null) initLine()
         return line?.maxVoltageDropAcceptablePercentage()
     }
@@ -138,8 +148,6 @@ class CalculatorModel {
                 tension == null ||
                 length == null
     }
-
-
 
     private fun createLine(
         functionalContext: FunctionalContext,
