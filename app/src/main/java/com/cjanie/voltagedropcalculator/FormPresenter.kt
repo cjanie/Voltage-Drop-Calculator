@@ -37,7 +37,7 @@ class FormPresenter(private val context: Context, calculatorModel: CalculatorMod
         .map {
             section -> "${
                 if (section.inMillimeterSquare.toString().contains(".0"))
-                section.inMillimeterSquare.toInt() else section
+                section.inMillimeterSquare.toInt() else section.inMillimeterSquare
             } ${context.getString(R.string.conductor_section_unit)}"
         }.toTypedArray()
 

@@ -5,12 +5,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +49,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             VoltageDropCalculatorTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
                     Column(modifier = Modifier
                         .padding(innerPadding)
                     ){
@@ -52,7 +58,7 @@ class MainActivity : ComponentActivity() {
                         )
 
                         // Form
-                        Column {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                             var isFormComplete by remember {
                                 mutableStateOf(false)
                             }
@@ -119,6 +125,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
 
+
+
                             var voltageDropInVolt: Float? by remember {
                                 mutableStateOf(null)
                             }
@@ -139,7 +147,7 @@ class MainActivity : ComponentActivity() {
                                 text = formPresenter.calculateVoltageDropPercentageLabel,
                                 onClick = {
                                     try {
-                                        voltageDropInVolt = calculatorModel.calculateVoltageDrop()?.inVolt
+                                        voltageDropInVolt = calculatorModel.calculateVoltageDropInVolt()
                                         voltageDropInPercentage = calculatorModel.calculateVoltageDropInPercentage()
                                         isVoltageDropAcceptable = calculatorModel.isVoltageDropAcceptable()
                                         maxVoltageDropAcceptablePercentage = calculatorModel.maxVoltageDropPercentageAcceptable()

@@ -8,6 +8,7 @@ abstract class Line (
     private val conductor: Conductor,
     S: Section,
     private val I: Intensity,
+    private val nominal_U: Tension,
     private val L: Length
 ) {
     private val R = this.conductor.RESISTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH(S)
@@ -20,8 +21,26 @@ abstract class Line (
 
     private val K = this.phaseShiftRatio() * phaseShift
 
-    open fun voltageDrop(): VoltageDrop {
+    private val voltageDrop = voltageDrop()
+
+    protected open fun voltageDrop(): VoltageDrop {
         return VoltageDrop( inVolt = K * I.inAmpere * L.inKilometer)
+    }
+
+    fun voltageDropInVolt(): Float {
+        return voltageDrop.inVolt
+    }
+
+    fun voltageDropPercentage(): Float {
+        return voltageDrop.percentage(nominal_U)
+    }
+
+    fun isVoltageDropAcceptable(): Boolean {
+        return voltageDrop.isAcceptable(nominal_U, functionalContext)
+    }
+
+    fun maxVoltageDropAcceptablePercentage(): Float {
+        return functionalContext.maxVoltageDropPercentageAcceptable
     }
 
 }

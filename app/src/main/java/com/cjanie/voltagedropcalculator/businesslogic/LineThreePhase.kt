@@ -3,8 +3,11 @@ package com.cjanie.voltagedropcalculator.businesslogic
 import kotlin.math.sqrt
 
 class LineThreePhase(
-    functionalContext: FunctionalContext, conductor: Conductor, S: Section, I: Intensity, L: Length
-) : Line(functionalContext, conductor, S, I, L) {
+    functionalContext: FunctionalContext, conductor: Conductor, S: Section,
+    I: Intensity,
+    nominal_U: Tension,
+    L: Length
+) : Line(functionalContext, conductor, S, I, nominal_U, L) {
 
     companion object {
         private val NUMBER_OF_PHASES = 3

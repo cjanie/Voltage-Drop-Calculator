@@ -95,12 +95,7 @@ class CalculatorModel {
     }
 
     private fun initLine() {
-        if (functionalContext == null ||
-            lineType == null ||
-            conductor == null ||
-            section == null ||
-            intensity == null ||
-            length == null)
+        if (isNullValue())
             throw NullValueException()
 
         line = createLine(
@@ -109,32 +104,29 @@ class CalculatorModel {
             conductor!!,
             section!!,
             intensity!!,
+            tension!!,
             length!!
         )
     }
 
-    var voltageDrop: VoltageDrop? = null
-
-    fun calculateVoltageDrop(): VoltageDrop? {
-        if (length == null) throw NullValueException()
+    fun calculateVoltageDropInVolt(): Float {
         if (line == null) initLine()
-        voltageDrop = line?.voltageDrop()
-        return voltageDrop
+        return line?.voltageDropInVolt()!!
     }
 
     fun calculateVoltageDropInPercentage(): Float? {
-        if(tension == null) throw NullValueException()
-        if (voltageDrop == null) calculateVoltageDrop()
-        return voltageDrop?.percentage(tension!!)
+        if (line == null) initLine()
+        return line?.voltageDropPercentage()
     }
 
     fun isVoltageDropAcceptable(): Boolean? {
-        if (functionalContext == null) throw NullValueException()
-        return calculateVoltageDropInPercentage()!! < functionalContext!!.maxVoltageDropPercentageAcceptable
+        if (line == null) initLine()
+        return line?.isVoltageDropAcceptable()
     }
 
     fun maxVoltageDropPercentageAcceptable(): Float? {
-        return functionalContext?.maxVoltageDropPercentageAcceptable
+        if (line == null) initLine()
+        return line?.maxVoltageDropAcceptablePercentage()
     }
 
     fun isNullValue(): Boolean {
@@ -155,6 +147,7 @@ class CalculatorModel {
         conductor: Conductor,
         section: Section,
         intensity: Intensity,
+        tension: Tension,
         length: Length
 
     ): Line {
@@ -164,6 +157,7 @@ class CalculatorModel {
                 conductor = conductor,
                 S = section,
                 I = intensity,
+                nominal_U = tension,
                 L = length
             )
             LineType.THREE_PHASE -> LineThreePhase(
@@ -171,6 +165,7 @@ class CalculatorModel {
                 conductor = conductor,
                 S = section,
                 I = intensity,
+                nominal_U = tension,
                 L = length
             )
         }
