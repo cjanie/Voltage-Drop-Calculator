@@ -1,3 +1,4 @@
 package com.cjanie.voltagedropcalculator.businesslogic
 
-class Current(val intensityInAmpere: Float)
+class Section(val inMillimeterSquare: Float) {
+}

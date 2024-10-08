@@ -12,3 +12,9 @@ val Pink40 = Color(0xFF7D5260)
 
 val copperColor = Color(0xFFB77729)
 val onCopperColor = Color.White
+
+val greenWarningColor = Color(0xFF004E00)
+val onGreenWarningColor = Color.White
+
+val redWarningColor = Color(0xFFC03D29)
+val onRedWarningColor = Color.White

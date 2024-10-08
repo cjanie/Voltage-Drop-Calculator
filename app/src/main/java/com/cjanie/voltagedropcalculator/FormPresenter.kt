@@ -2,12 +2,10 @@ package com.cjanie.voltagedropcalculator
 
 import android.content.Context
 import com.cjanie.voltagedropcalculator.businesslogic.FunctionalContext
+import com.cjanie.voltagedropcalculator.businesslogic.Material
 
 
-
-
-
-class FormPresenter(val context: Context, val calculatorModel: CalculatorModel) {
+class FormPresenter(private val context: Context, calculatorModel: CalculatorModel) {
 
     val functionalContextLabel = context.getString(R.string.functional_context_label)
     val functionalContexts: Array<String> = calculatorModel.functionalContextValues
@@ -30,7 +28,7 @@ class FormPresenter(val context: Context, val calculatorModel: CalculatorModel) 
     val conductorOptions: Array<String> = calculatorModel.conductorValues
         .map { conductorMaterial ->
             when (conductorMaterial) {
-                Conductor.COPPER -> context.getString(R.string.conductor_copper)
+                Material.COPPER -> context.getString(R.string.conductor_copper)
             }
 
         }.toTypedArray()
@@ -38,8 +36,8 @@ class FormPresenter(val context: Context, val calculatorModel: CalculatorModel) 
     val sectionOptions: Array<String> = calculatorModel.sectionValues
         .map {
             section -> "${
-                if (section.toString().contains(".0"))
-                section.toInt() else section
+                if (section.inMillimeterSquare.toString().contains(".0"))
+                section.inMillimeterSquare.toInt() else section
             } ${context.getString(R.string.conductor_section_unit)}"
         }.toTypedArray()
 
@@ -47,8 +45,8 @@ class FormPresenter(val context: Context, val calculatorModel: CalculatorModel) 
     val currentIntensityOptions: Array<String> = calculatorModel.currentIntensityValues
         .map {
             intensity ->  "${
-                if (intensity.toString().contains(".0"))
-                intensity.toInt() else intensity
+                if (intensity.inAmpere.toString().contains(".0"))
+                intensity.inAmpere.toInt() else intensity
             } ${context.getString(R.string.current_intensity_unit)}"
 
         }.toTypedArray()
@@ -57,8 +55,8 @@ class FormPresenter(val context: Context, val calculatorModel: CalculatorModel) 
     val tensionOptions: Array<String> = calculatorModel.tensionValues
         .map {
             tension -> "${
-                if (tension.toString().contains(".0"))
-                tension.toInt() else tension
+                if (tension.inVolt.toString().contains(".0"))
+                tension.inVolt.toInt() else tension
             } ${context.getString(R.string.tension_unit)}"
         }.toTypedArray()
 
@@ -66,20 +64,5 @@ class FormPresenter(val context: Context, val calculatorModel: CalculatorModel) 
     val lengthUnit = context.getString(R.string.line_length_unit)
 
     val calculateVoltageDropPercentageLabel = context.getString(R.string.calculate_voltage_drop_label)
-
-    val voltageDropPercentageLabel = context.getString(R.string.voltage_drop_percentage_label)
-    fun percentageAsString(percentageValue: Float): String {
-        return "$percentageValue ${context.getString(R.string.percentage_sign)}"
-    }
-
-    val voltageDropInVoltLabel = context.getString(R.string.voltage_drop_in_volt_label)
-    fun voltageDropInVoltAsString(voltageDropInVolt: Float): String {
-        return "$voltageDropInVolt ${context.getString(R.string.tension_unit)}"
-    }
-
-    fun isVoltageDropAcceptableAsString(isAcceptable: Boolean): String {
-        return if (isAcceptable) context.getString(R.string.voltage_drop_acceptable_result)
-        else context.getString(R.string.voltage_drop_not_acceptable_result)
-    }
 
 }

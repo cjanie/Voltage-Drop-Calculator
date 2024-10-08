@@ -3,11 +3,8 @@ package com.cjanie.voltagedropcalculator.businesslogic
 import kotlin.math.sqrt
 
 class LineThreePhase(
-    conductor: Conductor,
-    current: Current,
-    functionalContext: FunctionalContext,
-    tensionNominalInVolt: Float
-) : Line(conductor, current, functionalContext, tensionNominalInVolt) {
+    functionalContext: FunctionalContext, conductor: Conductor, S: Section, I: Intensity, L: Length
+) : Line(functionalContext, conductor, S, I, L) {
 
     companion object {
         private val NUMBER_OF_PHASES = 3
@@ -18,9 +15,11 @@ class LineThreePhase(
         return PHASE_SHIFT_RATIO
     }
 
-    override fun voltageDropInVolt(lengthInKilometer: Float): Float {
+    override fun voltageDrop(): VoltageDrop {
         // Between Phases and neutral
-        return super.voltageDropInVolt(lengthInKilometer) / PHASE_SHIFT_RATIO
+        return VoltageDrop(
+            inVolt = super.voltageDrop().inVolt / PHASE_SHIFT_RATIO
+        )
     }
 
 }

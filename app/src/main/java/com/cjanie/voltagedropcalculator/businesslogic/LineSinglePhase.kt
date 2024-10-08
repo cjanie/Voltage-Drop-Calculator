@@ -1,11 +1,9 @@
 package com.cjanie.voltagedropcalculator.businesslogic
 
 class LineSinglePhase(
-    conductor: Conductor,
-    current: Current,
-    functionalContext: FunctionalContext,
-    tensionNominalInVolt: Float,
-) : Line(conductor, current, functionalContext, tensionNominalInVolt) {
+    functionalContext: FunctionalContext, conductor: Conductor, S: Section, I: Intensity, L: Length
+
+) : Line(functionalContext, conductor, S, I, L) {
 
     companion object {
         private val NUMBER_OF_PHASES = 2 // 2 phases or 1 phase and neutral

@@ -1,17 +1,13 @@
 package com.cjanie.voltagedropcalculator.businesslogic
 
-abstract class Conductor(
-    private val sectionInMillimeterSquare: Float
-) {
+class Conductor(private val material: Material) {
 
     companion object {
         private val REACTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH = 0.08f
     }
 
-    abstract protected fun RESISTANCE_IN_OHM_PER_MILLIMETER_SQUARE_SECTION_AND_KILOMETER_LENGTH(): Float
-
-    fun RESISTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH(): Float {
-        return this.RESISTANCE_IN_OHM_PER_MILLIMETER_SQUARE_SECTION_AND_KILOMETER_LENGTH() / sectionInMillimeterSquare
+    fun RESISTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH(section: Section): Float {
+        return this.material.RESISTANCE_IN_OHM_PER_MILLIMETER_SQUARE_SECTION_AND_KILOMETER_LENGTH / section.inMillimeterSquare
     }
 
     fun REACTANCE_LINEAR_IN_OHM_PER_KILOMETER_LENGTH(): Float {

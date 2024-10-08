@@ -1,0 +1,37 @@
+package com.cjanie.voltagedropcalculator.ui.composables
+
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun NumberInput(name: String, select: (value: Float) -> Unit) {
+    var value by remember {
+        mutableStateOf("")
+    }
+
+    TextField(
+        label = { Label(name = name) },
+        value = value,
+        onValueChange = {
+            value = it
+            if (value.isNotEmpty()) select(value.toFloat())
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+        colors = OutlinedTextFieldDefaults.colors()
+    )
+}

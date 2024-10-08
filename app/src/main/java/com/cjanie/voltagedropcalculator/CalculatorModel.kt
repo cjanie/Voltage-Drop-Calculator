@@ -1,17 +1,19 @@
 package com.cjanie.voltagedropcalculator
 
-import com.cjanie.voltagedropcalculator.businesslogic.Copper
-import com.cjanie.voltagedropcalculator.businesslogic.Current
+import com.cjanie.voltagedropcalculator.businesslogic.Conductor
 import com.cjanie.voltagedropcalculator.businesslogic.FunctionalContext
+import com.cjanie.voltagedropcalculator.businesslogic.Intensity
+import com.cjanie.voltagedropcalculator.businesslogic.Length
 import com.cjanie.voltagedropcalculator.businesslogic.Line
 import com.cjanie.voltagedropcalculator.businesslogic.LineSinglePhase
 import com.cjanie.voltagedropcalculator.businesslogic.LineThreePhase
+import com.cjanie.voltagedropcalculator.businesslogic.Material
+import com.cjanie.voltagedropcalculator.businesslogic.Section
+import com.cjanie.voltagedropcalculator.businesslogic.Tension
+import com.cjanie.voltagedropcalculator.businesslogic.VoltageDrop
 
 enum class LineType {
     SINGLE_PHASE, THREE_PHASE
-}
-enum class Conductor {
-    COPPER
 }
 
 class CalculatorModel {
@@ -20,51 +22,51 @@ class CalculatorModel {
 
     val lineTypeValues: Set<LineType> = LineType.values().toHashSet()
 
-    val conductorValues: Set<Conductor> = Conductor.values().toHashSet()
+    val conductorValues: Set<Material> = Material.values().toHashSet()
 
-    val sectionValues: Set<Float> = setOf(
-        1.5f,
-        2.5f,
-        4f,
-        6f,
-        10f,
-        16f,
-        25f,
-        35f,
-        50f,
-        70f,
-        95f,
-        120f,
-        150f,
-        185f,
-        240f,
-        300f
+    val sectionValues: Set<Section> = setOf(
+        Section(inMillimeterSquare = 1.5f),
+        Section(inMillimeterSquare = 2.5f),
+        Section(inMillimeterSquare = 4f),
+        Section(inMillimeterSquare = 6f),
+        Section(inMillimeterSquare = 10f),
+        Section(inMillimeterSquare = 16f),
+        Section(inMillimeterSquare = 25f),
+        Section(inMillimeterSquare = 35f),
+        Section(inMillimeterSquare = 50f),
+        Section(inMillimeterSquare = 70f),
+        Section(inMillimeterSquare = 95f),
+        Section(inMillimeterSquare = 120f),
+        Section(inMillimeterSquare = 150f),
+        Section(inMillimeterSquare = 185f),
+        Section(inMillimeterSquare = 240f),
+        Section(inMillimeterSquare = 300f)
     )
 
-    val currentIntensityValues: Set<Float> = setOf(
-        20f,
-        100f,
-        150f,
-        500f
-
+    val currentIntensityValues: Set<Intensity> = setOf(
+        Intensity(inAmpere = 20f),
+        Intensity(inAmpere =100f),
+        Intensity(inAmpere =150f),
+        Intensity(inAmpere =500f)
     )
 
-    val tensionValues: Set<Float> = setOf(
-        3f,
-        24f,
-        230f,
+    val tensionValues: Set<Tension> = setOf(
+        Tension(inVolt = 3f),
+        Tension(24f),
+        Tension(230f),
     )
 
+    private var functionalContext: FunctionalContext? = null
+    private var lineType: LineType? = null
+    private var conductor: Conductor? = null
+    private var section: Section? = null
+    private var intensity: Intensity? = null
+    private var tension: Tension? = null
+    private var length: Length? = null
 
-    var functionalContext: FunctionalContext? = null
-    var lineType: LineType? = null
-    var conductor: Conductor? = null
-    var section: Float? = null
-    var intensity: Float? = null
-    var tension: Float? = null
-    var lineLength: Float? = null
+    private var line: Line? = null
 
-    fun setFunctionnalContext(itemPosition: Int) {
+    fun setFunctionalContext(itemPosition: Int) {
         functionalContext = functionalContextValues.toList()[itemPosition]
     }
 
@@ -73,7 +75,7 @@ class CalculatorModel {
     }
 
     fun setConductor(itemPosition: Int) {
-        conductor = conductorValues.toList()[itemPosition]
+        conductor = Conductor(conductorValues.toList()[itemPosition])
     }
 
     fun setSection(itemPosition: Int) {
@@ -88,17 +90,51 @@ class CalculatorModel {
         tension = tensionValues.toList()[itemPosition]
     }
 
-    fun calculateVoltageDropInVolt(): Float {
-        if (isNullValue()) throw NullValueException()
-        return calculateVoltageDropInVolt(
+    fun setLength(inKilometer: Float) {
+        length = Length(inKilometer)
+    }
+
+    private fun initLine() {
+        if (functionalContext == null ||
+            lineType == null ||
+            conductor == null ||
+            section == null ||
+            intensity == null ||
+            length == null)
+            throw NullValueException()
+
+        line = createLine(
             functionalContext!!,
             lineType!!,
             conductor!!,
             section!!,
             intensity!!,
-            tension!!,
-            lineLength!!
+            length!!
         )
+    }
+
+    var voltageDrop: VoltageDrop? = null
+
+    fun calculateVoltageDrop(): VoltageDrop? {
+        if (length == null) throw NullValueException()
+        if (line == null) initLine()
+        voltageDrop = line?.voltageDrop()
+        return voltageDrop
+    }
+
+    fun calculateVoltageDropInPercentage(): Float? {
+        if(tension == null) throw NullValueException()
+        if (voltageDrop == null) calculateVoltageDrop()
+        return voltageDrop?.percentage(tension!!)
+    }
+
+    fun isVoltageDropAcceptable(): Boolean? {
+        if (functionalContext == null) throw NullValueException()
+        return calculateVoltageDropInPercentage()!! < functionalContext!!.maxVoltageDropPercentageAcceptable
+    }
+
+    fun maxVoltageDropPercentageAcceptable(): Float? {
+        return functionalContext?.maxVoltageDropPercentageAcceptable
     }
 
     fun isNullValue(): Boolean {
@@ -108,99 +144,36 @@ class CalculatorModel {
                 section == null ||
                 intensity == null ||
                 tension == null ||
-                lineLength == null
-    }
-    fun calculateVoltageDropInPercentage(): Float {
-        if (isNullValue()) throw NullValueException()
-        return calculateVoltageDropInPercentage(
-            functionalContext!!,
-            lineType!!,
-            conductor!!,
-            section!!,
-            intensity!!,
-            tension!!,
-            lineLength!!
-        )
+                length == null
     }
 
-    private fun calculateVoltageDropInVolt(
-        functionalContext: FunctionalContext,
-        lineType: LineType,
-        conductor: Conductor,
-        section: Float,
-        intensity: Float,
-        tension: Float,
-        lineLength: Float
-    ): Float {
-        val line = createLine(
-            functionalContext,
-            lineType,
-            conductor,
-            section,
-            intensity,
-            tension
-        )
-        return line.voltageDropInVolt(lineLength)
-    }
+
 
     private fun createLine(
         functionalContext: FunctionalContext,
         lineType: LineType,
         conductor: Conductor,
-        section: Float,
-        intensity: Float,
-        tension: Float
+        section: Section,
+        intensity: Intensity,
+        length: Length
+
     ): Line {
         return when(lineType) {
             LineType.SINGLE_PHASE -> LineSinglePhase(
-                conductor = when(conductor) {
-                    Conductor.COPPER -> Copper(section)
-                },
-                current = Current(intensity),
                 functionalContext = functionalContext,
-                tensionNominalInVolt = tension
+                conductor = conductor,
+                S = section,
+                I = intensity,
+                L = length
             )
             LineType.THREE_PHASE -> LineThreePhase(
-                conductor = when(conductor) {
-                    Conductor.COPPER -> Copper(section)
-                },
-                current = Current(intensity),
                 functionalContext = functionalContext,
-                tensionNominalInVolt = tension
+                conductor = conductor,
+                S = section,
+                I = intensity,
+                L = length
             )
         }
     }
 
-    private fun calculateVoltageDropInPercentage(
-        functionalContext: FunctionalContext,
-        lineType: LineType,
-        conductor: Conductor,
-        section: Float,
-        intensity: Float,
-        tension: Float,
-        lineLength: Float
-    ): Float {
-        val line : Line = createLine(
-            functionalContext,
-            lineType,
-            conductor,
-            section,
-            intensity,
-            tension
-        )
-        return line.voltageDropInPercentage(lineLength)
-    }
-
-    fun isVoltageDropAcceptable(): Boolean {
-        if (isNullValue()) throw NullValueException()
-        val line : Line = createLine(
-            functionalContext!!,
-            lineType!!,
-            conductor!!,
-            section!!,
-            intensity!!,
-            tension!!
-        )
-        return line.isVoltageDropAcceptable(lineLength!!)
-    }
 }
