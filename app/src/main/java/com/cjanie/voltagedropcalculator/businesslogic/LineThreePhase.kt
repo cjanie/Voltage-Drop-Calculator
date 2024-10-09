@@ -25,4 +25,8 @@ class LineThreePhase(
         )
     }
 
+    override fun maxLengthAcceptable(): Length {
+        return Length(inKilometer = super.maxLengthAcceptable().inKilometer * PHASE_SHIFT_RATIO)
+    }
+
 }

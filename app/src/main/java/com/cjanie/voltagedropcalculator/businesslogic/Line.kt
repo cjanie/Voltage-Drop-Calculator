@@ -43,4 +43,10 @@ abstract class Line (
         return functionalContext.maxVoltageDropPercentageAcceptable
     }
 
+    // Max length acceptable
+    open fun maxLengthAcceptable(): Length {
+        val delta_U_inVolt = functionalContext.maxVoltageDropPercentageAcceptable * nominal_U.inVolt / 100
+        return Length(inKilometer = delta_U_inVolt / K * I.inAmpere)
+    }
+
 }
