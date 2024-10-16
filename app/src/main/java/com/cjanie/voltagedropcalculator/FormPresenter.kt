@@ -1,37 +1,61 @@
 package com.cjanie.voltagedropcalculator
 
 import android.content.Context
-import com.cjanie.voltagedropcalculator.businesslogic.FunctionalContext
-import com.cjanie.voltagedropcalculator.businesslogic.Material
+import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionnalContext
+import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
+import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
+import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 
 
-class FormPresenter(private val context: Context, calculatorModel: CalculatorModel) {
+class FormPresenter(private val context: Context, private val calculatorModel: CalculatorModel) {
 
     val functionalContextLabel = context.getString(R.string.functional_context_label)
-    val functionalContexts: Array<String> = calculatorModel.functionalContextValues
+    val functionnalContexts: Array<String> = calculatorModel.functionnalContextValues
         .map { functionalContext ->
             when (functionalContext) {
-                FunctionalContext.LIGHTING -> context.getString(R.string.functional_context_lighting)
+                FunctionnalContext.LIGHTING -> context.getString(R.string.functional_context_lighting)
             }
         }.toTypedArray()
+    fun setFunctionnalContext(itemPosition: Int) {
+        calculatorModel.setFunctionalContext(itemPosition)
+    }
 
-    val lineTypeLabel = context.getString(R.string.line_type_label)
-    val lineTypeOptions : Array<String> = calculatorModel.lineTypeValues
-        .map { lineType ->
-            when (lineType) {
-                LineType.SINGLE_PHASE -> context.getString(R.string.line_type_single_phase)
-                LineType.THREE_PHASE -> context.getString(R.string.line_type_three_phase)
+    val electricitySupplyLabel = context.getString(R.string.electricity_supply_label)
+    val electricitySupplyOptions: Array<String> = calculatorModel.electricitySupplyValues
+        .map { electricitySupply ->
+            when (electricitySupply) {
+                ElectricitySupply.PUBLIC -> context.getString(R.string.electricity_supply_public)
+                ElectricitySupply.PRIVATE -> context.getString(R.string.electricity_supply_private)
             }
         }.toTypedArray()
+    fun setElectricitySupply(itemPosition: Int) {
+        calculatorModel.setElectricitySupply(itemPosition)
+    }
+
+    val phasingLabel = context.getString(R.string.phasing_label)
+    val phasingOptions : Array<String> = calculatorModel.phasingValues
+        .map { phasing ->
+            when (phasing) {
+                Phasing.SINGLE_PHASE -> context.getString(R.string.phasing_single_phase)
+                Phasing.THREE_PHASE -> context.getString(R.string.phasing_three_phase)
+            }
+        }.toTypedArray()
+    fun setPhasing(itemPosition: Int) {
+        calculatorModel.setPhasing(itemPosition)
+    }
 
     val conductorLabel = context.getString(R.string.conductor_label)
-    val conductorOptions: Array<String> = calculatorModel.conductorValues
+    val conductorOptions: Array<String> = calculatorModel.conductorMaterialValues
         .map { conductorMaterial ->
             when (conductorMaterial) {
-                Material.COPPER -> context.getString(R.string.conductor_copper)
+                ConductorMaterial.COPPER -> context.getString(R.string.conductor_copper)
             }
 
         }.toTypedArray()
+    fun setConductor(itemPosition: Int) {
+        calculatorModel.setConductor(itemPosition)
+    }
+
     val sectionLabel = context.getString(R.string.section_label)
     val sectionOptions: Array<String> = calculatorModel.sectionValues
         .map {
@@ -40,9 +64,12 @@ class FormPresenter(private val context: Context, calculatorModel: CalculatorMod
                 section.inMillimeterSquare.toInt() else section.inMillimeterSquare
             } ${context.getString(R.string.conductor_section_unit)}"
         }.toTypedArray()
+    fun setSection(itemPosition: Int) {
+        calculatorModel.setSection(itemPosition)
+    }
 
-    val currentIntensityLabel = context.getString(R.string.current_intensity_label)
-    val currentIntensityOptions: Array<String> = calculatorModel.currentIntensityValues
+    val intensityLabel = context.getString(R.string.current_intensity_label)
+    val intensityOptions: Array<String> = calculatorModel.intensityValues
         .map {
             intensity ->  "${
                 if (intensity.inAmpere.toString().contains(".0"))
@@ -50,6 +77,9 @@ class FormPresenter(private val context: Context, calculatorModel: CalculatorMod
             } ${context.getString(R.string.current_intensity_unit)}"
 
         }.toTypedArray()
+    fun setIntensity(itemPosition: Int) {
+        calculatorModel.setIntensity(itemPosition)
+    }
 
     val tensionLabel = context.getString(R.string.tension_label)
     val tensionOptions: Array<String> = calculatorModel.tensionValues
@@ -59,10 +89,24 @@ class FormPresenter(private val context: Context, calculatorModel: CalculatorMod
                 tension.inVolt.toInt() else tension
             } ${context.getString(R.string.tension_unit)}"
         }.toTypedArray()
+    fun setTension(itemPosition: Int) {
+        calculatorModel.setTension(itemPosition)
+    }
 
     val lengthLabel = context.getString(R.string.line_length_label)
     val lengthUnit = context.getString(R.string.line_length_unit)
+    fun setLength(inKilometer: Float) {
+        calculatorModel.setLength(inKilometer)
+    }
 
-    val calculateVoltageDropPercentageLabel = context.getString(R.string.calculate_voltage_drop_label)
+    fun isFormComplete(): Boolean {
+        return !calculatorModel.isNullValue()
+    }
+
+
+    val calculateVoltageDropLabel = context.getString(R.string.calculate_voltage_drop_label)
+    fun calculateVoltageDrop(): CalculatorModel.VoltageDropResult {
+        return calculatorModel.calculateVoltageDrop()
+    }
 
 }

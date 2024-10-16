@@ -1,10 +1,14 @@
 <resources>
     <string name="app_name">Voltage Drop Calculator</string>
     <string name="functional_context_label">Functional Context</string>
-    <string name="line_type_label">Line Type</string>
-    <string name="line_type_single_phase">Single-Phase</string>
-    <string name="line_type_three_phase">Three-Phase</string>
     <string name="functional_context_lighting">Lighting</string>
+    <string name="functional_context_motor">Motor</string>
+    <string name="electricity_supply_label">Electricity Supply</string>
+    <string name="electricity_supply_public">Public</string>
+    <string name="electricity_supply_private">Private</string>
+    <string name="phasing_label">Phasing</string>
+    <string name="phasing_single_phase">Single-Phase</string>
+    <string name="phasing_three_phase">Three-Phase</string>
     <string name="conductor_label">Conductor</string>
     <string name="conductor_copper">Copper</string>
     <string name="section_label">Section in Millimeter Square</string>

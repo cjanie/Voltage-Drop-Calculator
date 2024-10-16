@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,8 +39,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val calculatorModel = CalculatorModel()
-        val formPresenter = FormPresenter(this, calculatorModel)
+
+        val formPresenter = FormPresenter(this, CalculatorModel())
         val resultPresenter = ResultPresenter(this)
         
         enableEdgeToEdge()
@@ -50,6 +49,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
                     Column(modifier = Modifier
+                        .verticalScroll(rememberScrollState())
                         .padding(innerPadding)
                     ){
                         Header(
@@ -60,111 +60,156 @@ class MainActivity : ComponentActivity() {
                             mutableStateOf(null)
                         }
 
-                        // Form
-                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                            var isFormComplete by remember {
-                                mutableStateOf(false)
+                        Form(
+                            formPresenter = formPresenter,
+                            fieldsEnabled = voltageDropResult == null,
+                            setResult = fun (result: CalculatorModel.VoltageDropResult) {
+                                voltageDropResult = result
                             }
+                        )
 
-                            NumberInput(
-                                name = formPresenter.lengthLabel,
-                                select =  fun(value: Float) {
-                                    calculatorModel.setLength(inKilometer = value)
-                                    isFormComplete = !calculatorModel.isNullValue()
-                                },
-                                enabled = voltageDropResult == null
+                        if(voltageDropResult != null) {
+                            Result(
+                                resultPresenter = resultPresenter,
+                                voltageDropResult = voltageDropResult!!
                             )
-
-                            Dropdown(
-                                name = formPresenter.functionalContextLabel,
-                                options = formPresenter.functionalContexts,
-                                select =  fun(index: Int) {
-                                    calculatorModel.setFunctionalContext(index)
-                                    isFormComplete = !calculatorModel.isNullValue()
-                                },
-                                enabled = voltageDropResult == null
-                            )
-
-                            Dropdown(
-                                name = formPresenter.lineTypeLabel,
-                                options = formPresenter.lineTypeOptions,
-                                select =  fun(index: Int) {
-                                    calculatorModel.setLineType(index)
-                                    isFormComplete = !calculatorModel.isNullValue()
-                                },
-                                enabled = voltageDropResult == null
-                            )
-
-                            Dropdown(
-                                name = formPresenter.conductorLabel,
-                                options = formPresenter.conductorOptions,
-                                select =  fun(index: Int) {
-                                    calculatorModel.setConductor(index)
-                                    isFormComplete = !calculatorModel.isNullValue()
-                                },
-                                enabled = voltageDropResult == null
-                            )
-
-                            Dropdown(
-                                name = formPresenter.sectionLabel,
-                                options = formPresenter.sectionOptions,
-                                select =  fun(index: Int) {
-                                    calculatorModel.setSection(index)
-                                    isFormComplete = !calculatorModel.isNullValue()
-                                },
-                                enabled = voltageDropResult == null
-                            )
-                            
-                            Dropdown(
-                                name = formPresenter.currentIntensityLabel,
-                                options = formPresenter.currentIntensityOptions,
-                                select =  fun(index: Int) {
-                                    calculatorModel.setIntensity(index)
-                                    isFormComplete = !calculatorModel.isNullValue()
-                                },
-                                enabled = voltageDropResult == null
-                            )
-                            
-                            Dropdown(
-                                name = formPresenter.tensionLabel,
-                                options = formPresenter.tensionOptions,
-                                select =  fun(index: Int) {
-                                    calculatorModel.setTension(index)
-                                    isFormComplete = !calculatorModel.isNullValue()
-                                },
-                                enabled = voltageDropResult == null
-                            )
-
-                            if(voltageDropResult == null) {
-                                SubmitButton(
-                                    text = formPresenter.calculateVoltageDropPercentageLabel,
-                                    onClick = {
-                                        try {
-                                            voltageDropResult = calculatorModel.calculateVoltageDrop()
-                                        } catch (e: NullValueException) {
-                                            e.printStackTrace()
-                                        }
-                                    },
-                                    enabled = isFormComplete,
-                                )
-                            }
-
-
-
-                        // Result
-                            if(voltageDropResult != null) {
-                                Result(
-                                    resultPresenter = resultPresenter,
-                                    voltageDropResult = voltageDropResult!!
-                                )
-                            }
-
                         }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun Form(
+    formPresenter: FormPresenter,
+    fieldsEnabled: Boolean,
+    setResult: (voltageDropResult: CalculatorModel.VoltageDropResult) -> Unit
+) {
+
+    Column() {
+        var isFormComplete by remember {
+            mutableStateOf(false)
+        }
+
+        NumberInput(
+            name = formPresenter.lengthLabel,
+            select =  fun(value: Float) {
+                formPresenter.setLength(inKilometer = value)
+                isFormComplete = formPresenter.isFormComplete()
+            },
+            enabled = fieldsEnabled
+        )
+
+        fun updateFormState() {
+            isFormComplete = formPresenter.isFormComplete()
+        }
+
+        DropdownField(
+            label = formPresenter.functionalContextLabel,
+            options = formPresenter.functionnalContexts,
+            select = fun(itemPosition: Int) {
+                formPresenter.setFunctionnalContext(itemPosition)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        DropdownField(
+            label = formPresenter.electricitySupplyLabel,
+            options = formPresenter.electricitySupplyOptions,
+            select = fun(index: Int) {
+                formPresenter.setElectricitySupply(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        DropdownField(
+            label = formPresenter.phasingLabel,
+            options = formPresenter.phasingOptions,
+            select =  fun(index: Int) {
+                formPresenter.setPhasing(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        DropdownField(
+            label = formPresenter.conductorLabel,
+            options = formPresenter.conductorOptions,
+            select =  fun(index: Int) {
+                formPresenter.setConductor(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        DropdownField(
+            label = formPresenter.sectionLabel,
+            options = formPresenter.sectionOptions,
+            select =  fun(index: Int) {
+                formPresenter.setSection(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        DropdownField(
+            label = formPresenter.intensityLabel,
+            options = formPresenter.intensityOptions,
+            select =  fun(index: Int) {
+                formPresenter.setIntensity(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        DropdownField(
+            label = formPresenter.tensionLabel,
+            options = formPresenter.tensionOptions,
+            select =  fun(index: Int) {
+                formPresenter.setTension(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        if(fieldsEnabled) {
+            SubmitButton(
+                text = formPresenter.calculateVoltageDropLabel,
+                onClick = {
+                    try {
+                        setResult(formPresenter.calculateVoltageDrop())
+                    } catch (e: NullValueException) {
+                        e.printStackTrace()
+                    }
+                },
+                enabled = isFormComplete,
+            )
+        }
+
+    }
+}
+
+@Composable
+fun DropdownField(
+    label: String,
+    options: Array<String>,
+    select: (itemPosition: Int) -> Unit,
+    updateFormState: () -> Unit,
+    enabled: Boolean
+) {
+    Dropdown(
+        name = label,
+        options = options,
+        select =  fun(itemPosition: Int) {
+            select(itemPosition)
+            updateFormState()
+        },
+        enabled = enabled
+    )
 }
 
 @Composable

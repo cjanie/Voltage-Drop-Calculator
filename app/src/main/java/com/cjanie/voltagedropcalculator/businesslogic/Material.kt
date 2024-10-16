@@ -1,5 +1,0 @@
-package com.cjanie.voltagedropcalculator.businesslogic
-
-enum class Material(val RESISTANCE_IN_OHM_PER_MILLIMETER_SQUARE_SECTION_AND_KILOMETER_LENGTH: Float) {
-    COPPER(RESISTANCE_IN_OHM_PER_MILLIMETER_SQUARE_SECTION_AND_KILOMETER_LENGTH = 23.7f)
-}

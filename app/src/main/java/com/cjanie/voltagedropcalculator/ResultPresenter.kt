@@ -1,7 +1,6 @@
 package com.cjanie.voltagedropcalculator
 
 import android.content.Context
-import com.cjanie.voltagedropcalculator.businesslogic.Line
 
 class ResultPresenter(private val context: Context) {
 

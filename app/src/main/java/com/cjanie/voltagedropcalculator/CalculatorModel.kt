@@ -1,27 +1,26 @@
 package com.cjanie.voltagedropcalculator
 
-import com.cjanie.voltagedropcalculator.businesslogic.Conductor
-import com.cjanie.voltagedropcalculator.businesslogic.FunctionalContext
-import com.cjanie.voltagedropcalculator.businesslogic.Intensity
-import com.cjanie.voltagedropcalculator.businesslogic.Length
-import com.cjanie.voltagedropcalculator.businesslogic.Line
-import com.cjanie.voltagedropcalculator.businesslogic.LineSinglePhase
-import com.cjanie.voltagedropcalculator.businesslogic.LineThreePhase
-import com.cjanie.voltagedropcalculator.businesslogic.Material
-import com.cjanie.voltagedropcalculator.businesslogic.Section
-import com.cjanie.voltagedropcalculator.businesslogic.Tension
-
-enum class LineType {
-    SINGLE_PHASE, THREE_PHASE
-}
+import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
+import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionnalContext
+import com.cjanie.voltagedropcalculator.businesslogic.models.Installation
+import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
+import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
+import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
+import com.cjanie.voltagedropcalculator.businesslogic.factories.InstallationFactory
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
 
 class CalculatorModel {
 
-    val functionalContextValues: Set<FunctionalContext> = FunctionalContext.values().toHashSet()
+    val functionnalContextValues: Set<FunctionnalContext> = FunctionnalContext.values().toHashSet()
 
-    val lineTypeValues: Set<LineType> = LineType.values().toHashSet()
+    val electricitySupplyValues: Set<ElectricitySupply> = ElectricitySupply.values().toHashSet()
 
-    val conductorValues: Set<Material> = Material.values().toHashSet()
+    val phasingValues: Set<Phasing> = Phasing.values().toHashSet()
+
+    val conductorMaterialValues: Set<ConductorMaterial> = ConductorMaterial.values().toHashSet()
 
     val sectionValues: Set<Section> = setOf(
         Section(inMillimeterSquare = 1.5f),
@@ -42,11 +41,11 @@ class CalculatorModel {
         Section(inMillimeterSquare = 300f)
     )
 
-    val currentIntensityValues: Set<Intensity> = setOf(
+    val intensityValues: Set<Intensity> = setOf(
         Intensity(inAmpere = 20f),
-        Intensity(inAmpere =100f),
-        Intensity(inAmpere =150f),
-        Intensity(inAmpere =500f)
+        Intensity(inAmpere = 100f),
+        Intensity(inAmpere = 150f),
+        Intensity(inAmpere = 500f)
     )
 
     val tensionValues: Set<Tension> = setOf(
@@ -55,26 +54,31 @@ class CalculatorModel {
         Tension(230f),
     )
 
-    private var functionalContext: FunctionalContext? = null
-    private var lineType: LineType? = null
-    private var conductor: Conductor? = null
+    private var functionnalContext: FunctionnalContext? = null
+    private var electricitySupply: ElectricitySupply? = null
+    private var phasing: Phasing? = null
+    private var conductorMaterial: ConductorMaterial? = null
     private var section: Section? = null
     private var intensity: Intensity? = null
     private var tension: Tension? = null
     private var length: Length? = null
 
-    private var line: Line? = null
+    private var installation: Installation? = null
 
     fun setFunctionalContext(itemPosition: Int) {
-        functionalContext = functionalContextValues.toList()[itemPosition]
+        functionnalContext = functionnalContextValues.toList()[itemPosition]
     }
 
-    fun setLineType(itemPosition: Int) {
-        lineType = lineTypeValues.toList()[itemPosition]
+    fun setElectricitySupply(itemPosition: Int) {
+        electricitySupply = electricitySupplyValues.toList()[itemPosition]
+    }
+
+    fun setPhasing(itemPosition: Int) {
+        phasing = phasingValues.toList()[itemPosition]
     }
 
     fun setConductor(itemPosition: Int) {
-        conductor = Conductor(conductorValues.toList()[itemPosition])
+        conductorMaterial = conductorMaterialValues.toList()[itemPosition]
     }
 
     fun setSection(itemPosition: Int) {
@@ -82,7 +86,7 @@ class CalculatorModel {
     }
 
     fun setIntensity(itemPosition: Int) {
-        intensity = currentIntensityValues.toList()[itemPosition]
+        intensity = intensityValues.toList()[itemPosition]
     }
 
     fun setTension(itemPosition: Int) {
@@ -93,22 +97,32 @@ class CalculatorModel {
         length = Length(inKilometer)
     }
 
-    private fun initLine() {
+    private fun setUpInstallation() {
         if (isNullValue())
             throw NullValueException()
 
-        line = createLine(
-            functionalContext!!,
-            lineType!!,
-            conductor!!,
-            section!!,
-            intensity!!,
-            tension!!,
-            length!!
+        installation = InstallationFactory.installation(
+            functionnalContext = functionnalContext!!,
+            electricitySupply = electricitySupply!!,
+            cable = LineFactory.line(
+                functionnalContext = functionnalContext!!,
+                electricitySupply = electricitySupply!!,
+                phasing = phasing!!,
+                conductorMaterial = conductorMaterial!!,
+                section = section!!,
+                intensity = intensity!!,
+                length = length!!
+                ),
+            nominalTension = tension!!
         )
     }
 
-    class VoltageDropResult(val inVolt: Float, val percentage: Float, val isVoltageDropAcceptable: Boolean, val maxVoltageDropAcceptablePercentage: Float)
+    class VoltageDropResult(
+        val inVolt: Float,
+        val percentage: Float,
+        val isVoltageDropAcceptable: Boolean,
+        val maxVoltageDropAcceptablePercentage: Float
+    )
 
     fun calculateVoltageDrop(): VoltageDropResult {
         return VoltageDropResult(
@@ -120,63 +134,35 @@ class CalculatorModel {
     }
 
     private fun calculateVoltageDropInVolt(): Float {
-        if (line == null) initLine()
-        return line?.voltageDropInVolt()!!
+        if (installation == null) setUpInstallation()
+        return installation?.voltageDropInVolt!!
     }
 
     private fun calculateVoltageDropInPercentage(): Float? {
-        if (line == null) initLine()
-        return line?.voltageDropPercentage()
+        if (installation == null) setUpInstallation()
+        return installation?.voltageDropPercentage
+
     }
 
     private fun isVoltageDropAcceptable(): Boolean? {
-        if (line == null) initLine()
-        return line?.isVoltageDropAcceptable()
+        if (installation == null) setUpInstallation()
+        return installation?.isVoltageDropAcceptable
     }
 
     private fun maxVoltageDropPercentageAcceptable(): Float? {
-        if (line == null) initLine()
-        return line?.maxVoltageDropAcceptablePercentage()
+        if (installation == null) setUpInstallation()
+        return installation?.maxVoltageDropLimitPercentage
     }
 
     fun isNullValue(): Boolean {
-        return functionalContext == null ||
-                lineType == null ||
-                conductor == null ||
+        return functionnalContext == null ||
+                electricitySupply == null ||
+                phasing == null ||
+                conductorMaterial == null ||
                 section == null ||
                 intensity == null ||
                 tension == null ||
                 length == null
-    }
-
-    private fun createLine(
-        functionalContext: FunctionalContext,
-        lineType: LineType,
-        conductor: Conductor,
-        section: Section,
-        intensity: Intensity,
-        tension: Tension,
-        length: Length
-
-    ): Line {
-        return when(lineType) {
-            LineType.SINGLE_PHASE -> LineSinglePhase(
-                functionalContext = functionalContext,
-                conductor = conductor,
-                S = section,
-                I = intensity,
-                nominal_U = tension,
-                L = length
-            )
-            LineType.THREE_PHASE -> LineThreePhase(
-                functionalContext = functionalContext,
-                conductor = conductor,
-                S = section,
-                I = intensity,
-                nominal_U = tension,
-                L = length
-            )
-        }
     }
 
 }

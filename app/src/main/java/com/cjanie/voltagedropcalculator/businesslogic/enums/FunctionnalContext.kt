@@ -1,11 +1,9 @@
-package com.cjanie.voltagedropcalculator.businesslogic
+package com.cjanie.voltagedropcalculator.businesslogic.enums
 
-enum class FunctionalContext(
-    val phi: Float,
+enum class FunctionnalContext(
     val maxVoltageDropPercentageAcceptable: Float
 ) {
     LIGHTING(
-        phi = 0f,
         maxVoltageDropPercentageAcceptable = 6f
     )
 }
