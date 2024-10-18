@@ -1,6 +1,8 @@
 package com.cjanie.voltagedropcalculator.businesslogic.models.line
 
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
+import com.cjanie.voltagedropcalculator.businesslogic.factories.InstallationFactory
+import com.cjanie.voltagedropcalculator.businesslogic.models.Installation
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Resistance
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
@@ -11,7 +13,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
 
 abstract class Line (
-    phaseShift: PhaseShift,
+    val phaseShift: PhaseShift,
     conductor: Conductor,
     section: Section,
     private val intensity: Intensity,
@@ -31,6 +33,12 @@ abstract class Line (
 
     protected open fun voltageDrop(): VoltageDrop {
         return VoltageDrop( inVolt = resistance.inOhmPerKilometer * intensity.inAmpere * length.inKilometer)
+    }
+
+    var output: Array<Line> = emptyArray()
+
+    fun supplies(circuits: Array<Line>) {
+        output = circuits
     }
 
     // Max length acceptable

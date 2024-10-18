@@ -9,10 +9,9 @@ import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
 class Installation(
     use: Use,
     private val cable: Line,
-    private val circuits: Array<Line> = emptyArray(),
+    private val circuits: Array<Line>,
     nominalTension: Tension
 ) {
-
     val maxVoltageDropLimitPercentage = MaxVoltageDropLimit(use).percentage
 
     private val voltageDrop = calculateVoltageDrop()

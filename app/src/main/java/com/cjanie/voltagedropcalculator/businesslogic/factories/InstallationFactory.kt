@@ -11,13 +11,13 @@ import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
 class InstallationFactory {
 
     companion object {
-        fun installation(functionnalContext: FunctionnalContext, electricitySupply: ElectricitySupply, cable: Line, circuits: Array<Line> = emptyArray(), nominalTension: Tension): Installation {
+        fun installation(functionnalContext: FunctionnalContext, electricitySupply: ElectricitySupply, cable: Line, nominalTension: Tension): Installation {
 
             val use: Use = when(functionnalContext) {
                 FunctionnalContext.LIGHTING -> Lighting(electricitySupply = electricitySupply)
             }
 
-            return Installation(use = use, cable = cable, circuits = circuits, nominalTension = nominalTension)
+            return Installation(use = use, cable = cable, circuits = cable.output, nominalTension = nominalTension)
         }
     }
 

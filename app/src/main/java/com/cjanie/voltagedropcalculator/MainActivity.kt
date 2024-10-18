@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
 
-        val formPresenter = FormPresenter(this, CalculatorModel())
+        val formPresenter = FormPresenter(this, FormModel())
         val resultPresenter = ResultPresenter(this)
         
         enableEdgeToEdge()
@@ -56,14 +56,14 @@ class MainActivity : ComponentActivity() {
                             text = getString(R.string.app_name)
                         )
 
-                        var voltageDropResult: CalculatorModel.VoltageDropResult? by remember {
+                        var voltageDropResult: FormModel.VoltageDropResult? by remember {
                             mutableStateOf(null)
                         }
 
                         Form(
                             formPresenter = formPresenter,
                             fieldsEnabled = voltageDropResult == null,
-                            setResult = fun (result: CalculatorModel.VoltageDropResult) {
+                            setResult = fun (result: FormModel.VoltageDropResult) {
                                 voltageDropResult = result
                             }
                         )
@@ -81,11 +81,16 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Composable()
+fun InstallationSetUp() {
+
+}
+
 @Composable
 fun Form(
     formPresenter: FormPresenter,
     fieldsEnabled: Boolean,
-    setResult: (voltageDropResult: CalculatorModel.VoltageDropResult) -> Unit
+    setResult: (voltageDropResult: FormModel.VoltageDropResult) -> Unit
 ) {
 
     Column() {
@@ -213,7 +218,7 @@ fun DropdownField(
 }
 
 @Composable
-fun Result(resultPresenter: ResultPresenter, voltageDropResult: CalculatorModel.VoltageDropResult) {
+fun Result(resultPresenter: ResultPresenter, voltageDropResult: FormModel.VoltageDropResult) {
     Column(
         modifier = Modifier
             .fillMaxWidth()

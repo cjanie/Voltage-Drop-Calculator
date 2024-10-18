@@ -12,7 +12,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
 
-class CalculatorModel {
+class FormModel {
 
     val functionnalContextValues: Set<FunctionnalContext> = FunctionnalContext.values().toHashSet()
 
