@@ -33,10 +33,6 @@ abstract class Line (
         return VoltageDrop( inVolt = resistance.inOhmPerKilometer * intensity.inAmpere * length.inKilometer)
     }
 
-    fun voltageDropInVolt(): Float {
-        return voltageDrop.inVolt
-    }
-
     // Max length acceptable
 
     open fun maxLengthAcceptable(nominal_U: Tension): Length {
