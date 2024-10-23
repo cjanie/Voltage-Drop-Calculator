@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Voltage Drop Calculator</string>
+
+    <string name="installation_setup_title">Installation Set Up</string>
+    <string name="define_installation_usage_label">Define Installation Usage</string>
+    <string name="add_input_cable_label">Add Input Cable</string>
+    <string name="add_output_circuits_label">Add Output Circuits</string>
+    <string name="define_nominal_tension">Define nominal tension</string>
+    <string name="skip">Skip</string>
     <string name="functional_context_label">Functional Context</string>
     <string name="functional_context_lighting">Lighting</string>
     <string name="functional_context_motor">Motor</string>

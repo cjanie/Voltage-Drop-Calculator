@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,13 +24,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cjanie.voltagedropcalculator.businesslogic.usecases.InstallationSetUp
+import com.cjanie.voltagedropcalculator.ui.CableViewModel
+import com.cjanie.voltagedropcalculator.ui.InputCableViewModel
+import com.cjanie.voltagedropcalculator.ui.InstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.InstallationSetUpViewModel
+import com.cjanie.voltagedropcalculator.ui.OutputCircuitsViewModel
+import com.cjanie.voltagedropcalculator.ui.TensionViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.Dropdown
 import com.cjanie.voltagedropcalculator.ui.composables.Header
+import com.cjanie.voltagedropcalculator.ui.composables.Label
 import com.cjanie.voltagedropcalculator.ui.composables.LabeledText
 import com.cjanie.voltagedropcalculator.ui.composables.NumberInput
 import com.cjanie.voltagedropcalculator.ui.composables.SubmitButton
 import com.cjanie.voltagedropcalculator.ui.composables.Title
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
+import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.onGreenWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.onRedWarningColor
@@ -36,11 +48,12 @@ import com.cjanie.voltagedropcalculator.ui.theme.redWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.whiteColor
 
 class MainActivity : ComponentActivity() {
+    
+    private val installationSetUpViewModel by lazy { InstallationSetUpViewModel(application) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-        val formPresenter = FormPresenter(this, FormModel())
         val resultPresenter = ResultPresenter(this)
         
         enableEdgeToEdge()
@@ -59,14 +72,8 @@ class MainActivity : ComponentActivity() {
                         var voltageDropResult: FormModel.VoltageDropResult? by remember {
                             mutableStateOf(null)
                         }
-
-                        Form(
-                            formPresenter = formPresenter,
-                            fieldsEnabled = voltageDropResult == null,
-                            setResult = fun (result: FormModel.VoltageDropResult) {
-                                voltageDropResult = result
-                            }
-                        )
+                        
+                        InstallationSetUp(installationSetUpViewModel = installationSetUpViewModel)
 
                         if(voltageDropResult != null) {
                             Result(
@@ -82,7 +89,210 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable()
-fun InstallationSetUp() {
+fun InstallationSetUp(
+    installationSetUpViewModel: InstallationSetUpViewModel
+) {
+    Column {
+        Title(name = installationSetUpViewModel.title, textColor = copperColor)
+
+        var step: InstallationSetUpStep? by remember {
+            mutableStateOf(installationSetUpViewModel.installationSetUpStart)
+        }
+
+        var setUp: InstallationSetUp? by remember {
+            mutableStateOf(null)
+        }
+
+        if(step != null) {
+
+            Label(name = installationSetUpViewModel.stepLabel(step!!))
+
+            fun next() {
+                step = installationSetUpViewModel.next(step!!)
+            }
+
+            when (step!!) {
+
+                InstallationSetUpStep.DEFINE_USAGE -> DefineInstallationUsage(
+                    viewModel = installationSetUpViewModel,
+                    next = { next() }
+                )
+                InstallationSetUpStep.ADD_INPUT_CABLE -> AddInputCable(
+                    viewModel = installationSetUpViewModel.inputCableViewModel,
+                    next = { next() }
+                )
+                InstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> AddOutputCircuits(
+                    viewModel = installationSetUpViewModel.outputCircuitsViewModel,
+                    next = { next() },
+                    skip = { next() }
+                )
+                InstallationSetUpStep.DEFINE_NOMINAL_TENSION -> DefineNominalTension(
+                    viewModel = installationSetUpViewModel,
+                    next = {
+                        next()
+                        setUp = installationSetUpViewModel.setUp() }
+                )
+            }
+        }
+
+        if (setUp != null) {
+
+            Column {
+                Canvas(modifier = Modifier.fillMaxWidth()) {
+                    //drawLine(Color.BLUE)
+                }
+            }
+        }
+
+
+
+    }
+}
+
+@Composable
+fun DefineInstallationUsage(viewModel: InstallationSetUpViewModel, next: () -> Unit) {
+
+    var isStepCompleted by remember {
+        mutableStateOf(false)
+    }
+
+    var isStepEnabled by remember {
+        mutableStateOf(true)
+    }
+
+    Column {
+
+        DropdownField(
+            label = viewModel.functionalContextLabel,
+            options = viewModel.functionnalContextOptions,
+            select = fun(itemPosition: Int) {
+                viewModel.setFunctionnalContext(itemPosition)
+            },
+            updateFormState = { isStepCompleted = viewModel.isUsageDefined() },
+            enabled = isStepEnabled
+        )
+        DropdownField(
+            label = viewModel.electricitySupplyLabel,
+            options = viewModel.electricitySupplyOptions,
+            select = fun(index: Int) {
+                viewModel.setElectricitySupply(index)
+            },
+            updateFormState = { isStepCompleted = viewModel.isUsageDefined() },
+            enabled = isStepEnabled
+        )
+
+        if(isStepCompleted) next()
+    }
+}
+
+
+@Composable
+fun AddInputCable(viewModel: InputCableViewModel, next: () -> Unit) {
+    CableForm(viewModel = viewModel, next = next)
+}
+
+
+@Composable
+fun CableForm(viewModel: CableViewModel, next: () -> Unit) {
+    var isStepCompleted by remember {
+        mutableStateOf(false)
+    }
+    var fieldsEnabled by remember {
+        mutableStateOf(true)
+    }
+
+    Column {
+        NumberInput(
+            name = viewModel.lengthLabel,
+            select =  fun(value: Float) {
+                viewModel.setLength(inKilometer = value)
+                isStepCompleted = viewModel.isFormComplete()
+            },
+            enabled = fieldsEnabled
+        )
+
+        fun updateFormState() {
+            isStepCompleted = viewModel.isFormComplete()
+        }
+
+        DropdownField(
+            label = viewModel.phasingLabel,
+            options = viewModel.phasingOptions,
+            select =  fun(index: Int) {
+                viewModel.setPhasing(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        DropdownField(
+            label = viewModel.conductorLabel,
+            options = viewModel.conductorOptions,
+            select =  fun(index: Int) {
+                viewModel.setConductor(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        DropdownField(
+            label = viewModel.sectionLabel,
+            options = viewModel.sectionOptions,
+            select =  fun(index: Int) {
+                viewModel.setSection(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        DropdownField(
+            label = viewModel.intensityLabel,
+            options = viewModel.intensityOptions,
+            select =  fun(index: Int) {
+                viewModel.setIntensity(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+
+        if (isStepCompleted) { next() }
+    }
+
+}
+
+@Composable
+fun AddOutputCircuits(viewModel: OutputCircuitsViewModel, next: () -> Unit, skip: () -> Unit) {
+    CableForm(viewModel = viewModel, next = next)
+    Button(onClick = { skip() }) {
+        Text(text = viewModel.skipLabel)
+    }
+}
+
+@Composable
+fun DefineNominalTension(viewModel: TensionViewModel, next: () -> Unit) {
+    var isStepCompleted by remember {
+        mutableStateOf(false)
+    }
+    var fieldsEnabled by remember {
+        mutableStateOf(true)
+    }
+    fun updateFormState() {
+        isStepCompleted = viewModel.isTensionDefined() != null
+    }
+    Column {
+        DropdownField(
+            label = viewModel.tensionLabel,
+            options = viewModel.tensionOptions,
+            select =  fun(index: Int) {
+                viewModel.setTension(index)
+            },
+            updateFormState = { updateFormState() },
+            enabled = fieldsEnabled
+        )
+    }
+
+    if (isStepCompleted) next()
+
 
 }
 
