@@ -7,9 +7,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.models.use.Lighting
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineSinglePhase
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineThreePhase
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
-import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
-import com.cjanie.voltagedropcalculator.businesslogic.models.use.Use
-import com.cjanie.voltagedropcalculator.businesslogic.usecases.InstallationSetUp
+import com.cjanie.voltagedropcalculator.businesslogic.usecases.InstallationSetUpUseCase
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
@@ -30,7 +28,7 @@ class LightingVoltageDropTest {
         // Parcourue par un courant d'une intensité de 150 Ampères
         val use = Lighting(ElectricitySupply.PRIVATE)
 
-        val installationSetUp = InstallationSetUp(use, Tension(inVolt = 230f))
+        val installationSetUp = InstallationSetUpUseCase(use, Tension(inVolt = 230f))
         installationSetUp.addInput(LineThreePhase(
                 phaseShift = use.phaseShift,
                 conductor = ConductorFactory.conductor(ConductorMaterial.COPPER),
@@ -74,8 +72,8 @@ class LightingVoltageDropTest {
         )
         val installation = Installation(
             use = use,
-            cable = lineThreePhase,
-            circuits = lineThreePhase.output,
+            input = lineThreePhase,
+            output = lineThreePhase.output,
             nominalTension = Tension(inVolt = 230f)
         )
         val DELTA_U = installation.voltageDropInVolt
@@ -95,8 +93,8 @@ class LightingVoltageDropTest {
 
         val installation = Installation(
             use = use,
-            cable = cable,
-            circuits = cable.output,
+            input = cable,
+            output = cable.output,
             nominalTension = Tension(inVolt = 230f)
         )
         val delta_U = installation.voltageDropInVolt

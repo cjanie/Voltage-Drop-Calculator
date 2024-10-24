@@ -20,6 +20,7 @@ class LineFactory {
 
             val use: Use = when(functionnalContext) {
                 FunctionnalContext.LIGHTING -> Lighting(electricitySupply = electricitySupply)
+                FunctionnalContext.MOTOR -> Lighting(electricitySupply = electricitySupply) // TODO MOTOR
             }
 
             val conductor = ConductorFactory.conductor(conductorMaterial)

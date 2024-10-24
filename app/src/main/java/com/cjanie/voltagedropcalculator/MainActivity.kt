@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cjanie.voltagedropcalculator.businesslogic.usecases.InstallationSetUp
 import com.cjanie.voltagedropcalculator.ui.CableViewModel
 import com.cjanie.voltagedropcalculator.ui.InputCableViewModel
 import com.cjanie.voltagedropcalculator.ui.InstallationSetUpStep
@@ -33,6 +31,7 @@ import com.cjanie.voltagedropcalculator.ui.OutputCircuitsViewModel
 import com.cjanie.voltagedropcalculator.ui.TensionViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.Dropdown
 import com.cjanie.voltagedropcalculator.ui.composables.Header
+import com.cjanie.voltagedropcalculator.ui.composables.InstallationDrawing
 import com.cjanie.voltagedropcalculator.ui.composables.Label
 import com.cjanie.voltagedropcalculator.ui.composables.LabeledText
 import com.cjanie.voltagedropcalculator.ui.composables.NumberInput
@@ -40,11 +39,7 @@ import com.cjanie.voltagedropcalculator.ui.composables.SubmitButton
 import com.cjanie.voltagedropcalculator.ui.composables.Title
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
 import com.cjanie.voltagedropcalculator.ui.theme.copperColor
-import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
-import com.cjanie.voltagedropcalculator.ui.theme.onGreenWarningColor
-import com.cjanie.voltagedropcalculator.ui.theme.onRedWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.onWhiteColor
-import com.cjanie.voltagedropcalculator.ui.theme.redWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.whiteColor
 
 class MainActivity : ComponentActivity() {
@@ -62,23 +57,40 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
                     Column(modifier = Modifier
+                        .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                         .padding(innerPadding)
                     ){
+
                         Header(
                             text = getString(R.string.app_name)
                         )
 
-                        var voltageDropResult: FormModel.VoltageDropResult? by remember {
+                        var installation: InstallationSetUpViewModel.InstallationPresenter? by remember {
                             mutableStateOf(null)
                         }
-                        
-                        InstallationSetUp(installationSetUpViewModel = installationSetUpViewModel)
+                        var voltageDropResult: InstallationSetUpViewModel.VoltageDropResultPresenter? by remember {
+                            mutableStateOf(null)
+                        }
+
+                        if (installation == null) {
+                            InstallationSetUp(
+                                installationSetUpViewModel = installationSetUpViewModel,
+                                finish = fun (installationPresenter: InstallationSetUpViewModel.InstallationPresenter) {
+                                    installation = installationPresenter
+                                }
+                            )
+                        } else {
+                            InstallationDrawing(installationPresenter = installation!!)
+                            Button(onClick = {
+                                voltageDropResult = installationSetUpViewModel.voltageDropResult()
+                            }) {
+                                Text("")
+                            }
+                        }
 
                         if(voltageDropResult != null) {
-                            Result(
-                                resultPresenter = resultPresenter,
-                                voltageDropResult = voltageDropResult!!
+                            Result(voltageDropResultPresenter = voltageDropResult!!
                             )
                         }
                     }
@@ -90,18 +102,16 @@ class MainActivity : ComponentActivity() {
 
 @Composable()
 fun InstallationSetUp(
-    installationSetUpViewModel: InstallationSetUpViewModel
-) {
-    Column {
+    installationSetUpViewModel: InstallationSetUpViewModel,
+    finish: (installationPresenter: InstallationSetUpViewModel.InstallationPresenter) -> Unit
+){
+    Column(Modifier.fillMaxSize()) {
         Title(name = installationSetUpViewModel.title, textColor = copperColor)
 
         var step: InstallationSetUpStep? by remember {
             mutableStateOf(installationSetUpViewModel.installationSetUpStart)
         }
 
-        var setUp: InstallationSetUp? by remember {
-            mutableStateOf(null)
-        }
 
         if(step != null) {
 
@@ -130,22 +140,11 @@ fun InstallationSetUp(
                     viewModel = installationSetUpViewModel,
                     next = {
                         next()
-                        setUp = installationSetUpViewModel.setUp() }
+                        finish(installationSetUpViewModel.setUp())
+                    }
                 )
             }
         }
-
-        if (setUp != null) {
-
-            Column {
-                Canvas(modifier = Modifier.fillMaxWidth()) {
-                    //drawLine(Color.BLUE)
-                }
-            }
-        }
-
-
-
     }
 }
 
@@ -428,11 +427,11 @@ fun DropdownField(
 }
 
 @Composable
-fun Result(resultPresenter: ResultPresenter, voltageDropResult: FormModel.VoltageDropResult) {
+fun Result(voltageDropResultPresenter: InstallationSetUpViewModel.VoltageDropResultPresenter) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (voltageDropResult.isVoltageDropAcceptable) greenWarningColor else redWarningColor),
+            .background(voltageDropResultPresenter.warningColor),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
@@ -443,28 +442,26 @@ fun Result(resultPresenter: ResultPresenter, voltageDropResult: FormModel.Voltag
             horizontalAlignment = Alignment.CenterHorizontally
         )  {
             LabeledText(
-                label = resultPresenter.voltageDropInVoltLabel,
-                text = resultPresenter.voltageDropInVoltAsString(voltageDropResult.inVolt),
+                label = voltageDropResultPresenter.inVoltLabel,
+                text = voltageDropResultPresenter.inVoltValue,
                 textColor = onWhiteColor
             )
             LabeledText(
-                label = resultPresenter.voltageDropPercentageLabel,
-                text = resultPresenter.percentageAsString(voltageDropResult.percentage),
+                label = voltageDropResultPresenter.asPercentageLabel,
+                text = voltageDropResultPresenter.asPercentageValue,
                 textColor = onWhiteColor
             )
         }
 
-        val textColor = if (voltageDropResult.isVoltageDropAcceptable) onGreenWarningColor else onRedWarningColor
-
         Title(
-            name = resultPresenter.isVoltageDropAcceptableAsString(voltageDropResult.isVoltageDropAcceptable),
-            textColor = textColor
+            name = voltageDropResultPresenter.isVoltageDropAcceptableWarningText,
+            textColor = voltageDropResultPresenter.onWarningColor
         )
 
         LabeledText(
-            label = resultPresenter.maxVoltageDropAcceptablePercentageLabel,
-            text = resultPresenter.percentageAsString(voltageDropResult.maxVoltageDropAcceptablePercentage),
-            textColor = textColor
+            label = voltageDropResultPresenter.maxVoltageDropLimitPercentageLabel,
+            text = voltageDropResultPresenter.maxVoltageDropLimitPercentageValue,
+            textColor = voltageDropResultPresenter.onWarningColor
         )
 
     }

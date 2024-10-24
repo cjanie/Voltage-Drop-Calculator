@@ -14,6 +14,7 @@ class FormPresenter(private val context: Context, private val formModel: FormMod
         .map { functionalContext ->
             when (functionalContext) {
                 FunctionnalContext.LIGHTING -> context.getString(R.string.functional_context_lighting)
+                FunctionnalContext.MOTOR -> "Motor"
             }
         }.toTypedArray()
     fun setFunctionnalContext(itemPosition: Int) {

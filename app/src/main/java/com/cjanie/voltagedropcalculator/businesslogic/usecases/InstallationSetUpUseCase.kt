@@ -6,7 +6,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Use
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
 
-class InstallationSetUp(val use: Use, val tension: Tension) {
+class InstallationSetUpUseCase(val use: Use, val tension: Tension) {
 
     private var cable: Line? = null
 
@@ -31,8 +31,8 @@ class InstallationSetUp(val use: Use, val tension: Tension) {
         if (cable != null) {
             return Installation(
                 use = use,
-                cable = cable!!,
-                circuits = cable!!.output,
+                input = cable!!,
+                output = cable!!.output,
                 nominalTension = tension
             )
         } else return null

@@ -15,9 +15,10 @@ class InstallationFactory {
 
             val use: Use = when(functionnalContext) {
                 FunctionnalContext.LIGHTING -> Lighting(electricitySupply = electricitySupply)
+                FunctionnalContext.MOTOR -> Lighting(electricitySupply = electricitySupply) // TODO MOTOR IMPL
             }
 
-            return Installation(use = use, cable = cable, circuits = cable.output, nominalTension = nominalTension)
+            return Installation(use = use, input = cable, output = cable.output, nominalTension = nominalTension)
         }
     }
 

@@ -14,13 +14,13 @@ import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
 
 abstract class Line (
     val phaseShift: PhaseShift,
-    conductor: Conductor,
-    section: Section,
-    private val intensity: Intensity,
-    private val length: Length
+    val conductor: Conductor,
+    val section: Section,
+    val intensity: Intensity,
+    val length: Length
 ) {
 
-    protected abstract val phasing: Phasing
+    abstract val phasing: Phasing
 
     private val resistance = Resistance(
         conductor = conductor,
