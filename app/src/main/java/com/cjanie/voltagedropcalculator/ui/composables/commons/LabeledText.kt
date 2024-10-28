@@ -1,4 +1,4 @@
-package com.cjanie.voltagedropcalculator.ui.composables
+package com.cjanie.voltagedropcalculator.ui.composables.commons
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,14 +11,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LabeledText(label: String, text: String, textColor: Color? = null) {
+fun LabeledText(label: String, text: String, textColor: Color = Color.Unspecified) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Label(name = label, color = textColor)
-        Text(text = text, color = if(textColor != null) textColor else Color.Unspecified)
+        Label(text = label, color = textColor)
+        Text(text = text, color = textColor)
     }
 }

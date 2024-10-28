@@ -1,4 +1,4 @@
-package com.cjanie.voltagedropcalculator.ui
+package com.cjanie.voltagedropcalculator.ui.viewmodels
 
 interface TensionViewModel {
 

@@ -1,6 +1,4 @@
-package com.cjanie.voltagedropcalculator.ui
-
-import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionnalContext
+package com.cjanie.voltagedropcalculator.ui.viewmodels
 
 interface UsageViewModel {
 

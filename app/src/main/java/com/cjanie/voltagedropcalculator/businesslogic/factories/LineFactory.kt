@@ -6,7 +6,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineSinglePhas
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineThreePhase
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Use
-import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionnalContext
+import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionalContext
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
@@ -16,11 +16,11 @@ import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
 class LineFactory {
 
     companion object {
-        fun line(functionnalContext: FunctionnalContext, electricitySupply: ElectricitySupply, phasing: Phasing, conductorMaterial: ConductorMaterial, section: Section, intensity: Intensity, length: Length): Line {
+        fun line(functionalContext: FunctionalContext, electricitySupply: ElectricitySupply, phasing: Phasing, conductorMaterial: ConductorMaterial, section: Section, intensity: Intensity, length: Length): Line {
 
-            val use: Use = when(functionnalContext) {
-                FunctionnalContext.LIGHTING -> Lighting(electricitySupply = electricitySupply)
-                FunctionnalContext.MOTOR -> Lighting(electricitySupply = electricitySupply) // TODO MOTOR
+            val use: Use = when(functionalContext) {
+                FunctionalContext.LIGHTING -> Lighting(electricitySupply = electricitySupply)
+                FunctionalContext.MOTOR -> Lighting(electricitySupply = electricitySupply) // TODO MOTOR
             }
 
             val conductor = ConductorFactory.conductor(conductorMaterial)

@@ -1,4 +1,4 @@
-package com.cjanie.voltagedropcalculator.ui.composables
+package com.cjanie.voltagedropcalculator.ui.composables.commons
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

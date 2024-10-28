@@ -1,12 +1,11 @@
-package com.cjanie.voltagedropcalculator.ui
+package com.cjanie.voltagedropcalculator.ui.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
-import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionnalContext
+import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionalContext
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
@@ -93,7 +92,7 @@ open class CableViewModel(application: Application) {
         Intensity(inAmpere = 500f)
     )
     val intensityOptions: Array<String> = intensityValues
-        .map { intensityToString(it, application)}.toTypedArray()
+        .map { intensityToString(it, application) }.toTypedArray()
 
     val lengthLabel = application.getString(R.string.line_length_label)
     val lengthUnit = application.getString(R.string.line_length_unit)
@@ -136,9 +135,9 @@ open class CableViewModel(application: Application) {
                 length == null
     }
 
-    fun createCable(functionnalContext: FunctionnalContext, electricitySupply: ElectricitySupply): Line {
+    fun createCable(functionalContext: FunctionalContext, electricitySupply: ElectricitySupply): Line {
         if (isNullValue()) throw NullValueException()
-        return LineFactory.line(functionnalContext, electricitySupply, phasing!!, conductor!!, section!!, intensity!!, length!!)
+        return LineFactory.line(functionalContext, electricitySupply, phasing!!, conductor!!, section!!, intensity!!, length!!)
     }
 
 }

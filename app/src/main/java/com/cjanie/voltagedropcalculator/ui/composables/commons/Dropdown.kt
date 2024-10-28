@@ -1,11 +1,9 @@
-package com.cjanie.voltagedropcalculator.ui.composables
+package com.cjanie.voltagedropcalculator.ui.composables.commons
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Dropdown(name: String, options: Array<String>, select: (itemPosition: Int) -> Unit, enabled: Boolean) {
+fun Dropdown(
+    label: String,
+    options: Array<String>,
+    select: (itemPosition: Int) -> Unit,
+    enabled: Boolean
+) {
     var isDropDownExpanded by remember {
         mutableStateOf(false)
     }
@@ -37,7 +40,7 @@ fun Dropdown(name: String, options: Array<String>, select: (itemPosition: Int) -
                 onClick = {isDropDownExpanded = true })
         else Modifier.fillMaxWidth()
         TextField(
-            label = { Label(name = name) },
+            label = { Label(text = label) },
             value = if (itemPosition == null) "" else options[itemPosition!!],
             onValueChange = { },
             enabled = false,

@@ -1,4 +1,4 @@
-package com.cjanie.voltagedropcalculator.ui
+package com.cjanie.voltagedropcalculator.ui.viewmodels
 
 import android.app.Application
 import com.cjanie.voltagedropcalculator.R
