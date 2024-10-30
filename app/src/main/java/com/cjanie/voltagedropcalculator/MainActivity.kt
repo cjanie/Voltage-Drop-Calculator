@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
@@ -52,19 +55,12 @@ class MainActivity : ComponentActivity() {
             VoltageDropCalculatorTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                    ConstraintLayout(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
                     ){
-                        val (header, content) = createRefs()
-
                         Header(
-                            modifier = Modifier.constrainAs(header) {
-                                top.linkTo(parent.top)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-
-                            },
                             text = getString(R.string.app_name)
                         )
 
@@ -79,31 +75,34 @@ class MainActivity : ComponentActivity() {
                             mutableStateOf(null)
                         }
 
-                        val contentModifier = Modifier.constrainAs(content) {
-                            top.linkTo(header.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-
                         if (installation == null) {
                             InstallationSetUp(
-                                modifier = contentModifier,
+                                modifier = Modifier,// contentModifier,
                                 installationViewModel = installationViewModel,
                                 finish = fun (installationPresenter: InstallationViewModel.InstallationPresenter) {
                                     installation = installationPresenter
                                 }
                             )
                         } else {
-                            Column(modifier = contentModifier) {
-                                InstallationDrawing(
-                                    installationPresenter = installation!!)
-                                voltageDropResult = installationViewModel.voltageDropResult()
 
+                            Column() {
+                                voltageDropResult = installationViewModel.voltageDropResult()
                                 if(voltageDropResult != null) {
-                                    VoltageDropResult(voltageDropResultPresenter = voltageDropResult!!
+                                    VoltageDropResult(
+                                        voltageDropResultPresenter = voltageDropResult!!,
                                     )
                                 }
+
+                                    InstallationDrawing(
+                                        installationPresenter = installation!!,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+
                             }
+
+
+
+
                         }
                     }
                 }

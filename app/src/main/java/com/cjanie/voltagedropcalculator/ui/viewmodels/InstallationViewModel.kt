@@ -203,13 +203,13 @@ class InstallationViewModel(
             else null
     }
     class CablePresenter(cable: Line, application: Application) {
-        private val phasing = CableViewModel.phasingToString(cable.phasing, application)
+        val phasing = cable.phasing
         private val conductor =
             CableViewModel.conductorToString(cable.conductor.material, application)
         private val section = CableViewModel.sectionToString(cable.section, application)
         private val intensity = CableViewModel.intensityToString(cable.intensity, application)
         private val length = CableViewModel.lengthToString(cable.length, application)
-        val cableText = "$phasing\n$conductor\n$section\n$intensity\n${length}"
+        val cableText = "$conductor\n$section\n$intensity\n${length}"
 
     }
 
