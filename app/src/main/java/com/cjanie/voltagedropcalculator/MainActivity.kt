@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionalContext
 import com.cjanie.voltagedropcalculator.businesslogic.factories.InstallationFactory
@@ -85,6 +86,35 @@ class MainActivity : ComponentActivity() {
                             )
                         } else {
 
+                            ConstraintLayout(Modifier.fillMaxSize()) {
+                                val (drawing, result) = createRefs()
+
+                                InstallationDrawing(
+                                    installationPresenter = installation!!,
+                                    modifier = Modifier.constrainAs(drawing) {
+                                        top.linkTo(parent.top)
+                                        start.linkTo(parent.start)
+                                        end.linkTo(parent.end)
+                                        bottom.linkTo(result.top)
+                                        width = Dimension.fillToConstraints
+                                        height = Dimension.fillToConstraints
+                                    }.fillMaxSize()
+                                )
+
+                                voltageDropResult = installationViewModel.voltageDropResult()
+                                if(voltageDropResult != null) {
+                                    VoltageDropResult(
+                                        voltageDropResultPresenter = voltageDropResult!!,
+                                        modifier = Modifier.constrainAs(result) {
+                                            start.linkTo(parent.start)
+                                            end.linkTo(parent.end)
+                                            bottom.linkTo(parent.bottom)
+                                        }
+                                    )
+                                }
+
+                            }
+/*
                             Column() {
                                 voltageDropResult = installationViewModel.voltageDropResult()
                                 if(voltageDropResult != null) {
@@ -99,6 +129,8 @@ class MainActivity : ComponentActivity() {
                                     )
 
                             }
+
+ */
 
 
 
