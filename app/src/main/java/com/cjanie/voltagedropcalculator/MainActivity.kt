@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
@@ -42,7 +43,9 @@ import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationDrawing
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationSetUp
 import com.cjanie.voltagedropcalculator.ui.composables.VoltageDropResult
+import com.cjanie.voltagedropcalculator.ui.composables.commons.SubmitButton
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
+import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 
 class MainActivity : ComponentActivity() {
     
@@ -91,17 +94,19 @@ class MainActivity : ComponentActivity() {
 
                                 InstallationDrawing(
                                     installationPresenter = installation!!,
-                                    modifier = Modifier.constrainAs(drawing) {
-                                        top.linkTo(parent.top)
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                        bottom.linkTo(result.top)
-                                        width = Dimension.fillToConstraints
-                                        height = Dimension.fillToConstraints
-                                    }.fillMaxSize()
+                                    modifier = Modifier
+                                        .constrainAs(drawing) {
+                                            top.linkTo(parent.top)
+                                            start.linkTo(parent.start)
+                                            end.linkTo(parent.end)
+                                            bottom.linkTo(result.top)
+                                            width = Dimension.fillToConstraints
+                                            height = Dimension.fillToConstraints
+                                        }
+                                        .fillMaxSize()
                                 )
 
-                                voltageDropResult = installationViewModel.voltageDropResult()
+
                                 if(voltageDropResult != null) {
                                     VoltageDropResult(
                                         voltageDropResultPresenter = voltageDropResult!!,
@@ -110,6 +115,17 @@ class MainActivity : ComponentActivity() {
                                             end.linkTo(parent.end)
                                             bottom.linkTo(parent.bottom)
                                         }
+                                    )
+                                } else {
+                                    SubmitButton(
+                                        text = installationViewModel.calculateVoltageDropLabel,
+                                        onClick = { voltageDropResult = installationViewModel.voltageDropResult() },
+                                        enabled = true,
+                                        modifier = Modifier.constrainAs(result) {
+                                            start.linkTo(parent.start)
+                                            end.linkTo(parent.end)
+                                            bottom.linkTo(parent.bottom)
+                                        }.padding(paddingMedium, 0.dp, paddingMedium, paddingMedium)
                                     )
                                 }
 

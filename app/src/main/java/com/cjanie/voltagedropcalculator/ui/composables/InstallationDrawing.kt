@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -39,8 +40,7 @@ fun InstallationDrawing(installationPresenter: InstallationViewModel.Installatio
         //InstallationSpecifications(installationPresenter)
 
         InstallationCanvas(
-            inputCablePresenter = installationPresenter.inputCablePresenter,
-            outputCircuitsPresenter = installationPresenter.outputCircuitsPresenter,
+            installationPresenter = installationPresenter,
             modifier = modifier
         )
 
@@ -63,8 +63,7 @@ fun InstallationSpecifications(specifications: InstallationViewModel.Installatio
 
 @Composable
 fun InstallationCanvas(
-    inputCablePresenter: InstallationViewModel.CablePresenter,
-    outputCircuitsPresenter: InstallationViewModel.CablePresenter?,
+    installationPresenter: InstallationViewModel.InstallationPresenter,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
     var columnHeightInPx by remember {
@@ -84,12 +83,21 @@ fun InstallationCanvas(
     ) {
 
         val textMeasurer = rememberTextMeasurer()
-        val inputCableText = inputCablePresenter.cableText
-        val outputCircuitsText = outputCircuitsPresenter?.cableText
+        val supplierText = installationPresenter.electricitySupply
+        val tensionText = installationPresenter.tension
+        val inputCableText = installationPresenter.inputCablePresenter.cableText
+        val outputCircuitsText = installationPresenter.outputCircuitsPresenter?.cableText
         val style = TextStyle(
             fontSize = 16.sp,
             color = Color.Black
         )
+        val supplierTextLayoutResult = remember(supplierText, style) {
+            textMeasurer.measure(supplierText, style)
+        }
+
+        val tensionTextResultLayout = remember(tensionText, style) {
+            textMeasurer.measure(tensionText, style)
+        }
         val inputCableTextLayoutResult = remember(inputCableText, style) {
             textMeasurer.measure(inputCableText, style)
         }
@@ -105,6 +113,7 @@ fun InstallationCanvas(
 
 
         Canvas(modifier = modifier.padding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)) {
+
             val canvasWidthInPx = columnWidthInPx - horizontalPadding.toPx() * 2
             val canvasHeightInPx = columnHeightInPx - verticalPadding.toPx() * 2
 
@@ -129,7 +138,6 @@ fun InstallationCanvas(
                 radius = supplierCirclesRadius,
                 style = Stroke(strokeWidth)
             )
-
             val supplierContactPoints = listOf(
                 Offset(x = supplierCirclesCenterX, y = supplierHeight),
                 Offset(x = supplierWidth / 3 * 2, y = supplierHeight)
@@ -140,6 +148,9 @@ fun InstallationCanvas(
                 end = supplierContactPoints.find { it.x == supplierCirclesCenterX }!!,
                 strokeWidth = strokeWidth
             )
+            drawText(supplierTextLayoutResult, topLeft = Offset(x = supplierWidth / 2, y = 0f))
+            drawText(tensionTextResultLayout, topLeft = Offset(x = supplierWidth / 2, y = supplierCircleBottomCenterY))
+
 
             for (point in supplierContactPoints) {
                 drawCircle(
@@ -149,41 +160,44 @@ fun InstallationCanvas(
                 )
             }
 
-            val supplierPinHeight = 50f
+            val pinHeight = canvasHeightInPx / 32
             val supplierPinStart = supplierContactPoints.find { it.x != supplierCirclesCenterX }!!
-            val supplierPinEnd = Offset(supplierPinStart.x, supplierPinStart.y + supplierPinHeight)
+            val supplierPinEnd = Offset(supplierPinStart.x, supplierPinStart.y + pinHeight)
             drawLine(color = copperColor, supplierPinStart, supplierPinEnd, strokeWidth)
 
             val supplierPinTip = supplierPinEnd
+            val pinTipOffset = pinHeight / 2
             drawLine(
-                start = Offset(supplierPinTip.x - 20, supplierPinTip.y + 20),
-                end = Offset(supplierPinTip.x + 20, supplierPinTip.y - 20),
+                start = Offset(supplierPinTip.x - pinTipOffset, supplierPinTip.y + pinTipOffset),
+                end = Offset(supplierPinTip.x + pinTipOffset, supplierPinTip.y - pinTipOffset),
                 color = copperColor,
                 strokeWidth = 4f
             )
             drawLine(
-                start = Offset(supplierPinTip.x + 20, supplierPinTip.y + 20),
-                end = Offset(supplierPinTip.x - 20, supplierPinTip.y - 20),
+                start = Offset(supplierPinTip.x + pinTipOffset, supplierPinTip.y + pinTipOffset),
+                end = Offset(supplierPinTip.x - pinTipOffset, supplierPinTip.y - pinTipOffset),
                 color = copperColor,
                 strokeWidth = 4f
             )
 
+            val switchHeight = pinHeight * 2
             val switch = Switch(
                     start = Offset(
-                        x = supplierPinTip.x - 40,
-                        y = supplierPinTip.y + 20
+                        x = supplierPinTip.x - pinTipOffset * 2,
+                        y = supplierPinTip.y + pinTipOffset
                     ),
                     end = Offset(
                         x = supplierPinTip.x,
-                        y = supplierPinTip.y + 100
+                        y = supplierPinTip.y + switchHeight
                     )
                 )
             drawLine(copperColor, switch.start, switch.end, 4f)
 
             // Repartitor
             val dividerWidth = supplierWidth + supplierWidth / 16
-            val dividerStart = Offset(x = canvasWidthInPx - dividerWidth, y = canvasHeightInPx / 2)
-            val dividerEnd = Offset(x = canvasWidthInPx, y = canvasHeightInPx / 2)
+            val dividerY = supplierHeight + (canvasHeightInPx - supplierHeight) / 2
+            val dividerStart = Offset(x = canvasWidthInPx - dividerWidth, y = dividerY)
+            val dividerEnd = Offset(x = canvasWidthInPx, y = dividerY)
 
             // Draw input cable
             val inputCableStart = switch.end
@@ -198,28 +212,30 @@ fun InstallationCanvas(
 
             val inputCableMiddle = Offset(x = inputCableEnd.x, y = inputCableEnd.y - inputCableHeight / 2)
 
-            if (inputCablePresenter.phasing == Phasing.THREE_PHASE) {
+            if (installationPresenter.inputCablePresenter.phasing == Phasing.THREE_PHASE) {
                 val cableMiddleBefore = Offset(x = inputCableMiddle.x, y = inputCableMiddle.y - inputCableHeight / 16)
                 val cableMiddleAfter = Offset(x = inputCableMiddle.x, y = inputCableMiddle.y + inputCableHeight / 16)
                 val phasingSignCenters = listOf(cableMiddleBefore, inputCableMiddle, cableMiddleAfter)
 
                 for (center in phasingSignCenters) {
+                    val phasingLinesOffset = canvasWidthInPx / 32
                     drawLine(
                         color = copperColor,
-                        start = Offset(x = center.x - 40, y = center.y + 40),
-                        end = Offset(x = center.x + 40, y = center.y - 40),
-                        strokeWidth = strokeWidth
+                        start = Offset(x = center.x - phasingLinesOffset, y = center.y + phasingLinesOffset),
+                        end = Offset(x = center.x + phasingLinesOffset, y = center.y - phasingLinesOffset)
                     )
                 }
             }
 
             // Input cable legend
-            drawText(inputCableTextLayoutResult, topLeft = Offset(x = 0f, y = inputCableMiddle.y))
+            drawText(
+                inputCableTextLayoutResult,
+                topLeft = Offset(x = 0f, y = inputCableStart.y))
 
             // Terminal
-            val deviceCircleRadius = 50f
+            val deviceCircleRadius = canvasHeightInPx / 32
 
-            if (outputCircuitsPresenter == null) {
+            if (installationPresenter.outputCircuitsPresenter == null) {
                 drawCircle(
                     color = Color.Red,
                     radius = deviceCircleRadius,
@@ -240,7 +256,7 @@ fun InstallationCanvas(
                 val dividerLength = dividerEnd.x - dividerStart.x
 
                 var pinStart = dividerStart
-                var pinEnd = Offset(x = pinStart.x, y = pinStart.y + 50)
+                var pinEnd = Offset(x = pinStart.x, y = pinStart.y + pinHeight)
 
 
 
@@ -252,7 +268,7 @@ fun InstallationCanvas(
                     pins.add(pin)
 
                     pinStart = Offset(x = pinStart.x + dividerLength / 4, y = pinStart.y)
-                    pinEnd = Offset(x = pinStart.x, y= pinStart.y + 50)
+                    pinEnd = Offset(x = pinStart.x, y= pinStart.y + pinHeight)
                 }
 
                 for (pin in pins) {
@@ -286,14 +302,14 @@ fun InstallationCanvas(
                 }
                 for (pinTip in pinTipsForElectricContacts) {
                     drawLine(
-                        start = Offset(pinTip.x - 20, pinTip.y + 20),
-                        end = Offset(pinTip.x + 20, pinTip.y - 20),
+                        start = Offset(pinTip.x - pinTipOffset, pinTip.y + pinTipOffset),
+                        end = Offset(pinTip.x + pinTipOffset, pinTip.y - pinTipOffset),
                         color = copperColor,
                         strokeWidth = 4f
                     )
                     drawLine(
-                        start = Offset(pinTip.x + 20, pinTip.y + 20),
-                        end = Offset(pinTip.x - 20, pinTip.y - 20),
+                        start = Offset(pinTip.x + pinTipOffset, pinTip.y + pinTipOffset),
+                        end = Offset(pinTip.x - pinTipOffset, pinTip.y - pinTipOffset),
                         color = copperColor,
                         strokeWidth = 4f
                     )
@@ -304,12 +320,12 @@ fun InstallationCanvas(
                 val switches = Array(3) {
                     Switch(
                         start = Offset(
-                            x = pinTipsForElectricContacts[it].x - 40,
-                            y = pinTipsForElectricContacts[it].y + 20
+                            x = pinTipsForElectricContacts[it].x - pinTipOffset * 2,
+                            y = pinTipsForElectricContacts[it].y + pinTipOffset
                         ),
                         end = Offset(
                             x = pinTipsForElectricContacts[it].x,
-                            y = pinTipsForElectricContacts[it].y + 100
+                            y = pinTipsForElectricContacts[it].y + switchHeight
                         )
                     )
                 }
@@ -329,17 +345,31 @@ fun InstallationCanvas(
                         color = copperColor,
                         strokeWidth = 4f
                     )
+                    val circleCenter = Offset(x = circuitEnd.x, y = canvasHeightInPx - deviceCircleRadius)
                     drawCircle(
-                        color = Color.Red,
+                        color = copperColor,
                         radius = deviceCircleRadius,
-                        center = Offset(x = circuitEnd.x, y = canvasHeightInPx - deviceCircleRadius)
+                        center = circleCenter,
+                        style = Stroke(strokeWidth)
                     )
+                    val trigonometryResult = deviceCircleRadius // TODO
+                    drawLine(
+                        start = Offset(circleCenter.x - trigonometryResult, circleCenter.y + trigonometryResult),
+                        end = Offset(circleCenter.x + trigonometryResult, circleCenter.y - trigonometryResult),
+                        color = copperColor,
+                        strokeWidth = 4f
+                    )
+                    drawLine(
+                        start = Offset(circleCenter.x + trigonometryResult, circleCenter.y + trigonometryResult),
+                        end = Offset(circleCenter.x - trigonometryResult, circleCenter.y - trigonometryResult),
+                        color = copperColor,
+                        strokeWidth = 4f
+                    )
+
                 }
 
                 if (outputCircuitsTextLayoutResult != null) {
-                    val circuitHeight = circuitEndY - circuitsStart[0].y
-                    val circuitMiddleY = circuitEndY - circuitHeight / 2
-                    drawText(outputCircuitsTextLayoutResult, topLeft = Offset(x = 0f, y= circuitMiddleY))
+                    drawText(outputCircuitsTextLayoutResult, topLeft = Offset(x = 0f, y= circuitsStart[0].y))
                 }
             }
 

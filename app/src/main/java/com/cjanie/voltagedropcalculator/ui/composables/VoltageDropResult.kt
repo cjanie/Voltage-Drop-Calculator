@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.cjanie.voltagedropcalculator.ui.composables.commons.LabeledText
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Title
 import com.cjanie.voltagedropcalculator.ui.theme.onWhiteColor
+import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.theme.whiteColor
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
 
@@ -22,13 +23,20 @@ fun VoltageDropResult(voltageDropResultPresenter: InstallationViewModel.VoltageD
             .background(voltageDropResultPresenter.warningColor),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Title(
+            text = voltageDropResultPresenter.isVoltageDropAcceptableWarningText,
+            textColor = voltageDropResultPresenter.onWarningColor
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp)
+                .padding(horizontal = paddingMedium, vertical = 0.dp)
                 .background(whiteColor),
             horizontalAlignment = Alignment.CenterHorizontally
         )  {
+
+
             LabeledText(
                 label = voltageDropResultPresenter.inVoltLabel,
                 text = voltageDropResultPresenter.inVoltValue,
@@ -41,15 +49,12 @@ fun VoltageDropResult(voltageDropResultPresenter: InstallationViewModel.VoltageD
             )
         }
 
-        Title(
-            text = voltageDropResultPresenter.isVoltageDropAcceptableWarningText,
-            textColor = voltageDropResultPresenter.onWarningColor
-        )
-
         LabeledText(
             label = voltageDropResultPresenter.maxVoltageDropLimitPercentageLabel,
             text = voltageDropResultPresenter.maxVoltageDropLimitPercentageValue,
-            textColor = voltageDropResultPresenter.onWarningColor
+            textColor = voltageDropResultPresenter.onWarningColor,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = paddingMedium + paddingMedium, vertical = paddingMedium)
+
         )
     }
 }

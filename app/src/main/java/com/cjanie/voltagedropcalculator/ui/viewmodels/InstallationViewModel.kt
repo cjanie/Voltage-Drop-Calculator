@@ -59,10 +59,7 @@ class InstallationViewModel(
         }
 
         private fun tensionToString(tension: Tension, application: Application): String {
-            return "${
-                if (tension.inVolt.toString().contains(".0"))
-                    tension.inVolt.toInt() else tension.inVolt
-            } ${application.getString(R.string.tension_unit)}"
+            return "${tension.inVolt.toInt()} ${application.getString(R.string.tension_unit)}"
         }
 
     }
@@ -219,12 +216,12 @@ class InstallationViewModel(
         val inVoltLabel = application.getString(R.string.voltage_drop_in_volt_label)
         val inVoltValue = tensionToString(Tension(calculateVoltageDrop.voltageDropInVolt), application )
         val asPercentageLabel = application.getString(R.string.voltage_drop_percentage_label)
-        val asPercentageValue = "${calculateVoltageDrop.voltageDropPercentage} ${application.getString(R.string.percentage_sign)}"
+        val asPercentageValue = "${calculateVoltageDrop.voltageDropPercentage.toInt()} ${application.getString(R.string.percentage_sign)}"
         val isVoltageDropAcceptableWarningText = if (calculateVoltageDrop.isVoltageDropAcceptable)
             "${application.getString(R.string.voltage_drop_acceptable_result)}"
         else "${application.getString(R.string.voltage_drop_not_acceptable_result)}"
         val maxVoltageDropLimitPercentageLabel = application.getString(R.string.max_voltage_drop_acceptable_percentage_label)
-        val maxVoltageDropLimitPercentageValue = "${calculateVoltageDrop.maxVoltageDropLimitPercentage} ${application.getString(R.string.percentage_sign)}"
+        val maxVoltageDropLimitPercentageValue = "${calculateVoltageDrop.maxVoltageDropLimitPercentage.toInt()} ${application.getString(R.string.percentage_sign)}"
         val warningColor = if (calculateVoltageDrop.isVoltageDropAcceptable) greenWarningColor
             else redWarningColor
         val onWarningColor = if (calculateVoltageDrop.isVoltageDropAcceptable)

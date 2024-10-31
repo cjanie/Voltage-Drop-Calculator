@@ -32,7 +32,7 @@
     <string name="voltage_drop_in_volt_label">Voltage Drop in Volt</string>
     <string name="voltage_drop_percentage_label">Voltage Drop Percentage</string>
     <string name="percentage_sign">%</string>
-    <string name="voltage_drop_acceptable_result">Voltage Drop Acceptable</string>
-    <string name="voltage_drop_not_acceptable_result">Voltage Drop Not acceptable</string>
+    <string name="voltage_drop_acceptable_result">Voltage Drop Result \n Acceptable</string>
+    <string name="voltage_drop_not_acceptable_result">Voltage Drop Result \n Not acceptable</string>
     <string name="max_voltage_drop_acceptable_percentage_label">Maximum Voltage Drop Acceptable</string>
 </resources>

@@ -13,13 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 import com.cjanie.voltagedropcalculator.ui.theme.onCopperColor
+import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 
 @Composable
-fun SubmitButton(text: String, onClick: () -> Unit, enabled: Boolean) {
+fun SubmitButton(text: String, onClick: () -> Unit, enabled: Boolean, modifier: Modifier = Modifier.padding(paddingMedium)
+    .fillMaxWidth()) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.Center
     ) {
         Button(
