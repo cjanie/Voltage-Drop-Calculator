@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -16,13 +15,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Label
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
@@ -32,7 +38,7 @@ class Pin(val start: Offset, val end: Offset)
 class Switch(val start: Offset, val end: Offset)
 
 @Composable
-fun InstallationDrawing(installationPresenter: InstallationViewModel.InstallationPresenter, modifier: Modifier = Modifier.fillMaxSize()) {
+fun InstallationDrawing(installationPresenter: InstallationViewModel.InstallationPresenter, editionMode: Boolean, modifier: Modifier = Modifier.fillMaxSize()) {
 
     Column(modifier = modifier)
          {
@@ -41,6 +47,7 @@ fun InstallationDrawing(installationPresenter: InstallationViewModel.Installatio
 
         InstallationCanvas(
             installationPresenter = installationPresenter,
+            editionMode = editionMode,
             modifier = modifier
         )
 
@@ -64,6 +71,7 @@ fun InstallationSpecifications(specifications: InstallationViewModel.Installatio
 @Composable
 fun InstallationCanvas(
     installationPresenter: InstallationViewModel.InstallationPresenter,
+    editionMode: Boolean,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
     var columnHeightInPx by remember {
@@ -72,6 +80,9 @@ fun InstallationCanvas(
     var columnWidthInPx by remember {
         mutableFloatStateOf(0f)
     }
+
+    val editIcon = ImageVector.vectorResource(id = R.drawable.baseline_edit_24)
+    val iconPainter = rememberVectorPainter(image = editIcon)
 
     Column(
         modifier = modifier
@@ -87,6 +98,7 @@ fun InstallationCanvas(
         val tensionText = installationPresenter.tension
         val inputCableText = installationPresenter.inputCablePresenter.cableText
         val outputCircuitsText = installationPresenter.outputCircuitsPresenter?.cableText
+        val usageText = installationPresenter.functionalContext
         val style = TextStyle(
             fontSize = 16.sp,
             color = Color.Black
@@ -105,6 +117,9 @@ fun InstallationCanvas(
             if(outputCircuitsText != null) {
                 textMeasurer.measure(outputCircuitsText, style)
             } else null
+        }
+        val usageTextResultLayout = remember(usageText, style) {
+            textMeasurer.measure(usageText, style)
         }
 
 
@@ -148,9 +163,6 @@ fun InstallationCanvas(
                 end = supplierContactPoints.find { it.x == supplierCirclesCenterX }!!,
                 strokeWidth = strokeWidth
             )
-            drawText(supplierTextLayoutResult, topLeft = Offset(x = supplierWidth / 2, y = 0f))
-            drawText(tensionTextResultLayout, topLeft = Offset(x = supplierWidth / 2, y = supplierCircleBottomCenterY))
-
 
             for (point in supplierContactPoints) {
                 drawCircle(
@@ -227,10 +239,7 @@ fun InstallationCanvas(
                 }
             }
 
-            // Input cable legend
-            drawText(
-                inputCableTextLayoutResult,
-                topLeft = Offset(x = 0f, y = inputCableStart.y))
+
 
             // Terminal
             val deviceCircleRadius = canvasHeightInPx / 32
@@ -368,13 +377,93 @@ fun InstallationCanvas(
 
                 }
 
+                // Legends
+
+                val supplierTextY = 0f
+                val tensionTextY = supplierCircleBottomCenterY
+                val usageTextY = circuitEndY + deviceCircleRadius - iconPainter.intrinsicSize.height / 2
+
+
+                drawText(
+                    supplierTextLayoutResult,
+                    topLeft = Offset(
+                        x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - supplierTextLayoutResult.size.width,
+                        y = supplierTextY)
+                )
+                drawText(
+                    tensionTextResultLayout,
+                    topLeft = Offset(
+                        x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - supplierTextLayoutResult.size.width,
+                        y = tensionTextY)
+                )
+
+
+                drawText(
+                    inputCableTextLayoutResult,
+                    topLeft = Offset(
+                        x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - inputCableTextLayoutResult.size.width,
+                        y = inputCableMiddle.y - inputCableTextLayoutResult.size.height / 2))
+
+
+                val circuitsHeight = circuitEndY - circuitsStart[0].y
+                val circuitsMiddleY = circuitsStart[0].y + circuitsHeight / 2
+
                 if (outputCircuitsTextLayoutResult != null) {
-                    drawText(outputCircuitsTextLayoutResult, topLeft = Offset(x = 0f, y= circuitsStart[0].y))
+                    drawText(
+                        outputCircuitsTextLayoutResult,
+                        topLeft = Offset(
+                            x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - outputCircuitsTextLayoutResult.size.width,
+                            y= circuitsMiddleY - outputCircuitsTextLayoutResult.size.height / 2)
+                    )
                 }
+                drawText(usageTextResultLayout, topLeft = Offset(
+                    x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - usageTextResultLayout.size.width,
+                    y = usageTextY
+                    )
+                )
+
+                // Edition
+                val editButtonX = canvasWidthInPx - iconPainter.intrinsicSize.width
+                val supplierButtonY = tensionTextY / 2 - iconPainter.intrinsicSize.height / 2
+                val inputCableButtonY = inputCableMiddle.y - iconPainter.intrinsicSize.height / 2
+
+                val circuitsButtonY = circuitsMiddleY - iconPainter.intrinsicSize.height / 2
+                val usageButtonY = usageTextY
+                if(editionMode) {
+                    showEditionMode(
+                        drawScope = this,
+                        editButtonX = editButtonX,
+                        editButtonYCoordinates = arrayOf(
+                            supplierButtonY,
+                            inputCableButtonY,
+                            circuitsButtonY,
+                            usageButtonY
+                        ),
+                        painter = iconPainter
+                    )
+                }
+
             }
-
-
         }
     }
+}
 
+fun showEditionMode(drawScope: DrawScope, editButtonX: Float, editButtonYCoordinates: Array<Float>, painter: VectorPainter) {
+    for (editButtonY in editButtonYCoordinates) {
+        drawEditButton(
+            drawScope = drawScope,
+            left = editButtonX,
+            top = editButtonY,
+            painter = painter
+        )
+    }
+
+}
+
+fun drawEditButton(drawScope: DrawScope, left: Float, top: Float, painter: VectorPainter) {
+    drawScope.translate(left = left, top = top) {
+        with(painter) {
+            draw(painter.intrinsicSize)
+        }
+    }
 }

@@ -94,6 +94,7 @@ class MainActivity : ComponentActivity() {
 
                                 InstallationDrawing(
                                     installationPresenter = installation!!,
+                                    editionMode = voltageDropResult == null,
                                     modifier = Modifier
                                         .constrainAs(drawing) {
                                             top.linkTo(parent.top)
@@ -125,7 +126,7 @@ class MainActivity : ComponentActivity() {
                                             start.linkTo(parent.start)
                                             end.linkTo(parent.end)
                                             bottom.linkTo(parent.bottom)
-                                        }.padding(paddingMedium, 0.dp, paddingMedium, paddingMedium)
+                                        }.padding(paddingMedium)
                                     )
                                 }
 
