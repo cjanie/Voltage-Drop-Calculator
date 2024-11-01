@@ -137,26 +137,29 @@ fun InstallationCanvas(
         }
 
 
+        val canvasClickableModifier = modifier
+            .padding(horizontalPadding, verticalPadding)
+            .pointerInput(true) {
+                detectTapGestures(onTap = { offset ->
 
+                    if(offset.x > canvasWidthInPx - canvasWidthInPx / 4) {
+                        if (offset.y < canvasHeightInPx / 8)
+                            editStep = if (offset.y < canvasHeightInPx / 16)
+                                InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY
+                            else InstallationSetUpStep.DEFINE_NOMINAL_TENSION
+
+                        else if (offset.y > canvasHeightInPx / 8 + (canvasHeightInPx - canvasHeightInPx/8) / 2) {
+                            editStep = if(offset.y > canvasHeightInPx - canvasHeightInPx / 16)
+                                InstallationSetUpStep.DEFINE_USAGE
+                            else InstallationSetUpStep.ADD_OUTPUT_CIRCUITS
+                        } else editStep = InstallationSetUpStep.ADD_INPUT_CABLE
+                    }
+
+                })
+            }
         Canvas(
-            modifier = modifier
+            modifier = if (editionMode) canvasClickableModifier else modifier
                 .padding(horizontalPadding, verticalPadding)
-                .pointerInput(true) {
-                    detectTapGestures(onTap = { offset ->
-                       if(offset.x > canvasWidthInPx - canvasWidthInPx / 4) {
-                            if (offset.y < canvasHeightInPx / 8)
-                                editStep = if (offset.y < canvasHeightInPx / 16)
-                                    InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY
-                                    else InstallationSetUpStep.DEFINE_NOMINAL_TENSION
-
-                            else if (offset.y > canvasHeightInPx / 8 + (canvasHeightInPx - canvasHeightInPx/8) / 2) {
-                                editStep = if(offset.y > canvasHeightInPx - canvasHeightInPx / 16)
-                                    InstallationSetUpStep.DEFINE_USAGE
-                                else InstallationSetUpStep.ADD_OUTPUT_CIRCUITS
-                            } else editStep = InstallationSetUpStep.ADD_INPUT_CABLE
-                       }
-                    })
-                }
         ) {
 
             canvasWidthInPx = columnWidthInPx - horizontalPadding.toPx() * 2

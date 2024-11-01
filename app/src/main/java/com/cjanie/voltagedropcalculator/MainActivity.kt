@@ -75,6 +75,7 @@ class MainActivity : ComponentActivity() {
                             mutableStateOf(null)
                         }
 
+
                         if (installationSetUpStep == null)
                         ConstraintLayout(Modifier.fillMaxSize()) {
                             val (drawing, result) = createRefs()
