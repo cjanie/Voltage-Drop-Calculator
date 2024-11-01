@@ -153,12 +153,10 @@ class InstallationViewModel(
             createCable(cableViewModel = inputCableViewModel)
 
         } catch (e: NullValueException) {
-            LineSinglePhase(installationSetUpUseCase.use.phaseShift, Copper(), Section(1f), Intensity(2f), Length(1f))
+            LineThreePhase(installationSetUpUseCase.use.phaseShift, Copper(), Section(1f), Intensity(2f), Length(1f))
         }
 
             installationSetUpUseCase.addInput(cable = inputLine)
-
-
 
         val output = try {
             createCable(cableViewModel = outputCircuitsViewModel)
