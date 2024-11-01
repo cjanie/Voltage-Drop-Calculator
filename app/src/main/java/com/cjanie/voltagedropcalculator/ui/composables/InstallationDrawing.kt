@@ -1,15 +1,18 @@
 package com.cjanie.voltagedropcalculator.ui.composables
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -21,6 +24,7 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.TextStyle
@@ -33,6 +37,8 @@ import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Label
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
 import com.cjanie.voltagedropcalculator.ui.theme.copperColor
+import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
+import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
 
 class Pin(val start: Offset, val end: Offset)
 class Switch(val start: Offset, val end: Offset)
@@ -84,6 +90,15 @@ fun InstallationCanvas(
     val editIcon = ImageVector.vectorResource(id = R.drawable.baseline_edit_24)
     val iconPainter = rememberVectorPainter(image = editIcon)
 
+    var editStep: InstallationSetUpStep? by remember {
+        mutableStateOf(null)
+    }
+
+    if (editStep != null) {
+        Text(text = editStep.toString())
+    }
+
+
     Column(
         modifier = modifier
             .onGloballyPositioned { coordinates ->
@@ -123,18 +138,45 @@ fun InstallationCanvas(
         }
 
 
-        val horizontalPadding = 20.dp
-        val verticalPadding = 20.dp
+        val horizontalPadding = paddingMedium
+        val verticalPadding = paddingMedium
+        
+
+        var canvasWidthInPx by remember {
+            mutableFloatStateOf(0f)
+        }
+
+        var canvasHeightInPx by remember {
+            mutableFloatStateOf(0f)
+        }
 
 
-        Canvas(modifier = modifier.padding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)) {
 
-            val canvasWidthInPx = columnWidthInPx - horizontalPadding.toPx() * 2
-            val canvasHeightInPx = columnHeightInPx - verticalPadding.toPx() * 2
+        Canvas(
+            modifier = modifier
+                .padding(horizontalPadding, verticalPadding)
+                .pointerInput(true) {
+                    detectTapGestures(onTap = { offset ->
+                       if(offset.x > canvasWidthInPx - canvasWidthInPx / 4) {
+                            if (offset.y < canvasHeightInPx / 8)
+                                editStep = InstallationSetUpStep.DEFINE_NOMINAL_TENSION
+
+                            else if (offset.y > canvasHeightInPx / 8 + (canvasHeightInPx - canvasHeightInPx/8) / 2) {
+                                editStep = if(offset.y > canvasHeightInPx - canvasHeightInPx / 16)
+                                    InstallationSetUpStep.DEFINE_USAGE
+                                else InstallationSetUpStep.ADD_OUTPUT_CIRCUITS
+                            } else editStep = InstallationSetUpStep.ADD_INPUT_CABLE
+                       }
+                    })
+                }
+        ) {
+
+            canvasWidthInPx = columnWidthInPx - horizontalPadding.toPx() * 2
+            canvasHeightInPx = columnHeightInPx - verticalPadding.toPx() * 2
 
             val strokeWidth = 4f
 
-            val supplierHeight = canvasHeightInPx / 8
+            var supplierHeight = canvasHeightInPx / 8
             val supplierWidth = canvasWidthInPx - canvasWidthInPx / 4
             drawLine(copperColor, Offset(x = 0f, y = supplierHeight), Offset(x = supplierWidth, y = supplierHeight), strokeWidth)
             val supplierCirclesCenterX = canvasWidthInPx / 4

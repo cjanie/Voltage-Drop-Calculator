@@ -134,20 +134,20 @@ class InstallationViewModel(
         return tension != null
     }
 
-    fun fakeInstallation(): Installation {
-        val fakeInstallation = InstallationSetUpUseCase(Lighting(ElectricitySupply.PUBLIC), Tension(14f))
+    fun installationPlaceHolder(): InstallationPresenter {
+        val installationSetUpUseCase = InstallationSetUpUseCase(Lighting(ElectricitySupply.PUBLIC), Tension(14f))
 
-        fakeInstallation.addInput(
-            LineThreePhase(fakeInstallation.use.phaseShift, Copper(), Section(1f), Intensity(2f), Length(1f))
+        installationSetUpUseCase.addInput(
+            LineThreePhase(installationSetUpUseCase.use.phaseShift, Copper(), Section(1f), Intensity(2f), Length(1f))
         )
-        fakeInstallation.addOutput(arrayOf(
-            LineSinglePhase(fakeInstallation.use.phaseShift, Copper(), Section(1f), Intensity(2f), Length(1f))
+        installationSetUpUseCase.addOutput(arrayOf(
+            LineSinglePhase(installationSetUpUseCase.use.phaseShift, Copper(), Section(1f), Intensity(2f), Length(1f))
         ))
-        return fakeInstallation.getInstallation()!!
+        return InstallationPresenter(installation = installationSetUpUseCase.getInstallation()!!, application)
     }
 
 
-    private var installation: Installation? = fakeInstallation()//null
+    private var installation: Installation? = null
 
     fun setUp(): InstallationPresenter {
         if (functionalContext == null || electricitySupply == null || tension == null)
@@ -164,6 +164,10 @@ class InstallationViewModel(
         }
         installation = installationSetUp.getInstallation()
         return InstallationPresenter(installation!!, application)
+    }
+
+    fun isSetUpComplete(): Boolean {
+        return isUsageDefined() && isTensionDefined() // TODO
     }
 
     private fun createCable(cableViewModel: CableViewModel): Line {

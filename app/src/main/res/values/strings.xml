@@ -34,5 +34,5 @@
     <string name="percentage_sign">%</string>
     <string name="voltage_drop_acceptable_result">Voltage Drop Result \n Acceptable</string>
     <string name="voltage_drop_not_acceptable_result">Voltage Drop Result \n Not acceptable</string>
-    <string name="max_voltage_drop_acceptable_percentage_label">Maximum Voltage Drop Acceptable</string>
+    <string name="max_voltage_drop_acceptable_percentage_label">Max Drop Acceptable</string>
 </resources>
