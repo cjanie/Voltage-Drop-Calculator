@@ -20,11 +20,12 @@ import androidx.constraintlayout.compose.Dimension
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationDrawing
-import com.cjanie.voltagedropcalculator.ui.composables.InstallationSetUp
+import com.cjanie.voltagedropcalculator.ui.composables.InstallationSetUpEdition
 import com.cjanie.voltagedropcalculator.ui.composables.VoltageDropResult
 import com.cjanie.voltagedropcalculator.ui.composables.commons.SubmitButton
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
+import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
 
 class MainActivity : ComponentActivity() {
     
@@ -50,20 +51,40 @@ class MainActivity : ComponentActivity() {
                         // Content: installation drawing
                         // 2 modes: edit / result
 
-                        var installation: InstallationViewModel.InstallationPresenter by remember {
-                            mutableStateOf(installationViewModel.installationPlaceHolder())
+                        var installationSetUpStep: InstallationSetUpStep? by remember {
+                            mutableStateOf(null)
                         }
+
+                        var installation: InstallationViewModel.InstallationPresenter by remember {
+                            mutableStateOf(installationViewModel.updateInstallationPlaceHolder())
+                        }
+
+                        if (installationSetUpStep != null) {
+                            InstallationSetUpEdition(
+                                installationViewModel = installationViewModel,
+                                step = installationSetUpStep!!,
+                                next = { installationSetUpStep = null
+                                        installation = installationViewModel.updateInstallationPlaceHolder()
+                                }
+                            )
+                        }
+
+
+
                         var voltageDropResult: InstallationViewModel.VoltageDropResultPresenter? by remember {
                             mutableStateOf(null)
                         }
 
-
+                        if (installationSetUpStep == null)
                         ConstraintLayout(Modifier.fillMaxSize()) {
                             val (drawing, result) = createRefs()
 
                             InstallationDrawing(
-                                installationPresenter = installation!!,
+                                installationPresenter = installation,
                                 editionMode = voltageDropResult == null,
+                                setInstallationSetUpStep = fun(step: InstallationSetUpStep){
+                                    installationSetUpStep = step
+                                },
                                 modifier = Modifier
                                     .constrainAs(drawing) {
                                         top.linkTo(parent.top)
@@ -91,11 +112,13 @@ class MainActivity : ComponentActivity() {
                                     text = installationViewModel.calculateVoltageDropLabel,
                                     onClick = { voltageDropResult = installationViewModel.voltageDropResult() },
                                     enabled = installationViewModel.isSetUpComplete(),
-                                    modifier = Modifier.constrainAs(result) {
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                        bottom.linkTo(parent.bottom)
-                                    }.padding(paddingMedium)
+                                    modifier = Modifier
+                                        .constrainAs(result) {
+                                            start.linkTo(parent.start)
+                                            end.linkTo(parent.end)
+                                            bottom.linkTo(parent.bottom)
+                                        }
+                                        .padding(paddingMedium)
                                 )
                             }
 

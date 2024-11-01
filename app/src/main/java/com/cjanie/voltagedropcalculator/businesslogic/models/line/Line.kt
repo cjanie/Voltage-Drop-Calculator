@@ -1,8 +1,6 @@
 package com.cjanie.voltagedropcalculator.businesslogic.models.line
 
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
-import com.cjanie.voltagedropcalculator.businesslogic.factories.InstallationFactory
-import com.cjanie.voltagedropcalculator.businesslogic.models.Installation
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Resistance
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop

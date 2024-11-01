@@ -2,11 +2,8 @@ package com.cjanie.voltagedropcalculator.ui.composables
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,11 +27,9 @@ import androidx.compose.ui.res.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
-import com.cjanie.voltagedropcalculator.ui.composables.commons.Label
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
 import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
@@ -44,7 +39,12 @@ class Pin(val start: Offset, val end: Offset)
 class Switch(val start: Offset, val end: Offset)
 
 @Composable
-fun InstallationDrawing(installationPresenter: InstallationViewModel.InstallationPresenter, editionMode: Boolean, modifier: Modifier = Modifier.fillMaxSize()) {
+fun InstallationDrawing(
+        installationPresenter: InstallationViewModel.InstallationPresenter,
+        editionMode: Boolean,
+        setInstallationSetUpStep: (step: InstallationSetUpStep) -> Unit,
+        modifier: Modifier = Modifier.fillMaxSize()
+) {
 
     Column(modifier = modifier)
          {
@@ -54,6 +54,7 @@ fun InstallationDrawing(installationPresenter: InstallationViewModel.Installatio
         InstallationCanvas(
             installationPresenter = installationPresenter,
             editionMode = editionMode,
+            setInstallationSetUpStep = setInstallationSetUpStep,
             modifier = modifier
         )
 
@@ -62,22 +63,10 @@ fun InstallationDrawing(installationPresenter: InstallationViewModel.Installatio
 }
 
 @Composable
-fun InstallationSpecifications(specifications: InstallationViewModel.InstallationSpecifications) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        val modifier = Modifier.padding(20.dp)
-        Label(text = specifications.functionalContext, modifier = modifier)
-        Label(text = specifications.electricitySupply, modifier = modifier)
-        Label(text = specifications.tension, modifier = modifier)
-    }
-}
-
-@Composable
 fun InstallationCanvas(
     installationPresenter: InstallationViewModel.InstallationPresenter,
     editionMode: Boolean,
+    setInstallationSetUpStep: (step: InstallationSetUpStep) -> Unit,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
     var columnHeightInPx by remember {
@@ -95,6 +84,7 @@ fun InstallationCanvas(
     }
 
     if (editStep != null) {
+        setInstallationSetUpStep(editStep!!)
         Text(text = editStep.toString())
     }
 
@@ -113,7 +103,7 @@ fun InstallationCanvas(
         val tensionText = installationPresenter.tension
         val inputCableText = installationPresenter.inputCablePresenter.cableText
         val outputCircuitsText = installationPresenter.outputCircuitsPresenter?.cableText
-        val usageText = installationPresenter.functionalContext
+        val usageText = installationPresenter.usage
         val style = TextStyle(
             fontSize = 16.sp,
             color = Color.Black
@@ -159,7 +149,9 @@ fun InstallationCanvas(
                     detectTapGestures(onTap = { offset ->
                        if(offset.x > canvasWidthInPx - canvasWidthInPx / 4) {
                             if (offset.y < canvasHeightInPx / 8)
-                                editStep = InstallationSetUpStep.DEFINE_NOMINAL_TENSION
+                                editStep = if (offset.y < canvasHeightInPx / 16)
+                                    InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY
+                                    else InstallationSetUpStep.DEFINE_NOMINAL_TENSION
 
                             else if (offset.y > canvasHeightInPx / 8 + (canvasHeightInPx - canvasHeightInPx/8) / 2) {
                                 editStep = if(offset.y > canvasHeightInPx - canvasHeightInPx / 16)
@@ -421,8 +413,8 @@ fun InstallationCanvas(
 
                 // Legends
 
-                val supplierTextY = 0f
-                val tensionTextY = supplierCircleBottomCenterY
+                val supplierTextY = supplierHeight / 4 - supplierTextLayoutResult.size.height / 2//0f
+                val tensionTextY = supplierHeight - supplierHeight / 4 - tensionTextResultLayout.size.height / 2//supplierCircleBottomCenterY
                 val usageTextY = circuitEndY + deviceCircleRadius - iconPainter.intrinsicSize.height / 2
 
 
@@ -442,6 +434,7 @@ fun InstallationCanvas(
 
                 drawText(
                     inputCableTextLayoutResult,
+                    color = installationPresenter.inputCablePresenter.textColor,
                     topLeft = Offset(
                         x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - inputCableTextLayoutResult.size.width,
                         y = inputCableMiddle.y - inputCableTextLayoutResult.size.height / 2))
@@ -453,12 +446,15 @@ fun InstallationCanvas(
                 if (outputCircuitsTextLayoutResult != null) {
                     drawText(
                         outputCircuitsTextLayoutResult,
+                        color = installationPresenter.outputCircuitsPresenter.textColor,
                         topLeft = Offset(
                             x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - outputCircuitsTextLayoutResult.size.width,
                             y= circuitsMiddleY - outputCircuitsTextLayoutResult.size.height / 2)
                     )
                 }
-                drawText(usageTextResultLayout, topLeft = Offset(
+                drawText(
+                    usageTextResultLayout,
+                    topLeft = Offset(
                     x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - usageTextResultLayout.size.width,
                     y = usageTextY
                     )
@@ -466,7 +462,8 @@ fun InstallationCanvas(
 
                 // Edition
                 val editButtonX = canvasWidthInPx - iconPainter.intrinsicSize.width
-                val supplierButtonY = tensionTextY / 2 - iconPainter.intrinsicSize.height / 2
+                val supplierButtonY = supplierTextY
+                val tensionButtonY = tensionTextY
                 val inputCableButtonY = inputCableMiddle.y - iconPainter.intrinsicSize.height / 2
 
                 val circuitsButtonY = circuitsMiddleY - iconPainter.intrinsicSize.height / 2
@@ -477,6 +474,7 @@ fun InstallationCanvas(
                         editButtonX = editButtonX,
                         editButtonYCoordinates = arrayOf(
                             supplierButtonY,
+                            tensionButtonY,
                             inputCableButtonY,
                             circuitsButtonY,
                             usageButtonY

@@ -5,7 +5,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionalContext
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
 
 class Lighting(electricitySupply: ElectricitySupply): Use(electricitySupply) {
-    override val functionalContext: FunctionalContext
+    override val usage: FunctionalContext
         get() = FunctionalContext.LIGHTING
     override val phaseShift: PhaseShift
         get() = PhaseShift(cosPHI = 1f)

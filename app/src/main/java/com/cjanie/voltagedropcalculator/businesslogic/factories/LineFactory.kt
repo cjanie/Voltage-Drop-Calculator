@@ -10,6 +10,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionalContext
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
+import com.cjanie.voltagedropcalculator.businesslogic.models.use.Motor
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
 
@@ -20,7 +21,7 @@ class LineFactory {
 
             val use: Use = when(functionalContext) {
                 FunctionalContext.LIGHTING -> Lighting(electricitySupply = electricitySupply)
-                FunctionalContext.MOTOR -> Lighting(electricitySupply = electricitySupply) // TODO MOTOR
+                FunctionalContext.MOTOR -> Motor(electricitySupply = electricitySupply)
             }
 
             val conductor = ConductorFactory.conductor(conductorMaterial)

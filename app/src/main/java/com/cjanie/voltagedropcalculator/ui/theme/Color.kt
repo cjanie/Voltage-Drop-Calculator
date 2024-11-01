@@ -21,3 +21,5 @@ val onRedWarningColor = Color.White
 
 val whiteColor = Color.White
 val onWhiteColor = Color.Black
+
+val placeHolderColor = Color.Gray

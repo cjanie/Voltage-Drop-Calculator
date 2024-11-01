@@ -1,10 +1,7 @@
 package com.cjanie.voltagedropcalculator.ui.composables
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,27 +10,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Dropdown
-import com.cjanie.voltagedropcalculator.ui.composables.commons.Label
 import com.cjanie.voltagedropcalculator.ui.composables.commons.NumberInput
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Subtitle
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Title
 import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CableViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.ElectricitySupplyViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InputCableViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.OutputCircuitsViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TensionViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.UsageViewModel
 
 @Composable()
-fun InstallationSetUp(
-    modifier: Modifier,
+fun InstallationSetUpEdition(
+    modifier: Modifier = Modifier.fillMaxSize(),
     installationViewModel: InstallationViewModel,
-    finish: (installationPresenter: InstallationViewModel.InstallationPresenter) -> Unit
+    step: InstallationSetUpStep,
+    next: () -> Unit
 ){
 
     Column(
@@ -45,25 +42,16 @@ fun InstallationSetUp(
             textColor = copperColor
         )
 
-        var step: InstallationSetUpStep? by remember {
-            mutableStateOf(installationViewModel.installationSetUpStart)
-        }
 
-
-        if(step != null) {
 
             Subtitle(
-                text = installationViewModel.stepLabel(step!!),
+                text = installationViewModel.stepLabel(step),
                 color = greenWarningColor
             )
 
-            fun next() {
-                step = installationViewModel.next(step!!)
-            }
+            when (step) {
 
-            when (step!!) {
-
-                InstallationSetUpStep.DEFINE_USAGE -> DefineInstallationUsage(
+                InstallationSetUpStep.DEFINE_USAGE -> EditUsage(
                     viewModel = installationViewModel,
                     next = { next() }
                 )
@@ -80,52 +68,65 @@ fun InstallationSetUp(
                     viewModel = installationViewModel,
                     next = {
                         next()
-                        finish(installationViewModel.setUp())
                     }
                 )
+
+                InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> EditElectricitySupply(
+                    viewModel = installationViewModel,
+                    next = { next() })
             }
-        }
+
     }
 }
 
 @Composable
-fun DefineInstallationUsage(viewModel: InstallationViewModel, next: () -> Unit) {
+fun EditUsage(viewModel: UsageViewModel, next: () -> Unit, modifier: Modifier = Modifier.fillMaxSize()) {
+
+    var isStepEnabled by remember {
+        mutableStateOf(true)
+    }
+
+    Column(modifier = modifier) {
+
+        Dropdown(
+            label = viewModel.usageLabel,
+            options = viewModel.usageOptions,
+            select = fun(itemPosition: Int) {
+                viewModel.setUsage(itemPosition)
+                next()
+            },
+            enabled = isStepEnabled
+        )
+
+    }
+}
+
+@Composable
+fun EditElectricitySupply(viewModel: ElectricitySupplyViewModel, next: () -> Unit, modifier: Modifier = Modifier.fillMaxSize()) {
 
     var isStepCompleted by remember {
         mutableStateOf(false)
+    }
+
+    if(isStepCompleted) next()
+
+    fun updateStepState() {
+        isStepCompleted = viewModel.isElectricitySupplyDefined()
     }
 
     var isStepEnabled by remember {
         mutableStateOf(true)
     }
 
-    Column {
-
-        fun updateStepState() {
-            isStepCompleted = viewModel.isUsageDefined()
-        }
-
-        Dropdown(
-            label = viewModel.functionalContextLabel,
-            options = viewModel.functionnalContextOptions,
-            select = fun(itemPosition: Int) {
-                viewModel.setFunctionnalContext(itemPosition)
-                updateStepState()
-            },
-            enabled = isStepEnabled
-        )
-        Dropdown(
-            label = viewModel.electricitySupplyLabel,
-            options = viewModel.electricitySupplyOptions,
-            select = fun(index: Int) {
-                viewModel.setElectricitySupply(index)
-                updateStepState()
-            },
-            enabled = isStepEnabled
-        )
-
-        if(isStepCompleted) next()
-    }
+    Dropdown(
+        label = viewModel.electricitySupplyLabel,
+        options = viewModel.electricitySupplyOptions,
+        select = fun(index: Int) {
+            viewModel.setElectricitySupply(index)
+            updateStepState()
+        },
+        enabled = isStepEnabled
+    )
 }
 
 

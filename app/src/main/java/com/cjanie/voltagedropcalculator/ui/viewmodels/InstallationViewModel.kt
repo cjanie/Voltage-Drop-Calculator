@@ -1,9 +1,11 @@
 package com.cjanie.voltagedropcalculator.ui.viewmodels
 
 import android.app.Application
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.R
+import com.cjanie.voltagedropcalculator.businesslogic.PhaseShiftInconsistancyException
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionalContext
 import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
@@ -14,6 +16,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineSinglePhase
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineThreePhase
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Lighting
+import com.cjanie.voltagedropcalculator.businesslogic.models.use.Motor
 import com.cjanie.voltagedropcalculator.businesslogic.usecases.InstallationSetUpUseCase
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
@@ -22,30 +25,32 @@ import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
 import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.onGreenWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.onRedWarningColor
+import com.cjanie.voltagedropcalculator.ui.theme.placeHolderColor
 import com.cjanie.voltagedropcalculator.ui.theme.redWarningColor
 
 enum class InstallationSetUpStep {
     DEFINE_USAGE,
+    DEFINE_ELECTRICITY_SUPPLY,
+    DEFINE_NOMINAL_TENSION,
     ADD_INPUT_CABLE,
     ADD_OUTPUT_CIRCUITS,
-    DEFINE_NOMINAL_TENSION
+
 }
 
 class InstallationViewModel(
     private val application: Application
 ) : AndroidViewModel(application),
     UsageViewModel,
+    ElectricitySupplyViewModel,
     TensionViewModel
 {
     // Title
     val title = application.getString(R.string.installation_setup_title)
 
-    val installationSetUpStart: InstallationSetUpStep? = InstallationSetUpStep.DEFINE_USAGE
-
     companion object {
 
-        private fun functionalContextToString(functionalContext: FunctionalContext, application: Application): String {
-            return when (functionalContext) {
+        private fun usageToString(usage: FunctionalContext, application: Application): String {
+            return when (usage) {
                 FunctionalContext.LIGHTING -> application.getString(R.string.functional_context_lighting)
                 FunctionalContext.MOTOR -> application.getString(R.string.functional_context_motor)
             }
@@ -70,30 +75,23 @@ class InstallationViewModel(
             InstallationSetUpStep.ADD_INPUT_CABLE -> application.getString(R.string.add_input_cable_label)
             InstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> application.getString(R.string.add_output_circuits_label)
             InstallationSetUpStep.DEFINE_NOMINAL_TENSION -> application.getString(R.string.define_nominal_tension)
-        }
-    }
-
-    fun next(currentStep: InstallationSetUpStep): InstallationSetUpStep? {
-        return when (currentStep) {
-            InstallationSetUpStep.DEFINE_USAGE -> InstallationSetUpStep.ADD_INPUT_CABLE
-            InstallationSetUpStep.ADD_INPUT_CABLE -> InstallationSetUpStep.ADD_OUTPUT_CIRCUITS
-            InstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> InstallationSetUpStep.DEFINE_NOMINAL_TENSION
-            InstallationSetUpStep.DEFINE_NOMINAL_TENSION -> null
+            InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> application.getString(R.string.define_electricity_supply)
         }
     }
 
     // UsageViewModel Impl
 
-    private var functionalContext: FunctionalContext? = null
-    private val functionalContextValues: Set<FunctionalContext> = FunctionalContext.values().toHashSet()
-    override val functionalContextLabel = application.getString(R.string.functional_context_label)
-    override val functionnalContextOptions: Array<String> = functionalContextValues
-        .map { functionalContextToString(it, application) }.toTypedArray()
-    override fun setFunctionnalContext(itemPosition: Int) {
-        functionalContext = functionalContextValues.toList()[itemPosition]
+    private var usage: FunctionalContext = FunctionalContext.LIGHTING
+    private val usageValues: Set<FunctionalContext> = FunctionalContext.values().toHashSet()
+    override val usageLabel = application.getString(R.string.usage_label)
+    override val usageOptions: Array<String> = usageValues
+        .map { usageToString(it, application) }.toTypedArray()
+    override fun setUsage(itemPosition: Int) {
+        usage = usageValues.toList()[itemPosition]
     }
 
-    private var electricitySupply: ElectricitySupply? = null
+    // ElectricitySupplyViewModel Impl
+    private var electricitySupply: ElectricitySupply = ElectricitySupply.PUBLIC
     private val electricitySupplyValues: Set<ElectricitySupply> = ElectricitySupply.values().toHashSet()
     override val electricitySupplyLabel = application.getString(R.string.electricity_supply_label)
     override val electricitySupplyOptions: Array<String> = electricitySupplyValues
@@ -103,26 +101,23 @@ class InstallationViewModel(
                 ElectricitySupply.PRIVATE -> application.getString(R.string.electricity_supply_private)
             }
         }.toTypedArray()
+
     override fun setElectricitySupply(itemPosition: Int) {
         electricitySupply = electricitySupplyValues.toList()[itemPosition]
     }
 
-    override fun isUsageDefined(): Boolean {
-        return functionalContext != null && electricitySupply != null
+    override fun isElectricitySupplyDefined(): Boolean {
+        return electricitySupply != null
     }
 
-
-    val inputCableViewModel = InputCableViewModel(application)
-
-    val outputCircuitsViewModel = OutputCircuitsViewModel(application)
-
     // TensionViewModel Impl
-    private var tension: Tension? = null
     private val tensionValues: Set<Tension> = setOf(
         Tension(inVolt = 3f),
         Tension(24f),
         Tension(230f),
     )
+    private var tension: Tension = tensionValues.toList()[2]
+
     override val tensionLabel = application.getString(R.string.tension_label)
     override val tensionOptions: Array<String> = tensionValues
         .map { tensionToString(it, application) }.toTypedArray()
@@ -134,27 +129,61 @@ class InstallationViewModel(
         return tension != null
     }
 
-    fun installationPlaceHolder(): InstallationPresenter {
-        val installationSetUpUseCase = InstallationSetUpUseCase(Lighting(ElectricitySupply.PUBLIC), Tension(14f))
+    // ViewModels for cables
 
-        installationSetUpUseCase.addInput(
-            LineThreePhase(installationSetUpUseCase.use.phaseShift, Copper(), Section(1f), Intensity(2f), Length(1f))
+
+    val inputCableViewModel = InputCableViewModel(application)
+
+    val outputCircuitsViewModel = OutputCircuitsViewModel(application)
+
+    // PlaceHolder
+
+    fun updateInstallationPlaceHolder(): InstallationPresenter {
+
+        var installationSetUpUseCase = InstallationSetUpUseCase(
+
+            use = when(usage) {
+                FunctionalContext.LIGHTING -> Lighting(electricitySupply)
+                FunctionalContext.MOTOR -> Motor(electricitySupply)
+                            },
+            tension = tension
         )
-        installationSetUpUseCase.addOutput(arrayOf(
+
+        val inputLine = try {
+            createCable(cableViewModel = inputCableViewModel)
+
+        } catch (e: NullValueException) {
             LineSinglePhase(installationSetUpUseCase.use.phaseShift, Copper(), Section(1f), Intensity(2f), Length(1f))
-        ))
-        return InstallationPresenter(installation = installationSetUpUseCase.getInstallation()!!, application)
+        }
+
+            installationSetUpUseCase.addInput(cable = inputLine)
+
+
+
+        val output = try {
+            createCable(cableViewModel = outputCircuitsViewModel)
+        } catch (e: NullValueException) {
+            LineSinglePhase(installationSetUpUseCase.use.phaseShift, Copper(), Section(50f), Intensity(2f), Length(0.02f))
+
+        }
+        installationSetUpUseCase.addOutput(arrayOf(output))
+
+        val inputCableColor = if (!inputCableViewModel.isFormComplete()) placeHolderColor else Color.Unspecified
+        val outputCircuitsColor = if (!outputCircuitsViewModel.isFormComplete()) placeHolderColor else Color.Unspecified
+        return InstallationPresenter(
+            installation = installationSetUpUseCase.getInstallation()!!,
+            application,
+            inputCableColor = inputCableColor,
+            outputCircuitsColor = outputCircuitsColor)
     }
 
 
     private var installation: Installation? = null
 
     fun setUp(): InstallationPresenter {
-        if (functionalContext == null || electricitySupply == null || tension == null)
-            throw NullValueException()
-        val use = when (functionalContext!!) {
-            FunctionalContext.LIGHTING -> Lighting(electricitySupply!!)
-            FunctionalContext.MOTOR -> Lighting(electricitySupply!!) // TODO MOTOR IMPL
+        val use = when (usage) {
+            FunctionalContext.LIGHTING -> Lighting(electricitySupply)
+            FunctionalContext.MOTOR -> Motor(electricitySupply) // TODO MOTOR IMPL
         }
         val installationSetUp = InstallationSetUpUseCase(use = use, tension = tension!!)
         installationSetUp.addInput(cable = createCable(cableViewModel = inputCableViewModel))
@@ -167,15 +196,15 @@ class InstallationViewModel(
     }
 
     fun isSetUpComplete(): Boolean {
-        return isUsageDefined() && isTensionDefined() // TODO
+        return inputCableViewModel.isFormComplete() // TODO
     }
 
     private fun createCable(cableViewModel: CableViewModel): Line {
-        if(functionalContext == null || electricitySupply == null || (cableViewModel is InputCableViewModel && !cableViewModel.isFormComplete()))
+        if(!cableViewModel.isFormComplete())
             throw NullValueException()
         return LineFactory.line(
-            functionalContext = functionalContext!!,
-            electricitySupply = electricitySupply!!,
+            functionalContext = usage,
+            electricitySupply = electricitySupply,
             phasing = cableViewModel.phasing!!,
             conductorMaterial = cableViewModel.conductor!!,
             section = cableViewModel.section!!,
@@ -184,26 +213,47 @@ class InstallationViewModel(
         )
     }
 
-    interface InstallationSpecifications {
-        val functionalContext: String
-        val electricitySupply: String
-        val tension: String
+    interface UsagePresenter {
+        val usage: String
     }
 
+    interface ElectricitySupplyPresenter {
+        val electricitySupply: String
+    }
+
+    interface TensionPresenter {
+        val tension: String
+    }
     class InstallationPresenter(
         installation: Installation,
-        application: Application
-    ): InstallationSpecifications {
-        override val functionalContext = functionalContextToString(functionalContext = installation.use.functionalContext, application = application)
+        application: Application,
+        inputCableColor: Color = Color.Unspecified,
+        outputCircuitsColor: Color = Color.Unspecified,
+    ): UsagePresenter, ElectricitySupplyPresenter, TensionPresenter
+
+    {
+        override val usage = usageToString(usage = installation.use.usage, application = application)
         override val electricitySupply = electricitySupplyToString(installation.use.electricitySupply, application)
         override val tension = tensionToString(tension = installation.nominalTension, application = application)
-        val inputCablePresenter = CablePresenter(cable = installation.input, application = application)
+        val inputCablePresenter = CablePresenter(
+            cable = installation.input,
+            application = application,
+            textColor = inputCableColor
+        )
         val outputCircuitsPresenter =
             if (!installation.output.isEmpty())
-                CablePresenter(cable = installation.output[0], application)
+                CablePresenter(
+                    cable = installation.output[0],
+                    application = application,
+                    textColor = outputCircuitsColor
+                )
             else null
     }
-    class CablePresenter(cable: Line, application: Application) {
+
+    class CablePresenter(
+        cable: Line, application: Application,
+        val textColor: Color = Color.Unspecified
+    ) {
         val phasing = cable.phasing
         private val conductor =
             CableViewModel.conductorToString(cable.conductor.material, application)
@@ -211,7 +261,6 @@ class InstallationViewModel(
         private val intensity = CableViewModel.intensityToString(cable.intensity, application)
         private val length = CableViewModel.lengthToString(cable.length, application)
         val cableText = "$conductor\n$section\n$intensity\n${length}"
-
     }
 
     val calculateVoltageDropLabel = application.getString(R.string.calculate_voltage_drop_label)
