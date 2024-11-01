@@ -48,9 +48,6 @@ fun InstallationDrawing(
 
     Column(modifier = modifier)
          {
-
-        //InstallationSpecifications(installationPresenter)
-
         InstallationCanvas(
             installationPresenter = installationPresenter,
             editionMode = editionMode,
@@ -85,7 +82,6 @@ fun InstallationCanvas(
 
     if (editStep != null) {
         setInstallationSetUpStep(editStep!!)
-        Text(text = editStep.toString())
     }
 
 

@@ -23,10 +23,11 @@ fun Dropdown(
     label: String,
     options: Array<String>,
     select: (itemPosition: Int) -> Unit,
-    enabled: Boolean
+    enabled: Boolean,
+    isExpanded: Boolean = false
 ) {
     var isDropDownExpanded by remember {
-        mutableStateOf(false)
+        mutableStateOf(isExpanded)
     }
 
     var itemPosition: Int? by remember {

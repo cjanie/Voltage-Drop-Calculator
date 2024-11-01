@@ -1,7 +1,9 @@
 package com.cjanie.voltagedropcalculator.ui.composables
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,61 +34,79 @@ fun InstallationSetUpEdition(
     step: InstallationSetUpStep,
     next: () -> Unit
 ){
-
-    Column(
-        modifier = modifier
-    ) {
-
-        Title(
-            text = installationViewModel.title,
-            textColor = copperColor
-        )
-
-
-
-            Subtitle(
-                text = installationViewModel.stepLabel(step),
-                color = greenWarningColor
-            )
-
             when (step) {
 
-                InstallationSetUpStep.DEFINE_USAGE -> EditUsage(
-                    viewModel = installationViewModel,
-                    next = { next() }
-                )
-                InstallationSetUpStep.ADD_INPUT_CABLE -> AddInputCable(
-                    viewModel = installationViewModel.inputCableViewModel,
-                    next = { next() }
-                )
-                InstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> AddOutputCircuits(
-                    viewModel = installationViewModel.outputCircuitsViewModel,
-                    next = { next() },
-                    skip = { next() }
-                )
-                InstallationSetUpStep.DEFINE_NOMINAL_TENSION -> DefineNominalTension(
-                    viewModel = installationViewModel,
-                    next = {
-                        next()
-                    }
-                )
+                InstallationSetUpStep.DEFINE_USAGE -> Column(
+                    modifier = modifier,
+                    verticalArrangement = Arrangement.Bottom
+                ){
+                    EditUsage(
+                        viewModel = installationViewModel,
+                        next = { next() },
+                    )
+                }
+                InstallationSetUpStep.ADD_INPUT_CABLE -> Column(
+                    modifier = modifier,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    Subtitle(
+                        text = installationViewModel.stepLabel(step),
+                        color = greenWarningColor
+                    )
+                    AddInputCable(
+                        viewModel = installationViewModel.inputCableViewModel,
+                        next = { next() }
+                    )
+                }
+                InstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> Column(
+                    modifier = modifier,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    Subtitle(
+                        text = installationViewModel.stepLabel(step),
+                        color = greenWarningColor
+                    )
+                    AddOutputCircuits(
+                        viewModel = installationViewModel.outputCircuitsViewModel,
+                        next = { next() },
+                        skip = { next() }
+                    )
 
-                InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> EditElectricitySupply(
-                    viewModel = installationViewModel,
-                    next = { next() })
+                }
+                InstallationSetUpStep.DEFINE_NOMINAL_TENSION -> Column(
+                    modifier = modifier,
+                    verticalArrangement = Arrangement.Top
+                ){
+                    EditNominalTension(
+                        viewModel = installationViewModel,
+                        next = { next() }
+                    )
+                }
+
+                InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> Column(
+                    modifier = modifier,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    EditElectricitySupply(
+                        viewModel = installationViewModel,
+                        next = { next() }
+                    )
+                }
             }
 
-    }
+
 }
 
 @Composable
-fun EditUsage(viewModel: UsageViewModel, next: () -> Unit, modifier: Modifier = Modifier.fillMaxSize()) {
+fun EditUsage(
+    viewModel: UsageViewModel, next: () -> Unit
+) {
 
     var isStepEnabled by remember {
         mutableStateOf(true)
     }
 
-    Column(modifier = modifier) {
+
 
         Dropdown(
             label = viewModel.usageLabel,
@@ -95,14 +115,17 @@ fun EditUsage(viewModel: UsageViewModel, next: () -> Unit, modifier: Modifier = 
                 viewModel.setUsage(itemPosition)
                 next()
             },
-            enabled = isStepEnabled
+            enabled = isStepEnabled,
+            isExpanded = true
         )
 
-    }
+
 }
 
 @Composable
-fun EditElectricitySupply(viewModel: ElectricitySupplyViewModel, next: () -> Unit, modifier: Modifier = Modifier.fillMaxSize()) {
+fun EditElectricitySupply(
+    viewModel: ElectricitySupplyViewModel, next: () -> Unit
+) {
 
     var isStepCompleted by remember {
         mutableStateOf(false)
@@ -125,7 +148,8 @@ fun EditElectricitySupply(viewModel: ElectricitySupplyViewModel, next: () -> Uni
             viewModel.setElectricitySupply(index)
             updateStepState()
         },
-        enabled = isStepEnabled
+        enabled = isStepEnabled,
+        isExpanded = true
     )
 }
 
@@ -137,7 +161,10 @@ fun AddInputCable(viewModel: InputCableViewModel, next: () -> Unit) {
 
 
 @Composable
-fun CableForm(viewModel: CableViewModel, next: () -> Unit) {
+fun CableForm(
+    viewModel: CableViewModel,
+    next: () -> Unit
+) {
     var isStepCompleted by remember {
         mutableStateOf(false)
     }
@@ -205,7 +232,11 @@ fun CableForm(viewModel: CableViewModel, next: () -> Unit) {
 }
 
 @Composable
-fun AddOutputCircuits(viewModel: OutputCircuitsViewModel, next: () -> Unit, skip: () -> Unit) {
+fun AddOutputCircuits(
+    viewModel: OutputCircuitsViewModel,
+    next: () -> Unit,
+    skip: () -> Unit
+) {
     CableForm(viewModel = viewModel, next = next)
     Button(onClick = { skip() }) {
         Text(text = viewModel.skipLabel)
@@ -213,7 +244,7 @@ fun AddOutputCircuits(viewModel: OutputCircuitsViewModel, next: () -> Unit, skip
 }
 
 @Composable
-fun DefineNominalTension(viewModel: TensionViewModel, next: () -> Unit) {
+fun EditNominalTension(viewModel: TensionViewModel, next: () -> Unit) {
     var isStepCompleted by remember {
         mutableStateOf(false)
     }
@@ -221,7 +252,6 @@ fun DefineNominalTension(viewModel: TensionViewModel, next: () -> Unit) {
         mutableStateOf(true)
     }
 
-    Column {
 
         fun updateStepState() {
             isStepCompleted = viewModel.isTensionDefined()
@@ -233,9 +263,9 @@ fun DefineNominalTension(viewModel: TensionViewModel, next: () -> Unit) {
                 viewModel.setTension(index)
                 updateStepState()
             },
-            enabled = fieldsEnabled
+            enabled = fieldsEnabled,
+            isExpanded = true
         )
-    }
 
     if (isStepCompleted) next()
 
