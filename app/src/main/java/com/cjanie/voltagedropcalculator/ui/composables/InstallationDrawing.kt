@@ -8,22 +8,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.*
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
 import com.cjanie.voltagedropcalculator.R
@@ -49,25 +45,37 @@ fun InstallationDrawing(
         modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
+    // Edit icon for edition mode
+    val editIcon = ImageVector.vectorResource(id = R.drawable.baseline_edit_24)
+    val editIconPainter = rememberVectorPainter(image = editIcon)
+
     when (installationTemplate) {
         InstallationTemplate.COMPLETE -> InstallationCanvas(
             installationPresenter = installationPresenter,
             editionMode = editionMode,
+            editIconPainter = editIconPainter,
             setInstallationSetUpStep = setInstallationSetUpStep,
             modifier = modifier
         )
 
-        InstallationTemplate.TRUNCATED -> TruncatedInstallationCanvas()
+        InstallationTemplate.TRUNCATED -> TruncatedInstallationCanvas(
+            editionMode = editionMode,
+            editIconPainter = editIconPainter
+        )
     }
 }
 
 @Composable
-fun TruncatedInstallationCanvas() {}
+fun TruncatedInstallationCanvas(
+    editionMode: Boolean,
+    editIconPainter: VectorPainter
+) {}
 
 @Composable
 fun InstallationCanvas(
     installationPresenter: InstallationViewModel.InstallationPresenter,
     editionMode: Boolean,
+    editIconPainter: VectorPainter,
     setInstallationSetUpStep: (step: InstallationSetUpStep) -> Unit,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
@@ -77,9 +85,6 @@ fun InstallationCanvas(
     var columnWidthInPx by remember {
         mutableFloatStateOf(0f)
     }
-
-    val editIcon = ImageVector.vectorResource(id = R.drawable.baseline_edit_24)
-    val iconPainter = rememberVectorPainter(image = editIcon)
 
     Column(
         modifier = modifier
@@ -391,8 +396,8 @@ fun InstallationCanvas(
                 // Edition
                 val supplierButtonY = supplierTextY
                 val tensionButtonY = tensionTextY
-                val inputCableButtonY = inputCableMiddle.y - iconPainter.intrinsicSize.height / 2
-                val circuitsButtonY = circuitsMiddleY - iconPainter.intrinsicSize.height / 2
+                val inputCableButtonY = inputCableMiddle.y - editIconPainter.intrinsicSize.height / 2
+                val circuitsButtonY = circuitsMiddleY - editIconPainter.intrinsicSize.height / 2
                 val usageButtonY = usageTextY
 
                 if(editionMode) {
@@ -406,7 +411,7 @@ fun InstallationCanvas(
                             circuitsButtonY,
                             usageButtonY
                         ),
-                        painter = iconPainter
+                        painter = editIconPainter
                     )
                 }
 
