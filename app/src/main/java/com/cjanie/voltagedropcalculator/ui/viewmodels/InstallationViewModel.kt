@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.R
-import com.cjanie.voltagedropcalculator.businesslogic.PhaseShiftInconsistancyException
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionalContext
 import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
@@ -212,7 +211,9 @@ class InstallationViewModel(
     }
 
     interface UsagePresenter {
-        val usage: String
+        val usageAsString: String
+        val usage: FunctionalContext
+
     }
 
     interface ElectricitySupplyPresenter {
@@ -230,7 +231,8 @@ class InstallationViewModel(
     ): UsagePresenter, ElectricitySupplyPresenter, TensionPresenter
 
     {
-        override val usage = usageToString(usage = installation.use.usage, application = application)
+        override val usageAsString = usageToString(usage = installation.use.usage, application = application)
+        override val usage: FunctionalContext = installation.use.usage
         override val electricitySupply = electricitySupplyToString(installation.use.electricitySupply, application)
         override val tension = tensionToString(tension = installation.nominalTension, application = application)
         val inputCablePresenter = CablePresenter(
