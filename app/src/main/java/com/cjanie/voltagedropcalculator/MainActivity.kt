@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationDrawing
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationSetUpEdition
@@ -29,7 +29,7 @@ import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
 
 class MainActivity : ComponentActivity() {
     
-    private val installationViewModel by lazy { InstallationViewModel(application) }
+    private val completeInstallationViewModel by lazy { CompleteInstallationViewModel(application) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,23 +55,23 @@ class MainActivity : ComponentActivity() {
                             mutableStateOf(null)
                         }
 
-                        var installation: InstallationViewModel.InstallationPresenter by remember {
-                            mutableStateOf(installationViewModel.updateInstallationPlaceHolder())
+                        var installation: CompleteInstallationViewModel.InstallationPresenter by remember {
+                            mutableStateOf(completeInstallationViewModel.updateInstallationPlaceHolder())
                         }
 
                         if (installationSetUpStep != null) {
                             InstallationSetUpEdition(
-                                installationViewModel = installationViewModel,
+                                completeInstallationViewModel = completeInstallationViewModel,
                                 step = installationSetUpStep!!,
                                 next = { installationSetUpStep = null
-                                        installation = installationViewModel.updateInstallationPlaceHolder()
+                                        installation = completeInstallationViewModel.updateInstallationPlaceHolder()
                                 }
                             )
                         }
 
 
 
-                        var voltageDropResult: InstallationViewModel.VoltageDropResultPresenter? by remember {
+                        var voltageDropResult: CompleteInstallationViewModel.VoltageDropResultPresenter? by remember {
                             mutableStateOf(null)
                         }
 
@@ -110,9 +110,9 @@ class MainActivity : ComponentActivity() {
                                 )
                             } else {
                                 SubmitButton(
-                                    text = installationViewModel.calculateVoltageDropLabel,
-                                    onClick = { voltageDropResult = installationViewModel.voltageDropResult() },
-                                    enabled = installationViewModel.isSetUpComplete(),
+                                    text = completeInstallationViewModel.calculateVoltageDropLabel,
+                                    onClick = { voltageDropResult = completeInstallationViewModel.voltageDropResult() },
+                                    enabled = completeInstallationViewModel.isSetUpComplete(),
                                     modifier = Modifier
                                         .constrainAs(result) {
                                             start.linkTo(parent.start)

@@ -1,6 +1,6 @@
 package com.cjanie.voltagedropcalculator.businesslogic.enums
 
-enum class FunctionalContext {
+enum class Usage {
     LIGHTING,
     MOTOR
 }

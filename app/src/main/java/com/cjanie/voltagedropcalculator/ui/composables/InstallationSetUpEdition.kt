@@ -3,7 +3,6 @@ package com.cjanie.voltagedropcalculator.ui.composables
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,14 +14,12 @@ import androidx.compose.ui.Modifier
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Dropdown
 import com.cjanie.voltagedropcalculator.ui.composables.commons.NumberInput
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Subtitle
-import com.cjanie.voltagedropcalculator.ui.composables.commons.Title
-import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CableViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.ElectricitySupplyViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InputCableViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
-import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.OutputCircuitsViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TensionViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.UsageViewModel
@@ -30,7 +27,7 @@ import com.cjanie.voltagedropcalculator.ui.viewmodels.UsageViewModel
 @Composable()
 fun InstallationSetUpEdition(
     modifier: Modifier = Modifier.fillMaxSize(),
-    installationViewModel: InstallationViewModel,
+    completeInstallationViewModel: CompleteInstallationViewModel,
     step: InstallationSetUpStep,
     next: () -> Unit
 ){
@@ -41,7 +38,7 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Bottom
                 ){
                     EditUsage(
-                        viewModel = installationViewModel,
+                        viewModel = completeInstallationViewModel,
                         next = { next() },
                     )
                 }
@@ -50,11 +47,11 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Center
                 ){
                     Subtitle(
-                        text = installationViewModel.stepLabel(step),
+                        text = completeInstallationViewModel.stepLabel(step),
                         color = greenWarningColor
                     )
                     AddInputCable(
-                        viewModel = installationViewModel.inputCableViewModel,
+                        viewModel = completeInstallationViewModel.inputCableViewModel,
                         next = { next() }
                     )
                 }
@@ -63,11 +60,11 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Center
                 ){
                     Subtitle(
-                        text = installationViewModel.stepLabel(step),
+                        text = completeInstallationViewModel.stepLabel(step),
                         color = greenWarningColor
                     )
                     AddOutputCircuits(
-                        viewModel = installationViewModel.outputCircuitsViewModel,
+                        viewModel = completeInstallationViewModel.outputCircuitsViewModel,
                         next = { next() },
                         skip = { next() }
                     )
@@ -78,7 +75,7 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Top
                 ){
                     EditNominalTension(
-                        viewModel = installationViewModel,
+                        viewModel = completeInstallationViewModel,
                         next = { next() }
                     )
                 }
@@ -88,7 +85,7 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Top
                 ) {
                     EditElectricitySupply(
-                        viewModel = installationViewModel,
+                        viewModel = completeInstallationViewModel,
                         next = { next() }
                     )
                 }

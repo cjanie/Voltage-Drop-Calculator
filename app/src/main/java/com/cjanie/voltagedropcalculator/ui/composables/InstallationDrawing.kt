@@ -19,14 +19,15 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.*
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
 import com.cjanie.voltagedropcalculator.R
-import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionalContext
+import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 import com.cjanie.voltagedropcalculator.ui.DrawingTools
-import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationViewModel
 import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
@@ -38,29 +39,40 @@ enum class InstallationTemplate {
 }
 @Composable
 fun InstallationDrawing(
-        installationPresenter: InstallationViewModel.InstallationPresenter,
-        editionMode: Boolean,
-        installationTemplate: InstallationTemplate = InstallationTemplate.COMPLETE,
-        setInstallationSetUpStep: (step: InstallationSetUpStep) -> Unit,
-        modifier: Modifier = Modifier.fillMaxSize()
+    installationPresenter: CompleteInstallationViewModel.InstallationPresenter,
+    editionMode: Boolean,
+    installationTemplate: InstallationTemplate = InstallationTemplate.COMPLETE,
+    setInstallationSetUpStep: (step: InstallationSetUpStep) -> Unit,
+    modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
     // Edit icon for edition mode
     val editIcon = ImageVector.vectorResource(id = R.drawable.baseline_edit_24)
     val editIconPainter = rememberVectorPainter(image = editIcon)
 
+    val textMeasurer = rememberTextMeasurer()
+    val textStyle = TextStyle(
+        fontSize = 16.sp,
+        color = Color.Black
+    )
+
     when (installationTemplate) {
         InstallationTemplate.COMPLETE -> InstallationCanvas(
             installationPresenter = installationPresenter,
             editionMode = editionMode,
             editIconPainter = editIconPainter,
+            textMeasurer = textMeasurer,
+            textStyle = textStyle,
             setInstallationSetUpStep = setInstallationSetUpStep,
             modifier = modifier
         )
 
         InstallationTemplate.TRUNCATED -> TruncatedInstallationCanvas(
             editionMode = editionMode,
-            editIconPainter = editIconPainter
+            editIconPainter = editIconPainter,
+            textMeasurer = textMeasurer,
+            textStyle = textStyle,
+            modifier = modifier
         )
     }
 }
@@ -68,14 +80,38 @@ fun InstallationDrawing(
 @Composable
 fun TruncatedInstallationCanvas(
     editionMode: Boolean,
-    editIconPainter: VectorPainter
-) {}
+    editIconPainter: VectorPainter,
+    textMeasurer: TextMeasurer,
+    textStyle: TextStyle,
+    modifier: Modifier = Modifier.fillMaxSize()
+) {
+
+    var columnHeightInPx by remember {
+        mutableFloatStateOf(0f)
+    }
+    var columnWidthInPx by remember {
+        mutableFloatStateOf(0f)
+    }
+
+    Column(
+        modifier = modifier
+            .onGloballyPositioned { coordinates ->
+                // Set column height using the LayoutCoordinates
+                columnHeightInPx = coordinates.size.height.toFloat()
+                columnWidthInPx = coordinates.size.width.toFloat()
+            }
+    ) {
+
+    }
+}
 
 @Composable
 fun InstallationCanvas(
-    installationPresenter: InstallationViewModel.InstallationPresenter,
+    installationPresenter: CompleteInstallationViewModel.InstallationPresenter,
     editionMode: Boolean,
     editIconPainter: VectorPainter,
+    textMeasurer: TextMeasurer,
+    textStyle: TextStyle,
     setInstallationSetUpStep: (step: InstallationSetUpStep) -> Unit,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
@@ -94,34 +130,29 @@ fun InstallationCanvas(
                 columnWidthInPx = coordinates.size.width.toFloat()
             }
     ) {
-
-        val textMeasurer = rememberTextMeasurer()
         val supplierText = installationPresenter.electricitySupply
         val tensionText = installationPresenter.tension
         val inputCableText = installationPresenter.inputCablePresenter.cableText
         val outputCircuitsText = installationPresenter.outputCircuitsPresenter?.cableText
         val usageText = installationPresenter.usageAsString
-        val style = TextStyle(
-            fontSize = 16.sp,
-            color = Color.Black
-        )
-        val supplierTextLayoutResult = remember(supplierText, style) {
-            textMeasurer.measure(supplierText, style)
+
+        val supplierTextLayoutResult = remember(supplierText, textStyle) {
+            textMeasurer.measure(supplierText, textStyle)
         }
 
-        val tensionTextResultLayout = remember(tensionText, style) {
-            textMeasurer.measure(tensionText, style)
+        val tensionTextResultLayout = remember(tensionText, textStyle) {
+            textMeasurer.measure(tensionText, textStyle)
         }
-        val inputCableTextLayoutResult = remember(inputCableText, style) {
-            textMeasurer.measure(inputCableText, style)
+        val inputCableTextLayoutResult = remember(inputCableText, textStyle) {
+            textMeasurer.measure(inputCableText, textStyle)
         }
-        val outputCircuitsTextLayoutResult = remember(outputCircuitsText, style) {
+        val outputCircuitsTextLayoutResult = remember(outputCircuitsText, textStyle) {
             if(outputCircuitsText != null) {
-                textMeasurer.measure(outputCircuitsText, style)
+                textMeasurer.measure(outputCircuitsText, textStyle)
             } else null
         }
-        val usageTextResultLayout = remember(usageText, style) {
-            textMeasurer.measure(usageText, style)
+        val usageTextResultLayout = remember(usageText, textStyle) {
+            textMeasurer.measure(usageText, textStyle)
         }
 
 
@@ -359,12 +390,12 @@ fun InstallationCanvas(
                     val deviceCircleCenter = Offset(x = circuitEnd.x, y = canvasHeightInPx - deviceCircleRadius)
 
                     when (installationPresenter.usage) {
-                        FunctionalContext.LIGHTING -> DrawingTools.drawLight(this,
+                        Usage.LIGHTING -> DrawingTools.drawLight(this,
                             deviceCircleRadius = deviceCircleRadius,
                             circleCenter = deviceCircleCenter,
                             strokeWidth = strokeWidth
                         )
-                        FunctionalContext.MOTOR -> DrawingTools.drawMotor(this,
+                        Usage.MOTOR -> DrawingTools.drawMotor(this,
                             deviceCircleRadius = deviceCircleRadius,
                             circleCenter = deviceCircleCenter
                         )

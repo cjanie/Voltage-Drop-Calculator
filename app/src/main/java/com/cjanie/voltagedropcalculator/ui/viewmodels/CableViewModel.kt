@@ -5,7 +5,7 @@ import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
-import com.cjanie.voltagedropcalculator.businesslogic.enums.FunctionalContext
+import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
@@ -135,9 +135,9 @@ open class CableViewModel(application: Application) {
                 length == null
     }
 
-    fun createCable(functionalContext: FunctionalContext, electricitySupply: ElectricitySupply): Line {
+    fun createCable(usage: Usage, electricitySupply: ElectricitySupply): Line {
         if (isNullValue()) throw NullValueException()
-        return LineFactory.line(functionalContext, electricitySupply, phasing!!, conductor!!, section!!, intensity!!, length!!)
+        return LineFactory.line(usage, electricitySupply, phasing!!, conductor!!, section!!, intensity!!, length!!)
     }
 
 }

@@ -2,7 +2,6 @@ package com.cjanie.voltagedropcalculator.ui.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -14,10 +13,10 @@ import com.cjanie.voltagedropcalculator.ui.composables.commons.Title
 import com.cjanie.voltagedropcalculator.ui.theme.onWhiteColor
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.theme.whiteColor
-import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationViewModel
 
 @Composable
-fun VoltageDropResult(voltageDropResultPresenter: InstallationViewModel.VoltageDropResultPresenter, modifier: Modifier = Modifier.fillMaxWidth()) {
+fun VoltageDropResult(voltageDropResultPresenter: CompleteInstallationViewModel.VoltageDropResultPresenter, modifier: Modifier = Modifier.fillMaxWidth()) {
     Column(
         modifier = modifier
             .background(voltageDropResultPresenter.warningColor),
