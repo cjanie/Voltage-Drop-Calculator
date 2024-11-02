@@ -37,27 +37,32 @@ import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
 
 class Pin(val start: Offset, val end: Offset)
 class Switch(val start: Offset, val end: Offset)
-
+enum class InstallationTemplate {
+    COMPLETE, TRUNCATED
+}
 @Composable
 fun InstallationDrawing(
         installationPresenter: InstallationViewModel.InstallationPresenter,
         editionMode: Boolean,
+        installationTemplate: InstallationTemplate = InstallationTemplate.COMPLETE,
         setInstallationSetUpStep: (step: InstallationSetUpStep) -> Unit,
         modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
-    Column(modifier = modifier)
-         {
-        InstallationCanvas(
+    when (installationTemplate) {
+        InstallationTemplate.COMPLETE -> InstallationCanvas(
             installationPresenter = installationPresenter,
             editionMode = editionMode,
             setInstallationSetUpStep = setInstallationSetUpStep,
             modifier = modifier
         )
 
-
+        InstallationTemplate.TRUNCATED -> TruncatedInstallationCanvas()
     }
 }
+
+@Composable
+fun TruncatedInstallationCanvas() {}
 
 @Composable
 fun InstallationCanvas(
@@ -133,16 +138,16 @@ fun InstallationCanvas(
             .pointerInput(true) {
                 detectTapGestures(onTap = { offset ->
 
-                    if(offset.x > canvasWidthInPx - canvasWidthInPx / 4) {
+                    if (offset.x > canvasWidthInPx - canvasWidthInPx / 4) {
                         if (offset.y < canvasHeightInPx / 8)
-                            setInstallationSetUpStep(if (offset.y < canvasHeightInPx / 16)
-                                InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY
-                            else InstallationSetUpStep.DEFINE_NOMINAL_TENSION
-                            )
-
-                        else if (offset.y > canvasHeightInPx / 8 + (canvasHeightInPx - canvasHeightInPx/8) / 2) {
                             setInstallationSetUpStep(
-                                if(offset.y > canvasHeightInPx - canvasHeightInPx / 16)
+                                if (offset.y < canvasHeightInPx / 16)
+                                    InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY
+                                else InstallationSetUpStep.DEFINE_NOMINAL_TENSION
+                            )
+                        else if (offset.y > canvasHeightInPx / 8 + (canvasHeightInPx - canvasHeightInPx / 8) / 2) {
+                            setInstallationSetUpStep(
+                                if (offset.y > canvasHeightInPx - canvasHeightInPx / 16)
                                     InstallationSetUpStep.DEFINE_USAGE
                                 else InstallationSetUpStep.ADD_OUTPUT_CIRCUITS
                             )
