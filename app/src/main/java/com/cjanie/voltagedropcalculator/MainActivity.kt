@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationDrawing
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationSetUpEdition
@@ -25,11 +25,13 @@ import com.cjanie.voltagedropcalculator.ui.composables.VoltageDropResult
 import com.cjanie.voltagedropcalculator.ui.composables.commons.SubmitButton
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
-import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 
 class MainActivity : ComponentActivity() {
     
-    private val completeInstallationViewModel by lazy { CompleteInstallationViewModel(application) }
+    private val completeInstallationSetUpViewModel by lazy { CompleteInstallationSetUpViewModel(application) }
+    private val truncatedInstallationSetUpViewModel by lazy { TruncatedInstallationSetUpViewModel(application) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,40 +53,45 @@ class MainActivity : ComponentActivity() {
                         // Content: installation drawing
                         // 2 modes: edit / result
 
-                        var installationSetUpStep: InstallationSetUpStep? by remember {
+                        var completeInstallationSetUpStep: CompleteInstallationSetUpStep? by remember {
                             mutableStateOf(null)
                         }
 
-                        var installation: CompleteInstallationViewModel.InstallationPresenter by remember {
-                            mutableStateOf(completeInstallationViewModel.updateInstallationPlaceHolder())
+                        var installation: CompleteInstallationSetUpViewModel.CompleteInstallationPresenter by remember {
+                            mutableStateOf(completeInstallationSetUpViewModel.updateInstallationPlaceHolder())
                         }
 
-                        if (installationSetUpStep != null) {
+                        var truncatedInstallation: TruncatedInstallationSetUpViewModel.TruncatedInstallationPresenter by remember {
+                            mutableStateOf(truncatedInstallationSetUpViewModel.updateInstallationPlaceHolder())
+                        }
+
+                        if (completeInstallationSetUpStep != null) {
                             InstallationSetUpEdition(
-                                completeInstallationViewModel = completeInstallationViewModel,
-                                step = installationSetUpStep!!,
-                                next = { installationSetUpStep = null
-                                        installation = completeInstallationViewModel.updateInstallationPlaceHolder()
+                                completeInstallationSetUpViewModel = completeInstallationSetUpViewModel,
+                                step = completeInstallationSetUpStep!!,
+                                next = { completeInstallationSetUpStep = null
+                                        installation = completeInstallationSetUpViewModel.updateInstallationPlaceHolder()
                                 }
                             )
                         }
 
 
 
-                        var voltageDropResult: CompleteInstallationViewModel.VoltageDropResultPresenter? by remember {
+                        var voltageDropResult: CompleteInstallationSetUpViewModel.VoltageDropResultPresenter? by remember {
                             mutableStateOf(null)
                         }
 
 
-                        if (installationSetUpStep == null)
+                        if (completeInstallationSetUpStep == null)
                         ConstraintLayout(Modifier.fillMaxSize()) {
                             val (drawing, result) = createRefs()
 
                             InstallationDrawing(
-                                installationPresenter = installation,
+                                completeInstallationPresenter = installation,
+                                truncatedInstallationPresenter = truncatedInstallation,
                                 editionMode = voltageDropResult == null,
-                                setInstallationSetUpStep = fun(step: InstallationSetUpStep){
-                                    installationSetUpStep = step
+                                setInstallationSetUpStep = fun(step: CompleteInstallationSetUpStep){
+                                    completeInstallationSetUpStep = step
                                 },
                                 modifier = Modifier
                                     .constrainAs(drawing) {
@@ -110,9 +117,9 @@ class MainActivity : ComponentActivity() {
                                 )
                             } else {
                                 SubmitButton(
-                                    text = completeInstallationViewModel.calculateVoltageDropLabel,
-                                    onClick = { voltageDropResult = completeInstallationViewModel.voltageDropResult() },
-                                    enabled = completeInstallationViewModel.isSetUpComplete(),
+                                    text = completeInstallationSetUpViewModel.calculateVoltageDropLabel,
+                                    onClick = { voltageDropResult = completeInstallationSetUpViewModel.voltageDropResult() },
+                                    enabled = completeInstallationSetUpViewModel.isSetUpComplete(),
                                     modifier = Modifier
                                         .constrainAs(result) {
                                             start.linkTo(parent.start)

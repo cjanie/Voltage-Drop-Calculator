@@ -27,10 +27,11 @@ import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 import com.cjanie.voltagedropcalculator.ui.DrawingTools
-import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
-import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 
 class Pin(val start: Offset, val end: Offset)
 class Switch(val start: Offset, val end: Offset)
@@ -39,10 +40,11 @@ enum class InstallationTemplate {
 }
 @Composable
 fun InstallationDrawing(
-    installationPresenter: CompleteInstallationViewModel.InstallationPresenter,
+    completeInstallationPresenter: CompleteInstallationSetUpViewModel.CompleteInstallationPresenter,
+    truncatedInstallationPresenter: TruncatedInstallationSetUpViewModel.TruncatedInstallationPresenter,
     editionMode: Boolean,
-    installationTemplate: InstallationTemplate = InstallationTemplate.COMPLETE,
-    setInstallationSetUpStep: (step: InstallationSetUpStep) -> Unit,
+    installationTemplate: InstallationTemplate = InstallationTemplate.TRUNCATED,//InstallationTemplate.COMPLETE,
+    setInstallationSetUpStep: (step: CompleteInstallationSetUpStep) -> Unit,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
@@ -58,7 +60,7 @@ fun InstallationDrawing(
 
     when (installationTemplate) {
         InstallationTemplate.COMPLETE -> InstallationCanvas(
-            installationPresenter = installationPresenter,
+            completeInstallationPresenter = completeInstallationPresenter,
             editionMode = editionMode,
             editIconPainter = editIconPainter,
             textMeasurer = textMeasurer,
@@ -68,6 +70,7 @@ fun InstallationDrawing(
         )
 
         InstallationTemplate.TRUNCATED -> TruncatedInstallationCanvas(
+            installationPresenter = truncatedInstallationPresenter,
             editionMode = editionMode,
             editIconPainter = editIconPainter,
             textMeasurer = textMeasurer,
@@ -79,6 +82,7 @@ fun InstallationDrawing(
 
 @Composable
 fun TruncatedInstallationCanvas(
+    installationPresenter: TruncatedInstallationSetUpViewModel.TruncatedInstallationPresenter,
     editionMode: Boolean,
     editIconPainter: VectorPainter,
     textMeasurer: TextMeasurer,
@@ -107,12 +111,12 @@ fun TruncatedInstallationCanvas(
 
 @Composable
 fun InstallationCanvas(
-    installationPresenter: CompleteInstallationViewModel.InstallationPresenter,
+    completeInstallationPresenter: CompleteInstallationSetUpViewModel.CompleteInstallationPresenter,
     editionMode: Boolean,
     editIconPainter: VectorPainter,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
-    setInstallationSetUpStep: (step: InstallationSetUpStep) -> Unit,
+    setInstallationSetUpStep: (step: CompleteInstallationSetUpStep) -> Unit,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
     var columnHeightInPx by remember {
@@ -130,11 +134,11 @@ fun InstallationCanvas(
                 columnWidthInPx = coordinates.size.width.toFloat()
             }
     ) {
-        val supplierText = installationPresenter.electricitySupply
-        val tensionText = installationPresenter.tension
-        val inputCableText = installationPresenter.inputCablePresenter.cableText
-        val outputCircuitsText = installationPresenter.outputCircuitsPresenter?.cableText
-        val usageText = installationPresenter.usageAsString
+        val supplierText = completeInstallationPresenter.electricitySupply
+        val tensionText = completeInstallationPresenter.tension
+        val inputCableText = completeInstallationPresenter.inputCablePresenter.cableText
+        val outputCircuitsText = completeInstallationPresenter.outputCircuitsPresenter?.cableText
+        val usageText = completeInstallationPresenter.usageAsString
 
         val supplierTextLayoutResult = remember(supplierText, textStyle) {
             textMeasurer.measure(supplierText, textStyle)
@@ -178,16 +182,16 @@ fun InstallationCanvas(
                         if (offset.y < canvasHeightInPx / 8)
                             setInstallationSetUpStep(
                                 if (offset.y < canvasHeightInPx / 16)
-                                    InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY
-                                else InstallationSetUpStep.DEFINE_NOMINAL_TENSION
+                                    CompleteInstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY
+                                else CompleteInstallationSetUpStep.DEFINE_NOMINAL_TENSION
                             )
                         else if (offset.y > canvasHeightInPx / 8 + (canvasHeightInPx - canvasHeightInPx / 8) / 2) {
                             setInstallationSetUpStep(
                                 if (offset.y > canvasHeightInPx - canvasHeightInPx / 16)
-                                    InstallationSetUpStep.DEFINE_USAGE
-                                else InstallationSetUpStep.ADD_OUTPUT_CIRCUITS
+                                    CompleteInstallationSetUpStep.DEFINE_USAGE
+                                else CompleteInstallationSetUpStep.ADD_OUTPUT_CIRCUITS
                             )
-                        } else setInstallationSetUpStep(InstallationSetUpStep.ADD_INPUT_CABLE)
+                        } else setInstallationSetUpStep(CompleteInstallationSetUpStep.ADD_INPUT_CABLE)
                     }
                 })
             }
@@ -265,7 +269,7 @@ fun InstallationCanvas(
 
             val inputCableMiddle = Offset(x = inputCableEnd.x, y = inputCableEnd.y - inputCableHeight / 2)
 
-            if (installationPresenter.inputCablePresenter.phasing == Phasing.THREE_PHASE) {
+            if (completeInstallationPresenter.inputCablePresenter.phasing == Phasing.THREE_PHASE) {
                 val cableMiddleBefore = Offset(x = inputCableMiddle.x, y = inputCableMiddle.y - inputCableHeight / 16)
                 val cableMiddleAfter = Offset(x = inputCableMiddle.x, y = inputCableMiddle.y + inputCableHeight / 16)
                 val phasingSignCenters = listOf(cableMiddleBefore, inputCableMiddle, cableMiddleAfter)
@@ -285,7 +289,7 @@ fun InstallationCanvas(
             // Terminal
             val deviceCircleRadius = canvasHeightInPx / 32
 
-            if (installationPresenter.outputCircuitsPresenter == null) {
+            if (completeInstallationPresenter.outputCircuitsPresenter == null) {
                 drawCircle(
                     color = Color.Red,
                     radius = deviceCircleRadius,
@@ -389,7 +393,7 @@ fun InstallationCanvas(
 
                     val deviceCircleCenter = Offset(x = circuitEnd.x, y = canvasHeightInPx - deviceCircleRadius)
 
-                    when (installationPresenter.usage) {
+                    when (completeInstallationPresenter.usage) {
                         Usage.LIGHTING -> DrawingTools.drawLight(this,
                             deviceCircleRadius = deviceCircleRadius,
                             circleCenter = deviceCircleCenter,

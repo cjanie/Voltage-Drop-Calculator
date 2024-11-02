@@ -2,9 +2,12 @@ package com.cjanie.voltagedropcalculator.ui.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
+import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
+import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
 
 open class InstallationSetUpViewModel(application: Application) : AndroidViewModel(application),
@@ -84,5 +87,37 @@ open class InstallationSetUpViewModel(application: Application) : AndroidViewMod
         return tension != null
     }
 
+    val outputCircuitsViewModel = OutputCircuitsViewModel(application)
+
+    protected fun createCable(cableViewModel: CableViewModel): Line {
+        if(!cableViewModel.isFormComplete())
+            throw NullValueException()
+        return LineFactory.line(
+            usage = usage,
+            electricitySupply = electricitySupply,
+            phasing = cableViewModel.phasing!!,
+            conductorMaterial = cableViewModel.conductor!!,
+            section = cableViewModel.section!!,
+            intensity = cableViewModel.intensity!!,
+            length = cableViewModel.length!!
+        )
+    }
+
+    // Installation Presenter interfaces
+    interface UsagePresenter {
+        val usageAsString: String
+        val usage: Usage
+
+    }
+
+    interface ElectricitySupplyPresenter {
+        val electricitySupply: String
+    }
+
+    interface TensionPresenter {
+        val tension: String
+    }
+
+    abstract class InstallationPresenter : UsagePresenter, ElectricitySupplyPresenter, TensionPresenter
 
 }

@@ -13,10 +13,10 @@ import com.cjanie.voltagedropcalculator.ui.composables.commons.Title
 import com.cjanie.voltagedropcalculator.ui.theme.onWhiteColor
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.theme.whiteColor
-import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 
 @Composable
-fun VoltageDropResult(voltageDropResultPresenter: CompleteInstallationViewModel.VoltageDropResultPresenter, modifier: Modifier = Modifier.fillMaxWidth()) {
+fun VoltageDropResult(voltageDropResultPresenter: CompleteInstallationSetUpViewModel.VoltageDropResultPresenter, modifier: Modifier = Modifier.fillMaxWidth()) {
     Column(
         modifier = modifier
             .background(voltageDropResultPresenter.warningColor),

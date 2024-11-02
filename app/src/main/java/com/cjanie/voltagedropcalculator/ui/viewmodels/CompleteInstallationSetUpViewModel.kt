@@ -4,9 +4,7 @@ import android.app.Application
 import androidx.compose.ui.graphics.Color
 import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.R
-import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
-import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
 import com.cjanie.voltagedropcalculator.businesslogic.models.CalculateVoltageDrop
 import com.cjanie.voltagedropcalculator.businesslogic.models.Installation
 import com.cjanie.voltagedropcalculator.businesslogic.models.conductor.Copper
@@ -26,7 +24,7 @@ import com.cjanie.voltagedropcalculator.ui.theme.onRedWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.placeHolderColor
 import com.cjanie.voltagedropcalculator.ui.theme.redWarningColor
 
-enum class InstallationSetUpStep {
+enum class CompleteInstallationSetUpStep {
     DEFINE_USAGE,
     DEFINE_ELECTRICITY_SUPPLY,
     DEFINE_NOMINAL_TENSION,
@@ -35,31 +33,36 @@ enum class InstallationSetUpStep {
 
 }
 
-class CompleteInstallationViewModel(
+class CompleteInstallationSetUpViewModel(
     private val application: Application
 ) : InstallationSetUpViewModel(application)
 {
-
-    fun stepLabel(step: InstallationSetUpStep): String {
-        return when (step) {
-            InstallationSetUpStep.DEFINE_USAGE -> application.getString(R.string.define_installation_usage_label)
-            InstallationSetUpStep.ADD_INPUT_CABLE -> application.getString(R.string.add_input_cable_label)
-            InstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> application.getString(R.string.add_output_circuits_label)
-            InstallationSetUpStep.DEFINE_NOMINAL_TENSION -> application.getString(R.string.define_nominal_tension)
-            InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> application.getString(R.string.define_electricity_supply)
+    companion object {
+        fun installationSetUpStepLabel(step: CompleteInstallationSetUpStep, application: Application): String {
+            return when (step) {
+                CompleteInstallationSetUpStep.DEFINE_USAGE -> application.getString(R.string.define_installation_usage_label)
+                CompleteInstallationSetUpStep.ADD_INPUT_CABLE -> application.getString(R.string.add_input_cable_label)
+                CompleteInstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> application.getString(R.string.add_output_circuits_label)
+                CompleteInstallationSetUpStep.DEFINE_NOMINAL_TENSION -> application.getString(R.string.define_nominal_tension)
+                CompleteInstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> application.getString(R.string.define_electricity_supply)
+            }
         }
+    }
+
+
+    fun installationSetUpStepLabel(step: CompleteInstallationSetUpStep): String {
+        return installationSetUpStepLabel(step, application)
     }
 
     // ViewModels for cables
 
-
     val inputCableViewModel = InputCableViewModel(application)
 
-    val outputCircuitsViewModel = OutputCircuitsViewModel(application)
+    // the outputCableViewModel initialized in parent class
 
     // PlaceHolder
 
-    fun updateInstallationPlaceHolder(): InstallationPresenter {
+    fun updateInstallationPlaceHolder(): CompleteInstallationPresenter {
 
         var installationSetUpUseCase = InstallationSetUpUseCase(
 
@@ -83,13 +86,13 @@ class CompleteInstallationViewModel(
             createCable(cableViewModel = outputCircuitsViewModel)
         } catch (e: NullValueException) {
             LineSinglePhase(installationSetUpUseCase.use.phaseShift, Copper(), Section(50f), Intensity(2f), Length(0.02f))
-
         }
+
         installationSetUpUseCase.addOutput(arrayOf(output))
 
         val inputCableColor = if (!inputCableViewModel.isFormComplete()) placeHolderColor else Color.Unspecified
         val outputCircuitsColor = if (!outputCircuitsViewModel.isFormComplete()) placeHolderColor else Color.Unspecified
-        return InstallationPresenter(
+        return CompleteInstallationPresenter(
             installation = installationSetUpUseCase.getInstallation()!!,
             application,
             inputCableColor = inputCableColor,
@@ -99,7 +102,7 @@ class CompleteInstallationViewModel(
 
     private var installation: Installation? = null
 
-    fun setUp(): InstallationPresenter {
+    fun setUp(): CompleteInstallationPresenter {
         val use = when (usage) {
             Usage.LIGHTING -> Lighting(electricitySupply)
             Usage.MOTOR -> Motor(electricitySupply) // TODO MOTOR IMPL
@@ -111,47 +114,19 @@ class CompleteInstallationViewModel(
 
         }
         installation = installationSetUp.getInstallation()
-        return InstallationPresenter(installation!!, application)
+        return CompleteInstallationPresenter(installation!!, application)
     }
 
     fun isSetUpComplete(): Boolean {
         return inputCableViewModel.isFormComplete() // TODO
     }
 
-    private fun createCable(cableViewModel: CableViewModel): Line {
-        if(!cableViewModel.isFormComplete())
-            throw NullValueException()
-        return LineFactory.line(
-            usage = usage,
-            electricitySupply = electricitySupply,
-            phasing = cableViewModel.phasing!!,
-            conductorMaterial = cableViewModel.conductor!!,
-            section = cableViewModel.section!!,
-            intensity = cableViewModel.intensity!!,
-            length = cableViewModel.length!!
-        )
-    }
-
-    interface UsagePresenter {
-        val usageAsString: String
-        val usage: Usage
-
-    }
-
-    interface ElectricitySupplyPresenter {
-        val electricitySupply: String
-    }
-
-    interface TensionPresenter {
-        val tension: String
-    }
-    class InstallationPresenter(
+    class CompleteInstallationPresenter(
         installation: Installation,
         application: Application,
         inputCableColor: Color = Color.Unspecified,
         outputCircuitsColor: Color = Color.Unspecified,
-    ): UsagePresenter, ElectricitySupplyPresenter, TensionPresenter
-
+    ): InstallationPresenter()
     {
         override val usageAsString = usageToString(usage = installation.use.usage, application = application)
         override val usage: Usage = installation.use.usage

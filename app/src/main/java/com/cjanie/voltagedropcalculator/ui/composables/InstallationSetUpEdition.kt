@@ -18,8 +18,8 @@ import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CableViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.ElectricitySupplyViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.InputCableViewModel
-import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpStep
-import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.OutputCircuitsViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TensionViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.UsageViewModel
@@ -27,65 +27,65 @@ import com.cjanie.voltagedropcalculator.ui.viewmodels.UsageViewModel
 @Composable()
 fun InstallationSetUpEdition(
     modifier: Modifier = Modifier.fillMaxSize(),
-    completeInstallationViewModel: CompleteInstallationViewModel,
-    step: InstallationSetUpStep,
+    completeInstallationSetUpViewModel: CompleteInstallationSetUpViewModel,
+    step: CompleteInstallationSetUpStep,
     next: () -> Unit
 ){
             when (step) {
 
-                InstallationSetUpStep.DEFINE_USAGE -> Column(
+                CompleteInstallationSetUpStep.DEFINE_USAGE -> Column(
                     modifier = modifier,
                     verticalArrangement = Arrangement.Bottom
                 ){
                     EditUsage(
-                        viewModel = completeInstallationViewModel,
+                        viewModel = completeInstallationSetUpViewModel,
                         next = { next() },
                     )
                 }
-                InstallationSetUpStep.ADD_INPUT_CABLE -> Column(
+                CompleteInstallationSetUpStep.ADD_INPUT_CABLE -> Column(
                     modifier = modifier,
                     verticalArrangement = Arrangement.Center
                 ){
                     Subtitle(
-                        text = completeInstallationViewModel.stepLabel(step),
+                        text = completeInstallationSetUpViewModel.installationSetUpStepLabel(step),
                         color = greenWarningColor
                     )
                     AddInputCable(
-                        viewModel = completeInstallationViewModel.inputCableViewModel,
+                        viewModel = completeInstallationSetUpViewModel.inputCableViewModel,
                         next = { next() }
                     )
                 }
-                InstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> Column(
+                CompleteInstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> Column(
                     modifier = modifier,
                     verticalArrangement = Arrangement.Center
                 ){
                     Subtitle(
-                        text = completeInstallationViewModel.stepLabel(step),
+                        text = completeInstallationSetUpViewModel.installationSetUpStepLabel(step),
                         color = greenWarningColor
                     )
                     AddOutputCircuits(
-                        viewModel = completeInstallationViewModel.outputCircuitsViewModel,
+                        viewModel = completeInstallationSetUpViewModel.outputCircuitsViewModel,
                         next = { next() },
                         skip = { next() }
                     )
 
                 }
-                InstallationSetUpStep.DEFINE_NOMINAL_TENSION -> Column(
+                CompleteInstallationSetUpStep.DEFINE_NOMINAL_TENSION -> Column(
                     modifier = modifier,
                     verticalArrangement = Arrangement.Top
                 ){
                     EditNominalTension(
-                        viewModel = completeInstallationViewModel,
+                        viewModel = completeInstallationSetUpViewModel,
                         next = { next() }
                     )
                 }
 
-                InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> Column(
+                CompleteInstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> Column(
                     modifier = modifier,
                     verticalArrangement = Arrangement.Top
                 ) {
                     EditElectricitySupply(
-                        viewModel = completeInstallationViewModel,
+                        viewModel = completeInstallationSetUpViewModel,
                         next = { next() }
                     )
                 }
