@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.*
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -74,15 +75,6 @@ fun InstallationCanvas(
 
     val editIcon = ImageVector.vectorResource(id = R.drawable.baseline_edit_24)
     val iconPainter = rememberVectorPainter(image = editIcon)
-
-    var editStep: InstallationSetUpStep? by remember {
-        mutableStateOf(null)
-    }
-
-    if (editStep != null) {
-        setInstallationSetUpStep(editStep!!)
-    }
-
 
     Column(
         modifier = modifier
@@ -143,17 +135,19 @@ fun InstallationCanvas(
 
                     if(offset.x > canvasWidthInPx - canvasWidthInPx / 4) {
                         if (offset.y < canvasHeightInPx / 8)
-                            editStep = if (offset.y < canvasHeightInPx / 16)
+                            setInstallationSetUpStep(if (offset.y < canvasHeightInPx / 16)
                                 InstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY
                             else InstallationSetUpStep.DEFINE_NOMINAL_TENSION
+                            )
 
                         else if (offset.y > canvasHeightInPx / 8 + (canvasHeightInPx - canvasHeightInPx/8) / 2) {
-                            editStep = if(offset.y > canvasHeightInPx - canvasHeightInPx / 16)
-                                InstallationSetUpStep.DEFINE_USAGE
-                            else InstallationSetUpStep.ADD_OUTPUT_CIRCUITS
-                        } else editStep = InstallationSetUpStep.ADD_INPUT_CABLE
+                            setInstallationSetUpStep(
+                                if(offset.y > canvasHeightInPx - canvasHeightInPx / 16)
+                                    InstallationSetUpStep.DEFINE_USAGE
+                                else InstallationSetUpStep.ADD_OUTPUT_CIRCUITS
+                            )
+                        } else setInstallationSetUpStep(InstallationSetUpStep.ADD_INPUT_CABLE)
                     }
-
                 })
             }
         Canvas(
@@ -273,10 +267,7 @@ fun InstallationCanvas(
                 var pinStart = dividerStart
                 var pinEnd = Offset(x = pinStart.x, y = pinStart.y + pinHeight)
 
-
-
-
-                var pins = mutableListOf<Pin>()
+                val pins = mutableListOf<Pin>()
 
                 while (pinStart.x <= dividerEnd.x) {
                     val pin = Pin(pinStart, pinEnd)
@@ -345,6 +336,7 @@ fun InstallationCanvas(
 
                 val circuitsStart = switches.map { it.end }
                 val circuitEndY = canvasHeightInPx - deviceCircleRadius * 2
+
                 for (circuitStart in circuitsStart) {
                     val circuitEnd = Offset(x = circuitStart.x, y = circuitEndY)
                     drawLine(
@@ -371,56 +363,27 @@ fun InstallationCanvas(
                 }
 
                 // Legends
-
-                val supplierTextY = supplierHeight / 4 - supplierTextLayoutResult.size.height / 2//0f
-                val tensionTextY = supplierHeight - supplierHeight / 4 - tensionTextResultLayout.size.height / 2//supplierCircleBottomCenterY
-                val usageTextY = circuitEndY + deviceCircleRadius - iconPainter.intrinsicSize.height / 2
-
-
-                drawText(
-                    supplierTextLayoutResult,
-                    topLeft = Offset(
-                        x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - supplierTextLayoutResult.size.width,
-                        y = supplierTextY)
-                )
-                drawText(
-                    tensionTextResultLayout,
-                    topLeft = Offset(
-                        x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - supplierTextLayoutResult.size.width,
-                        y = tensionTextY)
-                )
-
-
-                drawText(
-                    inputCableTextLayoutResult,
-                    color = installationPresenter.inputCablePresenter.textColor,
-                    topLeft = Offset(
-                        x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - inputCableTextLayoutResult.size.width,
-                        y = inputCableMiddle.y - inputCableTextLayoutResult.size.height / 2))
-
-
+                val supplierTextY = supplierHeight / 4
+                val tensionTextY = supplierHeight - supplierHeight / 4
+                val usageTextY = circuitEndY + deviceCircleRadius
+                val inputTextY = inputCableMiddle.y
                 val circuitsHeight = circuitEndY - circuitsStart[0].y
                 val circuitsMiddleY = circuitsStart[0].y + circuitsHeight / 2
+                val outputTextY = circuitsMiddleY
 
-                if (outputCircuitsTextLayoutResult != null) {
-                    drawText(
-                        outputCircuitsTextLayoutResult,
-                        color = installationPresenter.outputCircuitsPresenter.textColor,
-                        topLeft = Offset(
-                            x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - outputCircuitsTextLayoutResult.size.width,
-                            y= circuitsMiddleY - outputCircuitsTextLayoutResult.size.height / 2)
-                    )
-                }
-                drawText(
-                    usageTextResultLayout,
-                    topLeft = Offset(
-                    x = canvasWidthInPx - iconPainter.intrinsicSize.width * 2 - usageTextResultLayout.size.width,
-                    y = usageTextY
-                    )
+                val verticalCoordinatesOfLegendsMap = mapOf(
+                    supplierTextY to supplierTextLayoutResult,
+                    tensionTextY to tensionTextResultLayout,
+                    inputTextY to inputCableTextLayoutResult,
+                    outputTextY to outputCircuitsTextLayoutResult,
+                    usageTextY to usageTextResultLayout
                 )
 
+                DrawingTools.drawLegends(this,
+                    canvasWidthInPx = canvasWidthInPx,
+                    verticalCoordinatesOfLegendsMap = verticalCoordinatesOfLegendsMap)
+
                 // Edition
-                val editButtonX = canvasWidthInPx - iconPainter.intrinsicSize.width
                 val supplierButtonY = supplierTextY
                 val tensionButtonY = tensionTextY
                 val inputCableButtonY = inputCableMiddle.y - iconPainter.intrinsicSize.height / 2
@@ -428,9 +391,9 @@ fun InstallationCanvas(
                 val usageButtonY = usageTextY
 
                 if(editionMode) {
-                    drawEditionMode(
+                    DrawingTools.drawEditionMode(
                         drawScope = this,
-                        editButtonX = editButtonX,
+                        canvasWidthInPx = canvasWidthInPx,
                         editButtonYCoordinates = arrayOf(
                             supplierButtonY,
                             tensionButtonY,
@@ -444,16 +407,5 @@ fun InstallationCanvas(
 
             }
         }
-    }
-}
-
-fun drawEditionMode(drawScope: DrawScope, editButtonX: Float, editButtonYCoordinates: Array<Float>, painter: VectorPainter) {
-    for (editButtonY in editButtonYCoordinates) {
-        DrawingTools.drawEditButton(
-            drawScope = drawScope,
-            left = editButtonX,
-            top = editButtonY,
-            painter = painter
-        )
     }
 }

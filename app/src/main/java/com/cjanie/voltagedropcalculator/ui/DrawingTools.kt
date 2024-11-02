@@ -7,6 +7,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.drawText
 import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 
 class DrawingTools {
@@ -114,10 +116,29 @@ class DrawingTools {
             drawScope.drawPath(path, color)
         }
 
+        fun drawLegends(drawScope: DrawScope, canvasWidthInPx: Float,
+                        verticalCoordinatesOfLegendsMap: Map<Float, TextLayoutResult?>) {
+            val textX = canvasWidthInPx - canvasWidthInPx / 4
+
+            for (coordinateY in verticalCoordinatesOfLegendsMap.keys) {
+                val textLayoutResult = verticalCoordinatesOfLegendsMap.get(coordinateY)
+                if (textLayoutResult != null) {
+                    drawScope.drawText(
+                        verticalCoordinatesOfLegendsMap.get(coordinateY)!!,
+                        topLeft = Offset(
+                            x = textX,
+                            y = coordinateY - textLayoutResult.size.height / 2
+                        )
+                    )
+                }
+            }
+        }
+
         fun drawEditionMode(drawScope: DrawScope, canvasWidthInPx: Float, editButtonYCoordinates: Array<Float>, painter: VectorPainter) {
             val editButtonX = canvasWidthInPx - painter.intrinsicSize.width
+
             for (editButtonY in editButtonYCoordinates) {
-                drawEditButton(
+                DrawingTools.drawEditButton(
                     drawScope = drawScope,
                     left = editButtonX,
                     top = editButtonY,
@@ -126,13 +147,13 @@ class DrawingTools {
             }
         }
 
-       fun drawEditButton(drawScope: DrawScope, left: Float, top: Float, painter: VectorPainter) {
+       private fun drawEditButton(drawScope: DrawScope, left: Float, top: Float, painter: VectorPainter) {
             drawScope.translate(left = left, top = top) {
                 with(painter) {
                     draw(painter.intrinsicSize)
                 }
             }
-        }
+       }
 
     }
 }
