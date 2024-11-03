@@ -6,7 +6,7 @@ import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.models.CalculateVoltageDrop
-import com.cjanie.voltagedropcalculator.businesslogic.models.Installation
+import com.cjanie.voltagedropcalculator.businesslogic.models.CompleteInstallation
 import com.cjanie.voltagedropcalculator.businesslogic.models.conductor.Copper
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineSinglePhase
@@ -93,14 +93,14 @@ class CompleteInstallationSetUpViewModel(
         val inputCableColor = if (!inputCableViewModel.isFormComplete()) placeHolderColor else Color.Unspecified
         val outputCircuitsColor = if (!outputCircuitsViewModel.isFormComplete()) placeHolderColor else Color.Unspecified
         return CompleteInstallationPresenter(
-            installation = installationSetUpUseCase.getInstallation()!!,
+            completeInstallation = installationSetUpUseCase.getInstallation()!!,
             application,
             inputCableColor = inputCableColor,
             outputCircuitsColor = outputCircuitsColor)
     }
 
 
-    private var installation: Installation? = null
+    private var completeInstallation: CompleteInstallation? = null
 
     fun setUp(): CompleteInstallationPresenter {
         val use = when (usage) {
@@ -113,8 +113,8 @@ class CompleteInstallationSetUpViewModel(
             installationSetUp.addOutput(circuits = arrayOf(createCable(cableViewModel = outputCircuitsViewModel)))
 
         }
-        installation = installationSetUp.getInstallation()
-        return CompleteInstallationPresenter(installation!!, application)
+        completeInstallation = installationSetUp.getInstallation()
+        return CompleteInstallationPresenter(completeInstallation!!, application)
     }
 
     fun isSetUpComplete(): Boolean {
@@ -122,25 +122,25 @@ class CompleteInstallationSetUpViewModel(
     }
 
     class CompleteInstallationPresenter(
-        installation: Installation,
+        completeInstallation: CompleteInstallation,
         application: Application,
         inputCableColor: Color = Color.Unspecified,
         outputCircuitsColor: Color = Color.Unspecified,
     ): InstallationPresenter()
     {
-        override val usageAsString = usageToString(usage = installation.use.usage, application = application)
-        override val usage: Usage = installation.use.usage
-        override val electricitySupply = electricitySupplyToString(installation.use.electricitySupply, application)
-        override val tension = tensionToString(tension = installation.nominalTension, application = application)
+        override val usageAsString = usageToString(usage = completeInstallation.use.usage, application = application)
+        override val usage: Usage = completeInstallation.use.usage
+        override val electricitySupply = electricitySupplyToString(completeInstallation.use.electricitySupply, application)
+        override val tension = tensionToString(tension = completeInstallation.nominalTension, application = application)
         val inputCablePresenter = CablePresenter(
-            cable = installation.input,
+            cable = completeInstallation.input,
             application = application,
             textColor = inputCableColor
         )
         val outputCircuitsPresenter =
-            if (!installation.output.isEmpty())
+            if (!completeInstallation.output.isEmpty())
                 CablePresenter(
-                    cable = installation.output[0],
+                    cable = completeInstallation.output[0],
                     application = application,
                     textColor = outputCircuitsColor
                 )
@@ -180,8 +180,8 @@ class CompleteInstallationSetUpViewModel(
     }
 
     fun voltageDropResult() : VoltageDropResultPresenter {
-        if (installation == null) setUp()
-        return VoltageDropResultPresenter(installation!!, application)
+        if (completeInstallation == null) setUp()
+        return VoltageDropResultPresenter(completeInstallation!!, application)
     }
 
 }

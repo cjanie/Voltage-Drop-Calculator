@@ -1,6 +1,8 @@
 package com.cjanie.voltagedropcalculator.businesslogic.usecases
 
+import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.businesslogic.PhaseShiftInconsistancyException
+import com.cjanie.voltagedropcalculator.businesslogic.models.CompleteInstallation
 import com.cjanie.voltagedropcalculator.businesslogic.models.Installation
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Use
@@ -11,25 +13,26 @@ class InstallationSetUpUseCase(val use: Use, val tension: Tension) {
     private var cable: Line? = null
 
     fun addInput(cable: Line) {
-        if(cable != null) {
-            if (cable.phaseShift == use.phaseShift)
-                this.cable = cable
-            else throw PhaseShiftInconsistancyException()
-        }
+
+        if (!Installation.isPhaseShiftConsistent(cable, use.usage, use.electricitySupply))
+            throw PhaseShiftInconsistancyException()
+        else this.cable = cable
+
     }
 
     fun addOutput(circuits: Array<Line>) {
+        if (cable == null) throw NullValueException()
         for(circuit in circuits) {
-            if (circuit.phaseShift != use.phaseShift) throw PhaseShiftInconsistancyException()
+            if (!Installation.isPhaseShiftConsistent(circuit, use.usage, use.electricitySupply)) throw PhaseShiftInconsistancyException()
         }
-        if (cable != null) {
-            cable?.supplies(circuits)
-        }
+
+        cable?.supplies(circuits)
+
     }
 
-    fun getInstallation(): Installation? {
+    fun getInstallation(): CompleteInstallation? {
         if (cable != null) {
-            return Installation(
+            return CompleteInstallation(
                 use = use,
                 input = cable!!,
                 output = cable!!.output,

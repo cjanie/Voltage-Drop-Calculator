@@ -2,6 +2,7 @@ package com.cjanie.voltagedropcalculator.ui.viewmodels
 
 import android.app.Application
 import com.cjanie.voltagedropcalculator.R
+import com.cjanie.voltagedropcalculator.businesslogic.models.TruncatedInstallation
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
@@ -47,13 +48,7 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
             application = application
         )
     }
-    class TruncatedInstallation(
-        val usage: Usage,
-        val electricitySupply: ElectricitySupply,
-        val nominalTension: Tension,
-        val inputCableVoltageDrop: VoltageDrop) {
 
-    }
     class TruncatedInstallationPresenter(
         installation: TruncatedInstallation,
         application: Application,

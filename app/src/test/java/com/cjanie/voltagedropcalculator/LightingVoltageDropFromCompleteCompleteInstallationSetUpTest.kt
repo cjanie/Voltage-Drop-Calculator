@@ -2,7 +2,7 @@ package com.cjanie.voltagedropcalculator
 
 import com.cjanie.voltagedropcalculator.businesslogic.factories.ConductorFactory
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
-import com.cjanie.voltagedropcalculator.businesslogic.models.Installation
+import com.cjanie.voltagedropcalculator.businesslogic.models.CompleteInstallation
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Lighting
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineSinglePhase
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineThreePhase
@@ -16,7 +16,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class LightingVoltageDropTest {
+class LightingVoltageDropFromCompleteCompleteInstallationSetUpTest {
 
     @Test
     fun installationPrivateLighting() {
@@ -70,13 +70,13 @@ class LightingVoltageDropTest {
             length = Length(inKilometer = 0.05f),
             intensity = Intensity(inAmpere =  150f)
         )
-        val installation = Installation(
+        val completeInstallation = CompleteInstallation(
             use = use,
             input = lineThreePhase,
             output = lineThreePhase.output,
             nominalTension = Tension(inVolt = 230f)
         )
-        val DELTA_U = installation.voltageDropInVolt
+        val DELTA_U = completeInstallation.voltageDropInVolt
         assertEquals(2.5392857.toFloat(), DELTA_U)
     }
 
@@ -91,13 +91,13 @@ class LightingVoltageDropTest {
             intensity = Intensity(inAmpere = 20f),
         )
 
-        val installation = Installation(
+        val completeInstallation = CompleteInstallation(
             use = use,
             input = cable,
             output = cable.output,
             nominalTension = Tension(inVolt = 230f)
         )
-        val delta_U = installation.voltageDropInVolt
+        val delta_U = completeInstallation.voltageDropInVolt
         assertEquals(7.584f, delta_U)
     }
 
