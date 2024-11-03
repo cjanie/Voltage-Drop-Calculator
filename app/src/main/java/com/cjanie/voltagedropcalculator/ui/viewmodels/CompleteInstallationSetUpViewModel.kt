@@ -37,6 +37,8 @@ class CompleteInstallationSetUpViewModel(
     private val application: Application
 ) : InstallationSetUpViewModel(application)
 {
+    override var usage: Usage = Usage.LIGHTING
+
     companion object {
         fun installationSetUpStepLabel(step: CompleteInstallationSetUpStep, application: Application): String {
             return when (step) {

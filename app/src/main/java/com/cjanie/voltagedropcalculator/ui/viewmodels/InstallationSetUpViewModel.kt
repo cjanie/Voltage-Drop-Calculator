@@ -10,7 +10,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
 
-open class InstallationSetUpViewModel(application: Application) : AndroidViewModel(application),
+abstract class InstallationSetUpViewModel(application: Application) : AndroidViewModel(application),
     UsageViewModel,
     ElectricitySupplyViewModel,
     TensionViewModel {
@@ -39,7 +39,7 @@ open class InstallationSetUpViewModel(application: Application) : AndroidViewMod
 
     // UsageViewModel Impl
 
-    protected var usage: Usage = Usage.LIGHTING
+    protected abstract var usage: Usage
     private val usageValues: Set<Usage> = Usage.values().toHashSet()
     override val usageLabel = application.getString(R.string.usage_label)
     override val usageOptions: Array<String> = usageValues

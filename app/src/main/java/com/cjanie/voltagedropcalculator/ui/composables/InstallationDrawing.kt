@@ -120,6 +120,7 @@ fun TruncatedInstallationCanvas(
         val electricitySupplyText = installationPresenter.electricitySupply
         val nominalTensionText = installationPresenter.tension
         val inputCableVoltageDropText = installationPresenter.inputCableVoltageDrop
+        val outputCableText = installationPresenter.outputCircuitsPresenter?.cableText
         val usageText = installationPresenter.usageAsString
 
         var electricitySupplyTextLayoutResult = remember(electricitySupplyText, textStyle) {
@@ -132,6 +133,10 @@ fun TruncatedInstallationCanvas(
 
         var inputCableVoltageDropTextLayoutResult = remember(inputCableVoltageDropText, textStyle) {
             textMeasurer.measure(inputCableVoltageDropText, textStyle)
+        }
+
+        var circuitCableTextlayoutResult = remember(outputCableText, textStyle) {
+            textMeasurer.measure(outputCableText!!, textStyle)
         }
 
         var usageTextLayoutResult = remember(usageText, textStyle) {
@@ -311,6 +316,7 @@ fun TruncatedInstallationCanvas(
                 editElectricitySypplyTextY to electricitySupplyTextLayoutResult,
                 editTensionTextY to nominalTensionTextLayoutResult,
                 editInputCableVoltageDropTextY to inputCableVoltageDropTextLayoutResult,
+                editCircuitCableTextY to circuitCableTextlayoutResult,
                 editUsageTextY to usageTextLayoutResult
             )
             DrawingTools.drawLegends(

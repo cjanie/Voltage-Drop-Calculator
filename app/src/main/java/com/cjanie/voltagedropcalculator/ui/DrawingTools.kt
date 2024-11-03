@@ -162,8 +162,11 @@ class DrawingTools {
         }
 
 
-        fun drawLegends(drawScope: DrawScope, canvasWidthInPx: Float,
-                        verticalCoordinatesOfLegendsMap: Map<Float, TextLayoutResult?>) {
+        fun drawLegends(
+            drawScope: DrawScope,
+            canvasWidthInPx: Float,
+            verticalCoordinatesOfLegendsMap: Map<Float, TextLayoutResult?>
+        ) {
             val textX = canvasWidthInPx - canvasWidthInPx / 4
 
             for (coordinateY in verticalCoordinatesOfLegendsMap.keys) {

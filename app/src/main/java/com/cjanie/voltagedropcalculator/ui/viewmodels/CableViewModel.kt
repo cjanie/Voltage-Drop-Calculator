@@ -31,21 +31,21 @@ open class CableViewModel(application: Application) {
 
         fun sectionToString(section: Section, application: Application): String {
             return "${
-            if (section.inMillimeterSquare.toString().contains(".0"))
+            if (section.inMillimeterSquare.toString().endsWith(".0"))
                 section.inMillimeterSquare.toInt() else section.inMillimeterSquare
             } ${application.getString(R.string.conductor_section_unit)}"
         }
 
         fun intensityToString(intensity: Intensity, application: Application): String {
             return "${
-                if (intensity.inAmpere.toString().contains(".0"))
+                if (intensity.inAmpere.toString().endsWith(".0"))
                     intensity.inAmpere.toInt() else intensity.inAmpere
             } ${application.getString(R.string.current_intensity_unit)}"
         }
 
         fun lengthToString(length: Length, application: Application): String {
             return "${
-                if (length.inKilometer.toString().contains(".0")) 
+                if (length.inKilometer.toString().endsWith(".0")) 
                     length.inKilometer.toInt() else length.inKilometer
             } ${application.getString(R.string.line_length_unit)}"
         }
