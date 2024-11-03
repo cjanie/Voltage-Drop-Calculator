@@ -184,10 +184,10 @@ class DrawingTools {
             val editButtonX = canvasWidthInPx - painter.intrinsicSize.width
 
             for (editButtonY in editButtonYCoordinates) {
-                DrawingTools.drawEditButton(
+               drawEditButton(
                     drawScope = drawScope,
                     left = editButtonX,
-                    top = editButtonY,
+                    top = editButtonY - painter.intrinsicSize.width / 2,
                     painter = painter
                 )
             }

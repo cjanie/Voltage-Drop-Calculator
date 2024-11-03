@@ -11,9 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -27,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.ui.DrawingTools
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
-import com.cjanie.voltagedropcalculator.ui.theme.copperColor
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpStep
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
@@ -74,7 +71,7 @@ fun InstallationDrawing(
 
         InstallationTemplate.TRUNCATED -> TruncatedInstallationCanvas(
             installationPresenter = truncatedInstallationPresenter,
-            editionMode = editionMode,
+            isEditionMode = editionMode,
             editIconPainter = editIconPainter,
             textMeasurer = textMeasurer,
             textStyle = textStyle,
@@ -87,7 +84,7 @@ fun InstallationDrawing(
 @Composable
 fun TruncatedInstallationCanvas(
     installationPresenter: TruncatedInstallationSetUpViewModel.TruncatedInstallationPresenter,
-    editionMode: Boolean,
+    isEditionMode: Boolean,
     editIconPainter: VectorPainter,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
@@ -268,6 +265,42 @@ fun TruncatedInstallationCanvas(
                 strokeWidth = strokeWidth
             )
             */
+
+            if(isEditionMode) {
+
+                val editElectricitySupplyClickableStartY = inputCableStart.y
+                val editElectricitySupplyClickableHeight = inputCableHeight / 3
+                val editElectricitySypplyButtonY = editElectricitySupplyClickableStartY + editElectricitySupplyClickableHeight / 2
+
+                val editTensionClickableStartY = editElectricitySupplyClickableStartY + editElectricitySupplyClickableHeight
+                val editTensionClickableHeight = inputCableHeight / 3
+                val editTensionButtonY = editTensionClickableStartY + editTensionClickableHeight / 2
+
+                val editInputCableVoltageDropClickableStartY = editTensionClickableStartY + editTensionClickableHeight
+                val editInputCableVoltageDropClickableHeight = inputCableHeight / 3
+                val editInputCableVoltageDropButtonY = editInputCableVoltageDropClickableStartY + editInputCableVoltageDropClickableHeight / 2
+
+                val editCircuitCableClickableStartY = editInputCableVoltageDropClickableStartY + editInputCableVoltageDropClickableHeight
+                val editCircuitCableClickableHeight = circuitCableHeight + switchHeight + pinHeight + pinTipOffset
+                val editCircuitCableButtonY = editCircuitCableClickableStartY + editCircuitCableClickableHeight / 2
+
+                val editUsageClickableStartY = editCircuitCableClickableStartY + editCircuitCableClickableHeight
+                val editUsageClickableHeight = switchHeight + motorCableHeight + deviceCircleRadius * 2
+                val editUsageButtonY = editUsageClickableStartY + editUsageClickableHeight / 2
+
+                DrawingTools.drawEditionMode(
+                    drawScope = this,
+                    canvasWidthInPx = canvasWidthInPx,
+                    editButtonYCoordinates = arrayOf(
+                        editElectricitySypplyButtonY,
+                        editTensionButtonY,
+                        editInputCableVoltageDropButtonY,
+                        editCircuitCableButtonY,
+                        editUsageButtonY
+                    ),
+                    painter = editIconPainter
+                )
+            }
 
 
 
