@@ -1,6 +1,7 @@
 package com.cjanie.voltagedropcalculator.ui
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -115,6 +116,51 @@ class DrawingTools {
             path.close()
             drawScope.drawPath(path, color)
         }
+
+        fun drawPins(drawScope: DrawScope, pinsStart: Array<Offset>, height: Float, strokeWidth: Float, color: Color = copperColor) {
+            for (pinStart in pinsStart) {
+                drawPin(drawScope, start = pinStart, height = height, strokeWidth = strokeWidth, color = color)
+            }
+
+        }
+
+        fun drawPin(drawScope: DrawScope, start: Offset, height: Float, strokeWidth: Float, color: Color = copperColor) {
+            val end = Offset(x =start.x, y = start.y + height)
+            drawScope.drawLine(start = start, end = end, strokeWidth = strokeWidth, color = color)
+        }
+
+        fun drawContactPoints(drawScope: DrawScope, contactPoints: Array<Offset>, radius : Float, color: Color = copperColor) {
+            for (point in contactPoints) drawScope.drawCircle(color = color, center = point, radius = radius)
+        }
+
+        fun drawSwitch(drawScope: DrawScope, start: Offset, startOffset: Float, height: Float, strokeWidth: Float, color: Color = copperColor) {
+            val startWithOffset = Offset(x= start.x - startOffset, y = start.y)
+            val end = Offset(x = start.x, y = startWithOffset.y + height)
+            drawScope.drawLine(copperColor, start= startWithOffset, end= end, strokeWidth= strokeWidth)
+        }
+
+        fun drawMotorContact(drawScope: DrawScope, radius: Float, topLeft: Offset, strokeWidth: Float, color: Color = copperColor) {
+            drawScope.drawArc(
+                color = color,
+                startAngle = 90f,
+                sweepAngle = 180f,
+                useCenter =  true,
+                size = Size(radius, radius),
+                topLeft = topLeft,
+                style = Stroke(strokeWidth)
+            )
+        }
+
+        fun drawCable(drawScope: DrawScope, start: Offset, height: Float, strokeWidth: Float, color: Color = copperColor) {
+            val end = Offset(start.x, start.y + height)
+            drawScope.drawLine(color = color, start = start, end = end, strokeWidth = strokeWidth)
+        }
+
+        fun drawCircuitsRepartitor(drawScope: DrawScope, start: Offset, width: Float, strokeWidth: Float, color: Color = copperColor) {
+            val end = Offset(start.x + width, start.y)
+            drawScope.drawLine(color = color, start = start, end = end, strokeWidth = strokeWidth)
+        }
+
 
         fun drawLegends(drawScope: DrawScope, canvasWidthInPx: Float,
                         verticalCoordinatesOfLegendsMap: Map<Float, TextLayoutResult?>) {
