@@ -117,6 +117,27 @@ fun TruncatedInstallationCanvas(
             mutableFloatStateOf(0f)
         }
 
+        val electricitySupplyText = installationPresenter.electricitySupply
+        val nominalTensionText = installationPresenter.tension
+        val inputCableVoltageDropText = installationPresenter.inputCableVoltageDrop
+        val usageText = installationPresenter.usageAsString
+
+        var electricitySupplyTextLayoutResult = remember(electricitySupplyText, textStyle) {
+            textMeasurer.measure(electricitySupplyText, textStyle)
+        }
+
+        var nominalTensionTextLayoutResult = remember(nominalTensionText, textStyle) {
+            textMeasurer.measure(nominalTensionText, textStyle)
+        }
+
+        var inputCableVoltageDropTextLayoutResult = remember(inputCableVoltageDropText, textStyle) {
+            textMeasurer.measure(inputCableVoltageDropText, textStyle)
+        }
+
+        var usageTextLayoutResult = remember(usageText, textStyle) {
+            textMeasurer.measure(usageText, textStyle)
+        }
+
         Canvas(
             modifier = modifier
                 .padding(horizontalPadding, verticalPadding)
@@ -266,37 +287,49 @@ fun TruncatedInstallationCanvas(
             )
             */
 
+            val editElectricitySupplyClickableStartY = inputCableStart.y
+            val editElectricitySupplyClickableHeight = inputCableHeight / 3
+            val editElectricitySypplyTextY = editElectricitySupplyClickableStartY + editElectricitySupplyClickableHeight / 2
+
+            val editTensionClickableStartY = editElectricitySupplyClickableStartY + editElectricitySupplyClickableHeight
+            val editTensionClickableHeight = inputCableHeight / 3
+            val editTensionTextY = editTensionClickableStartY + editTensionClickableHeight / 2
+
+            val editInputCableVoltageDropClickableStartY = editTensionClickableStartY + editTensionClickableHeight
+            val editInputCableVoltageDropClickableHeight = inputCableHeight / 3
+            val editInputCableVoltageDropTextY = editInputCableVoltageDropClickableStartY + editInputCableVoltageDropClickableHeight / 2
+
+            val editCircuitCableClickableStartY = editInputCableVoltageDropClickableStartY + editInputCableVoltageDropClickableHeight
+            val editCircuitCableClickableHeight = circuitCableHeight + switchHeight + pinHeight + pinTipOffset
+            val editCircuitCableTextY = editCircuitCableClickableStartY + editCircuitCableClickableHeight / 2
+
+            val editUsageClickableStartY = editCircuitCableClickableStartY + editCircuitCableClickableHeight
+            val editUsageClickableHeight = switchHeight + motorCableHeight + deviceCircleRadius * 2
+            val editUsageTextY = editUsageClickableStartY + editUsageClickableHeight / 2
+
+            val textMap = mapOf(
+                editElectricitySypplyTextY to electricitySupplyTextLayoutResult,
+                editTensionTextY to nominalTensionTextLayoutResult,
+                editInputCableVoltageDropTextY to inputCableVoltageDropTextLayoutResult,
+                editUsageTextY to usageTextLayoutResult
+            )
+            DrawingTools.drawLegends(
+                this,
+                canvasWidthInPx = canvasWidthInPx,
+                verticalCoordinatesOfLegendsMap = textMap
+            )
+
             if(isEditionMode) {
-
-                val editElectricitySupplyClickableStartY = inputCableStart.y
-                val editElectricitySupplyClickableHeight = inputCableHeight / 3
-                val editElectricitySypplyButtonY = editElectricitySupplyClickableStartY + editElectricitySupplyClickableHeight / 2
-
-                val editTensionClickableStartY = editElectricitySupplyClickableStartY + editElectricitySupplyClickableHeight
-                val editTensionClickableHeight = inputCableHeight / 3
-                val editTensionButtonY = editTensionClickableStartY + editTensionClickableHeight / 2
-
-                val editInputCableVoltageDropClickableStartY = editTensionClickableStartY + editTensionClickableHeight
-                val editInputCableVoltageDropClickableHeight = inputCableHeight / 3
-                val editInputCableVoltageDropButtonY = editInputCableVoltageDropClickableStartY + editInputCableVoltageDropClickableHeight / 2
-
-                val editCircuitCableClickableStartY = editInputCableVoltageDropClickableStartY + editInputCableVoltageDropClickableHeight
-                val editCircuitCableClickableHeight = circuitCableHeight + switchHeight + pinHeight + pinTipOffset
-                val editCircuitCableButtonY = editCircuitCableClickableStartY + editCircuitCableClickableHeight / 2
-
-                val editUsageClickableStartY = editCircuitCableClickableStartY + editCircuitCableClickableHeight
-                val editUsageClickableHeight = switchHeight + motorCableHeight + deviceCircleRadius * 2
-                val editUsageButtonY = editUsageClickableStartY + editUsageClickableHeight / 2
 
                 DrawingTools.drawEditionMode(
                     drawScope = this,
                     canvasWidthInPx = canvasWidthInPx,
                     editButtonYCoordinates = arrayOf(
-                        editElectricitySypplyButtonY,
-                        editTensionButtonY,
-                        editInputCableVoltageDropButtonY,
-                        editCircuitCableButtonY,
-                        editUsageButtonY
+                        editElectricitySypplyTextY,
+                        editTensionTextY,
+                        editInputCableVoltageDropTextY,
+                        editCircuitCableTextY,
+                        editUsageTextY
                     ),
                     painter = editIconPainter
                 )
