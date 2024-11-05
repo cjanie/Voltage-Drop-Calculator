@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,15 +18,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.cjanie.voltagedropcalculator.ui.composables.AddOutputCircuits
+import com.cjanie.voltagedropcalculator.ui.composables.EditElectricitySupply
+import com.cjanie.voltagedropcalculator.ui.composables.EditInputCableVoltageDrop
+import com.cjanie.voltagedropcalculator.ui.composables.EditNominalTension
+import com.cjanie.voltagedropcalculator.ui.composables.EditUsage
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationDrawing
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationSetUpEdition
+import com.cjanie.voltagedropcalculator.ui.composables.InstallationTemplate
+import com.cjanie.voltagedropcalculator.ui.composables.TruncatedInstallationSetUpEdition
 import com.cjanie.voltagedropcalculator.ui.composables.VoltageDropResult
 import com.cjanie.voltagedropcalculator.ui.composables.commons.SubmitButton
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpStep
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 
 class MainActivity : ComponentActivity() {
@@ -50,8 +59,24 @@ class MainActivity : ComponentActivity() {
                             text = getString(R.string.app_name)
                         )
 
+                        var template by remember {
+                            mutableStateOf(InstallationTemplate.TRUNCATED)
+                        }
+                        Button(onClick = {
+                            when (template) {
+                                InstallationTemplate.TRUNCATED -> template = InstallationTemplate.COMPLETE
+                                InstallationTemplate.COMPLETE -> template = InstallationTemplate.TRUNCATED
+                            }
+                        }) {
+
+                        }
+
                         // Content: installation drawing
                         // 2 modes: edit / result
+
+                        var truncatedInstallationSetUpStep: TruncatedInstallationSetUpStep? by remember {
+                            mutableStateOf(null)
+                        }
 
                         var completeInstallationSetUpStep: CompleteInstallationSetUpStep? by remember {
                             mutableStateOf(null)
@@ -63,6 +88,21 @@ class MainActivity : ComponentActivity() {
 
                         var truncatedInstallation: TruncatedInstallationSetUpViewModel.TruncatedInstallationPresenter by remember {
                             mutableStateOf(truncatedInstallationSetUpViewModel.updateInstallationPlaceHolder())
+                        }
+
+                        if(truncatedInstallationSetUpStep != null) {
+
+                            fun next() {
+                                truncatedInstallationSetUpStep = null
+                                truncatedInstallation = truncatedInstallationSetUpViewModel
+                                    .updateInstallationPlaceHolder()
+                            }
+
+                            TruncatedInstallationSetUpEdition(
+                                viewModel = truncatedInstallationSetUpViewModel,
+                                step = truncatedInstallationSetUpStep!!,
+                                next = { next() }
+                            )
                         }
 
                         if (completeInstallationSetUpStep != null) {
@@ -93,6 +133,7 @@ class MainActivity : ComponentActivity() {
                                 setInstallationSetUpStep = fun(step: CompleteInstallationSetUpStep){
                                     completeInstallationSetUpStep = step
                                 },
+                                installationTemplate = template,
                                 modifier = Modifier
                                     .constrainAs(drawing) {
                                         top.linkTo(parent.top)
@@ -102,7 +143,10 @@ class MainActivity : ComponentActivity() {
                                         width = Dimension.fillToConstraints
                                         height = Dimension.fillToConstraints
                                     }
-                                    .fillMaxSize()
+                                    .fillMaxSize(),
+                                setTruncatedInstallationSetUpStep = fun (step: TruncatedInstallationSetUpStep) {
+                                    truncatedInstallationSetUpStep = step
+                                }
                             )
 
 

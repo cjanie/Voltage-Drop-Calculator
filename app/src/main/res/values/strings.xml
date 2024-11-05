@@ -26,6 +26,7 @@
     <string name="current_intensity_unit">A</string>
     <string name="tension_label">Tension in Volt</string>
     <string name="tension_unit">V</string>
+    <string name="input_cable_voltage_drop_in_volt_label">Input Cable Voltage Drop in Volt</string>
     <string name="line_length_label">Line Length in Kilometer</string>
     <string name="line_length_unit">km</string>
 

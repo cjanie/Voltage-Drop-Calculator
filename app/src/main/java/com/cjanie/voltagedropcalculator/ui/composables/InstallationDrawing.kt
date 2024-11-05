@@ -1,6 +1,7 @@
 package com.cjanie.voltagedropcalculator.ui.composables
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.TextMeasurer
@@ -27,6 +29,7 @@ import com.cjanie.voltagedropcalculator.ui.DrawingTools
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpStep
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 
 class Pin(val start: Offset, val end: Offset)
@@ -39,9 +42,9 @@ fun InstallationDrawing(
     completeInstallationPresenter: CompleteInstallationSetUpViewModel.CompleteInstallationPresenter,
     truncatedInstallationPresenter: TruncatedInstallationSetUpViewModel.TruncatedInstallationPresenter,
     editionMode: Boolean,
-    //installationTemplate: InstallationTemplate = InstallationTemplate.COMPLETE,
     installationTemplate: InstallationTemplate = InstallationTemplate.TRUNCATED,
     setInstallationSetUpStep: (step: CompleteInstallationSetUpStep) -> Unit,
+    setTruncatedInstallationSetUpStep: (step: TruncatedInstallationSetUpStep) -> Unit,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
@@ -76,7 +79,8 @@ fun InstallationDrawing(
             textMeasurer = textMeasurer,
             textStyle = textStyle,
             modifier = modifier,
-            strokeWidth = strokeWidth
+            strokeWidth = strokeWidth,
+            setInstallationSetUpStep = setTruncatedInstallationSetUpStep
         )
     }
 }
@@ -91,7 +95,8 @@ fun TruncatedInstallationCanvas(
     modifier: Modifier = Modifier.fillMaxSize(),
     horizontalPadding: Dp = paddingMedium,
     verticalPadding: Dp = paddingMedium,
-    strokeWidth: Float
+    strokeWidth: Float,
+    setInstallationSetUpStep: (step: TruncatedInstallationSetUpStep) -> Unit
 ) {
 
     var columnHeightInPx by remember {
@@ -143,9 +148,59 @@ fun TruncatedInstallationCanvas(
             textMeasurer.measure(usageText, textStyle)
         }
 
+        var electricitySupplyClickableEndY by remember {
+            mutableFloatStateOf(0f)
+        }
+
+        var tensionClickableEndY by remember {
+            mutableFloatStateOf(0f)
+        }
+
+        var inputCableVoltageDropEndY by remember {
+            mutableFloatStateOf(0f)
+        }
+
+        var circuitCableClickableEndY by remember {
+            mutableFloatStateOf(0f)
+        }
+
+        var usageClickableEndY by remember {
+            mutableFloatStateOf(0f)
+        }
+
+        val canvasClickableModifier = modifier
+            .padding(horizontalPadding, verticalPadding)
+            .pointerInput(true) {
+                detectTapGestures(onTap = { offset ->
+
+                    if (offset.x > canvasWidthInPx - canvasWidthInPx / 4) {
+                        if (offset.y < electricitySupplyClickableEndY)
+                            setInstallationSetUpStep(
+                                TruncatedInstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY
+                            )
+                        else if (offset.y < tensionClickableEndY) {
+                            setInstallationSetUpStep(
+                                TruncatedInstallationSetUpStep.DEFINE_NOMINAL_TENSION
+                            )
+                        }
+                        else if (offset.y < inputCableVoltageDropEndY) {
+                            setInstallationSetUpStep(
+                                TruncatedInstallationSetUpStep.DEFINE_INPUT_CABLE_VOLTAGE_DROP
+                            )
+                        }
+                        else if (offset.y < circuitCableClickableEndY) {
+                            setInstallationSetUpStep(
+                                TruncatedInstallationSetUpStep.ADD_OUTPUT_CIRCUITS
+                            )
+                        }
+                        else setInstallationSetUpStep(TruncatedInstallationSetUpStep.DEFINE_USAGE)
+                    }
+                })
+            }
+
         Canvas(
-            modifier = modifier
-                .padding(horizontalPadding, verticalPadding)
+            modifier = if(isEditionMode) canvasClickableModifier
+                else modifier.padding(horizontalPadding, verticalPadding)
         ) {
 
             canvasWidthInPx = columnWidthInPx - horizontalPadding.toPx() * 2
@@ -292,32 +347,37 @@ fun TruncatedInstallationCanvas(
             )
             */
 
-            val editElectricitySupplyClickableStartY = inputCableStart.y
-            val editElectricitySupplyClickableHeight = inputCableHeight / 3
-            val editElectricitySypplyTextY = editElectricitySupplyClickableStartY + editElectricitySupplyClickableHeight / 2
+            val electricitySupplyClickableStartY = inputCableStart.y
+            val electricitySupplyClickableHeight = inputCableHeight / 3
+            electricitySupplyClickableEndY = electricitySupplyClickableStartY + electricitySupplyClickableHeight
+            val electricitySypplyTextY = electricitySupplyClickableStartY + electricitySupplyClickableHeight / 2
 
-            val editTensionClickableStartY = editElectricitySupplyClickableStartY + editElectricitySupplyClickableHeight
-            val editTensionClickableHeight = inputCableHeight / 3
-            val editTensionTextY = editTensionClickableStartY + editTensionClickableHeight / 2
+            val tensionClickableStartY = electricitySupplyClickableStartY + electricitySupplyClickableHeight
+            val tensionClickableHeight = inputCableHeight / 3
+            tensionClickableEndY = tensionClickableStartY + tensionClickableHeight
+            val tensionTextY = tensionClickableStartY + tensionClickableHeight / 2
 
-            val editInputCableVoltageDropClickableStartY = editTensionClickableStartY + editTensionClickableHeight
-            val editInputCableVoltageDropClickableHeight = inputCableHeight / 3
-            val editInputCableVoltageDropTextY = editInputCableVoltageDropClickableStartY + editInputCableVoltageDropClickableHeight / 2
+            val inputCableVoltageDropClickableStartY = tensionClickableStartY + tensionClickableHeight
+            val inputCableVoltageDropClickableHeight = inputCableHeight / 3
+            inputCableVoltageDropEndY = inputCableVoltageDropClickableStartY + inputCableVoltageDropClickableHeight
+            val inputCableVoltageDropTextY = inputCableVoltageDropClickableStartY + inputCableVoltageDropClickableHeight / 2
 
-            val editCircuitCableClickableStartY = editInputCableVoltageDropClickableStartY + editInputCableVoltageDropClickableHeight
-            val editCircuitCableClickableHeight = circuitCableHeight + switchHeight + pinHeight + pinTipOffset
-            val editCircuitCableTextY = editCircuitCableClickableStartY + editCircuitCableClickableHeight / 2
+            val circuitCableClickableStartY = inputCableVoltageDropClickableStartY + inputCableVoltageDropClickableHeight
+            val circuitCableClickableHeight = circuitCableHeight + switchHeight + pinHeight + pinTipOffset
+            circuitCableClickableEndY = circuitCableClickableStartY + circuitCableClickableHeight
+            val circuitCableTextY = circuitCableClickableStartY + circuitCableClickableHeight / 2
 
-            val editUsageClickableStartY = editCircuitCableClickableStartY + editCircuitCableClickableHeight
-            val editUsageClickableHeight = switchHeight + motorCableHeight + deviceCircleRadius * 2
-            val editUsageTextY = editUsageClickableStartY + editUsageClickableHeight / 2
+            val usageClickableStartY = circuitCableClickableStartY + circuitCableClickableHeight
+            val usageClickableHeight = switchHeight + motorCableHeight + deviceCircleRadius * 2
+            usageClickableEndY = usageClickableStartY + usageClickableHeight
+            val usageTextY = usageClickableStartY + usageClickableHeight / 2
 
             val textMap = mapOf(
-                editElectricitySypplyTextY to electricitySupplyTextLayoutResult,
-                editTensionTextY to nominalTensionTextLayoutResult,
-                editInputCableVoltageDropTextY to inputCableVoltageDropTextLayoutResult,
-                editCircuitCableTextY to circuitCableTextlayoutResult,
-                editUsageTextY to usageTextLayoutResult
+                electricitySypplyTextY to electricitySupplyTextLayoutResult,
+                tensionTextY to nominalTensionTextLayoutResult,
+                inputCableVoltageDropTextY to inputCableVoltageDropTextLayoutResult,
+                circuitCableTextY to circuitCableTextlayoutResult,
+                usageTextY to usageTextLayoutResult
             )
             DrawingTools.drawLegends(
                 this,
@@ -331,11 +391,11 @@ fun TruncatedInstallationCanvas(
                     drawScope = this,
                     canvasWidthInPx = canvasWidthInPx,
                     editButtonYCoordinates = arrayOf(
-                        editElectricitySypplyTextY,
-                        editTensionTextY,
-                        editInputCableVoltageDropTextY,
-                        editCircuitCableTextY,
-                        editUsageTextY
+                        electricitySypplyTextY,
+                        tensionTextY,
+                        inputCableVoltageDropTextY,
+                        circuitCableTextY,
+                        usageTextY
                     ),
                     painter = editIconPainter
                 )

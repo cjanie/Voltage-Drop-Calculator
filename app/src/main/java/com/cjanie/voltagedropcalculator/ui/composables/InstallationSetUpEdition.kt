@@ -22,7 +22,66 @@ import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpS
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.OutputCircuitsViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TensionViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.UsageViewModel
+
+@Composable
+fun TruncatedInstallationSetUpEdition(
+    modifier: Modifier = Modifier.fillMaxSize(),
+    viewModel: TruncatedInstallationSetUpViewModel,
+    step: TruncatedInstallationSetUpStep,
+    next: () -> Unit
+) {
+    when(step!!) {
+        TruncatedInstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.Top
+        ) {
+            EditElectricitySupply(
+                viewModel = viewModel,
+                next = { next() }
+            )
+        }
+        TruncatedInstallationSetUpStep.DEFINE_NOMINAL_TENSION -> Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.Top
+        ){
+            EditNominalTension(
+                viewModel = viewModel,
+                next = { next() }
+            )
+        }
+        TruncatedInstallationSetUpStep.DEFINE_INPUT_CABLE_VOLTAGE_DROP -> Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.Top
+        ){
+            EditInputCableVoltageDrop(
+                viewModel = viewModel,
+                next = { next() }
+            )
+        }
+        TruncatedInstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.Center
+        ){
+            AddOutputCircuits(
+                viewModel = viewModel.outputCircuitsViewModel,
+                next = { next() },
+                skip = { next() }
+            )
+        }
+        TruncatedInstallationSetUpStep.DEFINE_USAGE -> Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.Bottom
+        ){
+            EditUsage(
+                viewModel = viewModel,
+                next = { next() }
+            )
+        }
+    }
+}
 
 @Composable()
 fun InstallationSetUpEdition(
@@ -266,5 +325,20 @@ fun EditNominalTension(viewModel: TensionViewModel, next: () -> Unit) {
 
     if (isStepCompleted) next()
 
+}
 
+
+@Composable
+fun EditInputCableVoltageDrop(viewModel: TruncatedInstallationSetUpViewModel, next: () -> Unit) {
+
+    NumberInput(
+        name = viewModel.inputCableVoltageDropLabel,
+        select = fun(value: Float) {
+            viewModel.setInputCableVoltageDrop(inVolt = value)
+                                   },
+        enabled = true
+    )
+    Button(onClick = { next() }) {
+
+    }
 }

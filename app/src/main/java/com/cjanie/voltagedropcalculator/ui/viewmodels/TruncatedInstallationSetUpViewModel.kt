@@ -35,6 +35,11 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
         override var usage: Usage = Usage.MOTOR
 
     var inputCableVoltageDrop = VoltageDrop(10f)
+    val inputCableVoltageDropLabel = application.getString(R.string.input_cable_voltage_drop_in_volt_label)
+
+    fun setInputCableVoltageDrop(inVolt: Float) {
+        inputCableVoltageDrop = VoltageDrop(inVolt)
+    }
 
 
     companion object {
