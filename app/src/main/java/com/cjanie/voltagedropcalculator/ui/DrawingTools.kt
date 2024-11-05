@@ -165,7 +165,8 @@ class DrawingTools {
         fun drawLegends(
             drawScope: DrawScope,
             canvasWidthInPx: Float,
-            verticalCoordinatesOfLegendsMap: Map<Float, TextLayoutResult?>
+            verticalCoordinatesOfLegendsMap: Map<Float, TextLayoutResult?>,
+            textColorMap: Map<Float, Color?>
         ) {
             val textX = canvasWidthInPx - canvasWidthInPx / 4
 
@@ -174,10 +175,14 @@ class DrawingTools {
                 if (textLayoutResult != null) {
                     drawScope.drawText(
                         verticalCoordinatesOfLegendsMap.get(coordinateY)!!,
+                        color = if (textColorMap.get(coordinateY) != null)
+                                textColorMap.get(coordinateY)!!
+                            else Color.Unspecified,
                         topLeft = Offset(
                             x = textX,
                             y = coordinateY - textLayoutResult.size.height / 2
                         )
+
                     )
                 }
             }

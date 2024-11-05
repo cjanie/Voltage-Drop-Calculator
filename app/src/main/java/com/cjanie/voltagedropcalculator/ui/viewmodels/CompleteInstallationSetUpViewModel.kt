@@ -95,7 +95,7 @@ class CompleteInstallationSetUpViewModel(
         val inputCableColor = if (!inputCableViewModel.isFormComplete()) placeHolderColor else Color.Unspecified
         val outputCircuitsColor = if (!outputCircuitsViewModel.isFormComplete()) placeHolderColor else Color.Unspecified
         return CompleteInstallationPresenter(
-            completeInstallation = installationSetUpUseCase.getInstallation()!!,
+            installation = installationSetUpUseCase.getInstallation()!!,
             application,
             inputCableColor = inputCableColor,
             outputCircuitsColor = outputCircuitsColor)
@@ -124,25 +124,25 @@ class CompleteInstallationSetUpViewModel(
     }
 
     class CompleteInstallationPresenter(
-        completeInstallation: CompleteInstallation,
+        installation: CompleteInstallation,
         application: Application,
         inputCableColor: Color = Color.Unspecified,
         outputCircuitsColor: Color = Color.Unspecified,
     ): InstallationPresenter()
     {
-        override val usageAsString = usageToString(usage = completeInstallation.use.usage, application = application)
-        override val usage: Usage = completeInstallation.use.usage
-        override val electricitySupply = electricitySupplyToString(completeInstallation.use.electricitySupply, application)
-        override val tension = tensionToString(tension = completeInstallation.nominalTension, application = application)
+        override val usageAsString = usageToString(usage = installation.use.usage, application = application)
+        override val usage: Usage = installation.use.usage
+        override val electricitySupply = electricitySupplyToString(installation.use.electricitySupply, application)
+        override val tension = tensionToString(tension = installation.nominalTension, application = application)
         val inputCablePresenter = CablePresenter(
-            cable = completeInstallation.input,
+            cable = installation.input,
             application = application,
             textColor = inputCableColor
         )
         val outputCircuitsPresenter =
-            if (!completeInstallation.output.isEmpty())
+            if (!installation.output.isEmpty())
                 CablePresenter(
-                    cable = completeInstallation.output[0],
+                    cable = installation.output[0],
                     application = application,
                     textColor = outputCircuitsColor
                 )

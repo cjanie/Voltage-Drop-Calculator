@@ -18,15 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.cjanie.voltagedropcalculator.ui.composables.AddOutputCircuits
-import com.cjanie.voltagedropcalculator.ui.composables.EditElectricitySupply
-import com.cjanie.voltagedropcalculator.ui.composables.EditInputCableVoltageDrop
-import com.cjanie.voltagedropcalculator.ui.composables.EditNominalTension
-import com.cjanie.voltagedropcalculator.ui.composables.EditUsage
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationDrawing
-import com.cjanie.voltagedropcalculator.ui.composables.InstallationSetUpEdition
+import com.cjanie.voltagedropcalculator.ui.composables.CompleteInstallationSetUpEdition
 import com.cjanie.voltagedropcalculator.ui.composables.InstallationTemplate
 import com.cjanie.voltagedropcalculator.ui.composables.TruncatedInstallationSetUpEdition
 import com.cjanie.voltagedropcalculator.ui.composables.VoltageDropResult
@@ -92,22 +87,18 @@ class MainActivity : ComponentActivity() {
 
                         if(truncatedInstallationSetUpStep != null) {
 
-                            fun next() {
-                                truncatedInstallationSetUpStep = null
-                                truncatedInstallation = truncatedInstallationSetUpViewModel
-                                    .updateInstallationPlaceHolder()
-                            }
-
                             TruncatedInstallationSetUpEdition(
                                 viewModel = truncatedInstallationSetUpViewModel,
                                 step = truncatedInstallationSetUpStep!!,
-                                next = { next() }
+                                next = { truncatedInstallationSetUpStep = null
+                                    truncatedInstallation = truncatedInstallationSetUpViewModel.updateInstallationPlaceHolder()
+                                }
                             )
                         }
 
                         if (completeInstallationSetUpStep != null) {
-                            InstallationSetUpEdition(
-                                completeInstallationSetUpViewModel = completeInstallationSetUpViewModel,
+                            CompleteInstallationSetUpEdition(
+                                viewModel = completeInstallationSetUpViewModel,
                                 step = completeInstallationSetUpStep!!,
                                 next = { completeInstallationSetUpStep = null
                                         installation = completeInstallationSetUpViewModel.updateInstallationPlaceHolder()

@@ -379,10 +379,14 @@ fun TruncatedInstallationCanvas(
                 circuitCableTextY to circuitCableTextlayoutResult,
                 usageTextY to usageTextLayoutResult
             )
+            val colorMap = mapOf(
+                circuitCableTextY to installationPresenter.outputCircuitsPresenter?.textColor
+            )
             DrawingTools.drawLegends(
                 this,
                 canvasWidthInPx = canvasWidthInPx,
-                verticalCoordinatesOfLegendsMap = textMap
+                verticalCoordinatesOfLegendsMap = textMap,
+                textColorMap = colorMap
             )
 
             if(isEditionMode) {

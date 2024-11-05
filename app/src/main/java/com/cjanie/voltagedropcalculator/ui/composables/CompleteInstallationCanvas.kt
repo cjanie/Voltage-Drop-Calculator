@@ -338,10 +338,15 @@ fun CompleteInstallationCanvas(
                     outputTextY to outputCircuitsTextLayoutResult,
                     usageTextY to usageTextResultLayout
                 )
+                val textColorMap: Map<Float, Color> = mapOf(
+                    inputTextY to completeInstallationPresenter.inputCablePresenter.textColor,
+                    outputTextY to completeInstallationPresenter.outputCircuitsPresenter.textColor
+                )
 
                 DrawingTools.drawLegends(this,
                     canvasWidthInPx = canvasWidthInPx,
-                    verticalCoordinatesOfLegendsMap = verticalCoordinatesOfLegendsMap)
+                    verticalCoordinatesOfLegendsMap = verticalCoordinatesOfLegendsMap,
+                    textColorMap = textColorMap)
 
                 // Edition
                 val supplierButtonY = supplierTextY

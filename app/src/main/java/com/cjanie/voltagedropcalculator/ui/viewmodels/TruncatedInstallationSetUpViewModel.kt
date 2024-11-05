@@ -105,7 +105,7 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
         override val usage: Usage = installation.usage
         override val electricitySupply = electricitySupplyToString(installation.electricitySupply, application)
         override val tension = tensionToString(tension = installation.nominalTension, application = application)
-        val inputCableVoltageDrop = tensionToString(tension = Tension(installation.inputCableVoltageDrop.inVolt), application = application)
+        val inputCableVoltageDrop ="- ${tensionToString(tension = Tension(installation.inputCableVoltageDrop.inVolt), application = application)}"
 
         val outputCircuitsPresenter =
             if (!installation.outputCircuits.isEmpty())

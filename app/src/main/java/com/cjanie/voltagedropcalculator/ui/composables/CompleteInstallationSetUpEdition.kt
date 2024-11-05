@@ -84,9 +84,9 @@ fun TruncatedInstallationSetUpEdition(
 }
 
 @Composable()
-fun InstallationSetUpEdition(
+fun CompleteInstallationSetUpEdition(
     modifier: Modifier = Modifier.fillMaxSize(),
-    completeInstallationSetUpViewModel: CompleteInstallationSetUpViewModel,
+    viewModel: CompleteInstallationSetUpViewModel,
     step: CompleteInstallationSetUpStep,
     next: () -> Unit
 ){
@@ -97,7 +97,7 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Bottom
                 ){
                     EditUsage(
-                        viewModel = completeInstallationSetUpViewModel,
+                        viewModel = viewModel,
                         next = { next() },
                     )
                 }
@@ -106,11 +106,11 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Center
                 ){
                     Subtitle(
-                        text = completeInstallationSetUpViewModel.installationSetUpStepLabel(step),
+                        text = viewModel.installationSetUpStepLabel(step),
                         color = greenWarningColor
                     )
                     AddInputCable(
-                        viewModel = completeInstallationSetUpViewModel.inputCableViewModel,
+                        viewModel = viewModel.inputCableViewModel,
                         next = { next() }
                     )
                 }
@@ -119,11 +119,11 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Center
                 ){
                     Subtitle(
-                        text = completeInstallationSetUpViewModel.installationSetUpStepLabel(step),
+                        text = viewModel.installationSetUpStepLabel(step),
                         color = greenWarningColor
                     )
                     AddOutputCircuits(
-                        viewModel = completeInstallationSetUpViewModel.outputCircuitsViewModel,
+                        viewModel = viewModel.outputCircuitsViewModel,
                         next = { next() },
                         skip = { next() }
                     )
@@ -134,7 +134,7 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Top
                 ){
                     EditNominalTension(
-                        viewModel = completeInstallationSetUpViewModel,
+                        viewModel = viewModel,
                         next = { next() }
                     )
                 }
@@ -144,7 +144,7 @@ fun InstallationSetUpEdition(
                     verticalArrangement = Arrangement.Top
                 ) {
                     EditElectricitySupply(
-                        viewModel = completeInstallationSetUpViewModel,
+                        viewModel = viewModel,
                         next = { next() }
                     )
                 }
