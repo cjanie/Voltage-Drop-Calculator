@@ -30,7 +30,7 @@ class Copper {
         fun voltageDropProperty(
             section: Section,
             X: LinearReactance = DEFAULT_LINEAR_REACTANCE,
-            usage: Usage = Usage.LIGHTING
+            usage: Usage
         ): ConductorVoltageDropProperty {
 
             val R = linearResistance(section)

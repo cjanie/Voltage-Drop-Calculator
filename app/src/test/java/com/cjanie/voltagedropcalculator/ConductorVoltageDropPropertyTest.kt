@@ -1,5 +1,6 @@
 package com.cjanie.voltagedropcalculator
 
+import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
 import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.Copper
 import org.junit.Assert.assertEquals
@@ -14,7 +15,7 @@ class ConductorVoltageDropPropertyTest {
         // lighting
         // K = 32 // Delta_U in volt per Ampere and per Kimometer
         val section = Section(inMillimeterSquare = 1.5f)
-        val K = Copper.voltageDropProperty(section)
+        val K = Copper.voltageDropProperty(section, usage = Usage.LIGHTING)
         assertEquals(31.6f, K?.inVoltPerAmpereAndPerKilometer)
     }
 
@@ -25,7 +26,7 @@ class ConductorVoltageDropPropertyTest {
         // lighting
         // K = 19 // Delta_U in volt per Ampere and per Kimometer
         val section = Section(inMillimeterSquare = 2.5f)
-        val K = Copper.voltageDropProperty(section)
+        val K = Copper.voltageDropProperty(section, usage = Usage.LIGHTING)
         assertEquals(18.960001f, K?.inVoltPerAmpereAndPerKilometer)
     }
 
@@ -36,7 +37,7 @@ class ConductorVoltageDropPropertyTest {
         // lighting
         // K = 11.9 // Delta_U in volt per Ampere and per Kimometer
         val section = Section(inMillimeterSquare = 4f)
-        val K = Copper.voltageDropProperty(section)
+        val K = Copper.voltageDropProperty(section, usage = Usage.LIGHTING)
         assertEquals(11.85f, K?.inVoltPerAmpereAndPerKilometer)
     }
 }
