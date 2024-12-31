@@ -404,10 +404,6 @@ fun TruncatedInstallationCanvas(
                     painter = editIconPainter
                 )
             }
-
-
-
-
         }
     }
 }

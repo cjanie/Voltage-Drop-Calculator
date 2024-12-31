@@ -7,15 +7,13 @@ import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.models.Installation
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
-import com.cjanie.voltagedropcalculator.businesslogic.models.use.Lighting
-import com.cjanie.voltagedropcalculator.businesslogic.models.use.Motor
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
 
 class TruncatedInstallationSetUpUseCase(
     private val usage: Usage,
     private val electricitySupply: ElectricitySupply,
-    private val nominalTension: Tension,
+    private val nominalVoltage: Voltage,
     private val inputCableVoltageDrop: VoltageDrop
 ) {
     private val outputCircuits = mutableListOf<Line>()
@@ -32,7 +30,7 @@ class TruncatedInstallationSetUpUseCase(
         else return TruncatedInstallation(
             usage = usage,
             electricitySupply = electricitySupply,
-            nominalTension = nominalTension,
+            nominalVoltage = nominalVoltage,
             inputCableVoltageDrop = inputCableVoltageDrop!!,
             outputCircuits = outputCircuits.toTypedArray()
         )

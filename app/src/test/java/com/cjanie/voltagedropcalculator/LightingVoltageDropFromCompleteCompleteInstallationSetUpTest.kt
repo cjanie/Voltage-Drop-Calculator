@@ -11,7 +11,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.usecases.InstallationSetUp
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -28,7 +28,7 @@ class LightingVoltageDropFromCompleteCompleteInstallationSetUpTest {
         // Parcourue par un courant d'une intensité de 150 Ampères
         val use = Lighting(ElectricitySupply.PRIVATE)
 
-        val installationSetUp = InstallationSetUpUseCase(use, Tension(inVolt = 230f))
+        val installationSetUp = InstallationSetUpUseCase(use, Voltage(inVolt = 230f))
         installationSetUp.addInput(LineThreePhase(
                 phaseShift = use.phaseShift,
                 conductor = ConductorFactory.conductor(ConductorMaterial.COPPER),
@@ -74,7 +74,7 @@ class LightingVoltageDropFromCompleteCompleteInstallationSetUpTest {
             use = use,
             input = lineThreePhase,
             output = lineThreePhase.output,
-            nominalTension = Tension(inVolt = 230f)
+            nominalVoltage = Voltage(inVolt = 230f)
         )
         val DELTA_U = completeInstallation.voltageDropInVolt
         assertEquals(2.5392857.toFloat(), DELTA_U)
@@ -95,7 +95,7 @@ class LightingVoltageDropFromCompleteCompleteInstallationSetUpTest {
             use = use,
             input = cable,
             output = cable.output,
-            nominalTension = Tension(inVolt = 230f)
+            nominalVoltage = Voltage(inVolt = 230f)
         )
         val delta_U = completeInstallation.voltageDropInVolt
         assertEquals(7.584f, delta_U)

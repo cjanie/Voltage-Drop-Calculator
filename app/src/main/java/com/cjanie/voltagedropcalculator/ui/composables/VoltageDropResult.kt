@@ -14,9 +14,10 @@ import com.cjanie.voltagedropcalculator.ui.theme.onWhiteColor
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.theme.whiteColor
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
+import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpViewModel
 
 @Composable
-fun VoltageDropResult(voltageDropResultPresenter: CompleteInstallationSetUpViewModel.VoltageDropResultPresenter, modifier: Modifier = Modifier.fillMaxWidth()) {
+fun VoltageDropResult(voltageDropResultPresenter: InstallationSetUpViewModel.VoltageDropResultPresenter, modifier: Modifier = Modifier.fillMaxWidth()) {
     Column(
         modifier = modifier
             .background(voltageDropResultPresenter.warningColor),
@@ -34,7 +35,6 @@ fun VoltageDropResult(voltageDropResultPresenter: CompleteInstallationSetUpViewM
                 .background(whiteColor),
             horizontalAlignment = Alignment.CenterHorizontally
         )  {
-
 
             LabeledText(
                 label = voltageDropResultPresenter.inVoltLabel,

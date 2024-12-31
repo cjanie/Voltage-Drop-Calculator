@@ -2,13 +2,13 @@ package com.cjanie.voltagedropcalculator.businesslogic.models.line
 
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Resistance
+import com.cjanie.voltagedropcalculator.businesslogic.models.conductor.Resistance
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
 import com.cjanie.voltagedropcalculator.businesslogic.models.conductor.Conductor
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
 
 abstract class Line (
     val phaseShift: PhaseShift,
@@ -20,7 +20,7 @@ abstract class Line (
 
     abstract val phasing: Phasing
 
-    private val resistance = Resistance(
+    val resistance = Resistance(
         conductor = conductor,
         section = section,
         phaseShift = phaseShift,
@@ -41,7 +41,7 @@ abstract class Line (
 
     // Max length acceptable
 
-    open fun maxLengthAcceptable(nominal_U: Tension): Length {
+    open fun maxLengthAcceptable(nominal_U: Voltage): Length {
         //val delta_U_inVolt = functionalContext.maxVoltageDropPercentageAcceptable * nominal_U.inVolt / 100
         // return Length(inKilometer = delta_U_inVolt / K * I.inAmpere)
         TODO()

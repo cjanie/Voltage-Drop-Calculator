@@ -29,6 +29,7 @@ import com.cjanie.voltagedropcalculator.ui.composables.commons.SubmitButton
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
 import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpStep
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 
@@ -86,7 +87,6 @@ class MainActivity : ComponentActivity() {
                         }
 
                         if(truncatedInstallationSetUpStep != null) {
-
                             TruncatedInstallationSetUpEdition(
                                 viewModel = truncatedInstallationSetUpViewModel,
                                 step = truncatedInstallationSetUpStep!!,
@@ -106,9 +106,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-
-
-                        var voltageDropResult: CompleteInstallationSetUpViewModel.VoltageDropResultPresenter? by remember {
+                        var voltageDropResult: InstallationSetUpViewModel.VoltageDropResultPresenter? by remember {
                             mutableStateOf(null)
                         }
 
@@ -152,9 +150,9 @@ class MainActivity : ComponentActivity() {
                                 )
                             } else {
                                 SubmitButton(
-                                    text = completeInstallationSetUpViewModel.calculateVoltageDropLabel,
-                                    onClick = { voltageDropResult = completeInstallationSetUpViewModel.voltageDropResult() },
-                                    enabled = completeInstallationSetUpViewModel.isSetUpComplete(),
+                                    text = truncatedInstallationSetUpViewModel.calculateVoltageDropLabel,
+                                    onClick = { voltageDropResult = truncatedInstallationSetUpViewModel.voltageDropResult() },
+                                    enabled = truncatedInstallationSetUpViewModel.isSetUpComplete(),
                                     modifier = Modifier
                                         .constrainAs(result) {
                                             start.linkTo(parent.start)

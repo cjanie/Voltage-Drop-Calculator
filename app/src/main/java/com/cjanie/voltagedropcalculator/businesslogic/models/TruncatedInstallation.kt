@@ -4,13 +4,13 @@ import com.cjanie.voltagedropcalculator.businesslogic.PhaseShiftInconsistancyExc
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
 
 class TruncatedInstallation(
     val usage: Usage,
     val electricitySupply: ElectricitySupply,
-    val nominalTension: Tension,
+    val nominalVoltage: Voltage,
     val inputCableVoltageDrop: VoltageDrop,
     val outputCircuits: Array<Line> = emptyArray()
 ) : Installation() {
@@ -23,13 +23,13 @@ class TruncatedInstallation(
     }
 
     override val maxVoltageDropLimitPercentage: Float
-        get() = TODO("Not yet implemented")
+        get() = maxVoltageDropLimitPercentage
     override val voltageDropInVolt: Float
-        get() = TODO("Not yet implemented")
+        get() = inputCableVoltageDrop.inVolt + outputCircuits[0].voltageDrop.inVolt
     override val voltageDropPercentage: Float
-        get() = TODO("Not yet implemented")
+        get() = VoltageDrop(inVolt = voltageDropInVolt).percentage(nominalVoltage)
     override val isVoltageDropAcceptable: Boolean
-        get() = TODO("Not yet implemented")
+        get() = voltageDropPercentage < maxVoltageDropLimitPercentage
 
 
 }

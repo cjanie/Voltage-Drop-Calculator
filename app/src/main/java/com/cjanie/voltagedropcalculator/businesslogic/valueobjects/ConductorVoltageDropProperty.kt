@@ -1,0 +1,3 @@
+package com.cjanie.voltagedropcalculator.businesslogic.valueobjects
+
+class ConductorVoltageDropProperty(val inVoltPerAmpereAndPerKilometer: Float)

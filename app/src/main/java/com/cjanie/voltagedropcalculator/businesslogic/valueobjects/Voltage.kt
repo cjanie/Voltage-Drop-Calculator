@@ -2,8 +2,8 @@ package com.cjanie.voltagedropcalculator.businesslogic.valueobjects
 
 import com.cjanie.voltagedropcalculator.businesslogic.enums.OhmLawParameterUnit
 
-class Intensity(val inAmpere: Float) {
+class Voltage(val inVolt: Float) {
     companion object {
-        val unit = OhmLawParameterUnit.AMPERE
+        val unit = OhmLawParameterUnit.VOLT
     }
 }

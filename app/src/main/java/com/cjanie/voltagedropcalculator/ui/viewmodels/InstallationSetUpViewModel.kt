@@ -1,14 +1,20 @@
 package com.cjanie.voltagedropcalculator.ui.viewmodels
 
 import android.app.Application
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
+import com.cjanie.voltagedropcalculator.businesslogic.models.CalculateVoltageDrop
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
+import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
+import com.cjanie.voltagedropcalculator.ui.theme.onGreenWarningColor
+import com.cjanie.voltagedropcalculator.ui.theme.onRedWarningColor
+import com.cjanie.voltagedropcalculator.ui.theme.redWarningColor
 
 abstract class InstallationSetUpViewModel(application: Application) : AndroidViewModel(application),
     UsageViewModel,
@@ -31,8 +37,8 @@ abstract class InstallationSetUpViewModel(application: Application) : AndroidVie
             }
         }
 
-        fun tensionToString(tension: Tension, application: Application): String {
-            return "${tension.inVolt.toInt()} ${application.getString(R.string.tension_unit)}"
+        fun tensionToString(voltage: Voltage, application: Application): String {
+            return "${voltage.inVolt.toInt()} ${application.getString(R.string.tension_unit)}"
         }
 
     }
@@ -69,22 +75,22 @@ abstract class InstallationSetUpViewModel(application: Application) : AndroidVie
     }
 
     // TensionViewModel Impl
-    private val tensionValues: Set<Tension> = setOf(
-        Tension(inVolt = 3f),
-        Tension(24f),
-        Tension(230f),
+    private val voltageValues: Set<Voltage> = setOf(
+        Voltage(inVolt = 3f),
+        Voltage(24f),
+        Voltage(230f),
     )
-    protected var tension: Tension = tensionValues.toList()[2]
+    protected var voltage: Voltage = voltageValues.toList()[2]
 
     override val tensionLabel = application.getString(R.string.tension_label)
-    override val tensionOptions: Array<String> = tensionValues
+    override val tensionOptions: Array<String> = voltageValues
         .map { tensionToString(it, application) }.toTypedArray()
     override fun setTension(itemPosition: Int) {
-        tension = tensionValues.toList()[itemPosition]
+        voltage = voltageValues.toList()[itemPosition]
     }
 
     override fun isTensionDefined(): Boolean {
-        return tension != null
+        return voltage != null
     }
 
     val outputCircuitsViewModel = OutputCircuitsViewModel(application)
@@ -103,6 +109,12 @@ abstract class InstallationSetUpViewModel(application: Application) : AndroidVie
         )
     }
 
+    abstract fun isSetUpComplete(): Boolean
+
+    val calculateVoltageDropLabel = application.getString(R.string.calculate_voltage_drop_label)
+
+    abstract fun voltageDropResult(): VoltageDropResultPresenter
+
     // Installation Presenter interfaces
     interface UsagePresenter {
         val usageAsString: String
@@ -120,4 +132,35 @@ abstract class InstallationSetUpViewModel(application: Application) : AndroidVie
 
     abstract class InstallationPresenter : UsagePresenter, ElectricitySupplyPresenter, TensionPresenter
 
-}
+    class CablePresenter(
+        cable: Line, application: Application,
+        val textColor: Color = Color.Unspecified
+    ) {
+        val phasing = cable.phasing
+        private val conductor =
+            CableViewModel.conductorToString(cable.conductor.material, application)
+        private val section = CableViewModel.sectionToString(cable.section, application)
+        private val intensity = CableViewModel.intensityToString(cable.intensity, application)
+        private val length = CableViewModel.lengthToString(cable.length, application)
+        val cableText = "$conductor\n$section\n$intensity\n${length}"
+    }
+
+    class VoltageDropResultPresenter(
+        calculateVoltageDrop: CalculateVoltageDrop,
+        application: Application) {
+        val inVoltLabel = application.getString(R.string.voltage_drop_in_volt_label)
+        val inVoltValue = tensionToString(Voltage(calculateVoltageDrop.voltageDropInVolt), application )
+        val asPercentageLabel = application.getString(R.string.voltage_drop_percentage_label)
+        val asPercentageValue = "${calculateVoltageDrop.voltageDropPercentage.toInt()} ${application.getString(R.string.percentage_sign)}"
+        val isVoltageDropAcceptableWarningText = if (calculateVoltageDrop.isVoltageDropAcceptable)
+            "${application.getString(R.string.voltage_drop_acceptable_result)}"
+        else "${application.getString(R.string.voltage_drop_not_acceptable_result)}"
+        val maxVoltageDropLimitPercentageLabel = application.getString(R.string.max_voltage_drop_acceptable_percentage_label)
+        val maxVoltageDropLimitPercentageValue = "${calculateVoltageDrop.maxVoltageDropLimitPercentage.toInt()} ${application.getString(R.string.percentage_sign)}"
+        val warningColor = if (calculateVoltageDrop.isVoltageDropAcceptable) greenWarningColor
+        else redWarningColor
+        val onWarningColor = if (calculateVoltageDrop.isVoltageDropAcceptable)
+            onGreenWarningColor
+        else onRedWarningColor
+    }
+    }

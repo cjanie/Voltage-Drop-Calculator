@@ -4,14 +4,14 @@ import com.cjanie.voltagedropcalculator.businesslogic.PhaseShiftInconsistancyExc
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Use
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.MaxVoltageDropLimit
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
 
 class CompleteInstallation(
     val use: Use,
     val input: Line,
     val output: Array<Line>,
-    val nominalTension: Tension
+    val nominalVoltage: Voltage
 ): Installation() {
 
     init {
@@ -31,8 +31,8 @@ class CompleteInstallation(
     private val voltageDrop = calculateVoltageDrop()
 
     override val voltageDropInVolt = voltageDrop.inVolt
-    override val voltageDropPercentage = voltageDrop.percentage(nominalTension)
-    override val isVoltageDropAcceptable = maxVoltageDropLimitPercentage > voltageDrop.percentage(nominalTension)
+    override val voltageDropPercentage = voltageDrop.percentage(nominalVoltage)
+    override val isVoltageDropAcceptable = maxVoltageDropLimitPercentage > voltageDrop.percentage(nominalVoltage)
 
     private fun calculateVoltageDrop(): VoltageDrop {
         val cableVoltageDrop = input.voltageDrop

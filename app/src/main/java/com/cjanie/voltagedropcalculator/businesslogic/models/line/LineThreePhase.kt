@@ -22,7 +22,7 @@ class LineThreePhase(
     override fun voltageDrop(): VoltageDrop {
         // Between Phases and neutral
         return VoltageDrop(
-            inVolt = super.voltageDrop().inVolt / phasing.ratio
+            inVolt = super.voltageDrop().inVolt // / phasing.ratio
         )
     }
 /*

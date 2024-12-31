@@ -5,10 +5,8 @@ import androidx.compose.ui.graphics.Color
 import com.cjanie.voltagedropcalculator.NullValueException
 import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.models.TruncatedInstallation
-import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.models.conductor.Copper
-import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineSinglePhase
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineThreePhase
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Lighting
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Motor
@@ -16,10 +14,9 @@ import com.cjanie.voltagedropcalculator.businesslogic.usecases.TruncatedInstalla
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Tension
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
 import com.cjanie.voltagedropcalculator.ui.theme.placeHolderColor
-import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel.CablePresenter
 
 enum class TruncatedInstallationSetUpStep {
     DEFINE_ELECTRICITY_SUPPLY,
@@ -34,9 +31,8 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
 
         override var usage: Usage = Usage.MOTOR
 
-    var inputCableVoltageDrop = VoltageDrop(10f)
     val inputCableVoltageDropLabel = application.getString(R.string.input_cable_voltage_drop_in_volt_label)
-
+    var inputCableVoltageDrop = VoltageDrop(10f)
     fun setInputCableVoltageDrop(inVolt: Float) {
         inputCableVoltageDrop = VoltageDrop(inVolt)
     }
@@ -56,7 +52,6 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
         }
     }
 
-
     fun installationSetUpStepLabel(step: TruncatedInstallationSetUpStep): String {
         return installationSetUpStepLabel(step, application)
     }
@@ -65,7 +60,7 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
         val installationSetUpUseCase = TruncatedInstallationSetUpUseCase(
             usage = usage,
             electricitySupply = electricitySupply,
-            nominalTension = tension,
+            nominalVoltage = voltage,
             inputCableVoltageDrop = inputCableVoltageDrop
         )
         val use = when (usage) {
@@ -95,6 +90,33 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
         )
     }
 
+    override fun isSetUpComplete(): Boolean {
+        return outputCircuitsViewModel.isFormComplete()
+    }
+
+    private var installation: TruncatedInstallation? = null
+
+    fun setUp(): TruncatedInstallationPresenter {
+        val use = when (usage) {
+            Usage.LIGHTING -> Lighting(electricitySupply)
+            Usage.MOTOR -> Motor(electricitySupply) // TODO MOTOR IMPL
+        }
+        val installationSetUp = TruncatedInstallationSetUpUseCase(usage, electricitySupply, voltage, inputCableVoltageDrop)
+        if(outputCircuitsViewModel.isFormComplete()) {
+            installationSetUp.addOutputCircuit(createCable(cableViewModel = outputCircuitsViewModel))
+        }
+        installation = installationSetUp.getInstallation()
+        return TruncatedInstallationPresenter(installation!!, application)
+    }
+
+    override fun voltageDropResult(): VoltageDropResultPresenter {
+        if (installation == null) setUp()
+        return VoltageDropResultPresenter(
+            calculateVoltageDrop = installation!!,
+            application = application
+        )
+    }
+
     class TruncatedInstallationPresenter(
         installation: TruncatedInstallation,
         application: Application,
@@ -104,8 +126,8 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
         override val usageAsString = usageToString(usage = installation.usage, application = application)
         override val usage: Usage = installation.usage
         override val electricitySupply = electricitySupplyToString(installation.electricitySupply, application)
-        override val tension = tensionToString(tension = installation.nominalTension, application = application)
-        val inputCableVoltageDrop ="- ${tensionToString(tension = Tension(installation.inputCableVoltageDrop.inVolt), application = application)}"
+        override val tension = tensionToString(voltage = installation.nominalVoltage, application = application)
+        val inputCableVoltageDrop ="- ${tensionToString(voltage = Voltage(installation.inputCableVoltageDrop.inVolt), application = application)}"
 
         val outputCircuitsPresenter =
             if (!installation.outputCircuits.isEmpty())
@@ -116,5 +138,8 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
                 )
             else null
     }
+
+
+
 
 }
