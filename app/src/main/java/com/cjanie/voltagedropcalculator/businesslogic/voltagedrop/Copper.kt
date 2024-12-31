@@ -7,6 +7,8 @@ import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.LinearReactan
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.LinearResistance
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class Copper {
 
@@ -36,7 +38,7 @@ class Copper {
                 Usage.LIGHTING -> 1f
                 Usage.MOTOR -> 0.8f
             }
-            val sinPhi = PhaseShift.sinPhiFrom(cosPhi)
+            val sinPhi = sqrt(1 - cosPhi.pow(2))
 
             return ConductorVoltageDropProperty(inVoltPerAmpereAndPerKilometer =
             2 * (R.inOhmPerKilometer * cosPhi + X.inOhmPerKilometer * sinPhi)

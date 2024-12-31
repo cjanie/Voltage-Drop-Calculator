@@ -1,51 +1,15 @@
 package com.cjanie.voltagedropcalculator
 
+import com.cjanie.voltagedropcalculator.adapters.device.Light
+import com.cjanie.voltagedropcalculator.adapters.voltageprovider.VoltageProvider230
+import com.cjanie.voltagedropcalculator.businesslogic.gateways.Device
+import com.cjanie.voltagedropcalculator.businesslogic.ohmlaw.OhmLaw
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Resistance
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class VoltageProvider230: VoltageProvider {
-    override fun provides(): Voltage {
-        return Voltage(230f)
-    }
-
-}
-class Light(private val consumes: Intensity): Device {
-    override fun consumes(): Intensity {
-        return consumes
-    }
-}
-
-interface VoltageProvider {
-    fun provides(): Voltage
-}
-
-interface Device {
-    fun consumes(): Intensity
-}
-
-class OhmLaw {
-    companion object {
-        fun resistance(U: Voltage, I: Intensity): Resistance {
-            // Ohm Law: U=RI
-            // so R = U/I
-            return Resistance(inOhm = U.inVolt / I.inAmpere)
-        }
-
-        fun voltage(R: Resistance, I: Intensity): Voltage {
-            // Ohm Law: U=RI
-            return Voltage(inVolt = R.inOhm * I.inAmpere)
-        }
-
-        fun intensity(U: Voltage, R: Resistance): Intensity {
-            // Ohm Law: U=RI
-            // so I = U/R
-            return Intensity(inAmpere = U.inVolt / R.inOhm)
-        }
-    }
-}
 
 class OhmLawTest {
 
