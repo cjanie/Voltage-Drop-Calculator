@@ -8,13 +8,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.L
 import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.VoltageDrop
 
-class Line(
-    val length: Length,
-    val conductorMaterial: ConductorMaterial,
-    val section: Section,
-    val intensity: Intensity,
-    val usage: Usage
-) {
+class Line{
     companion object {
         fun voltageDropAtEndOfLine(K: ConductorVoltageDropProperty, I: Intensity, L: Length): VoltageDrop {
             return VoltageDrop(inVolt =
@@ -23,12 +17,4 @@ class Line(
         }
     }
 
-    fun voltageDropAtEndOfLine(): VoltageDrop {
-        val K = ConductorVoltageDropProperty.property(
-            conductorMaterial = conductorMaterial,
-            section = section,
-            usage = usage
-        )
-        return Companion.voltageDropAtEndOfLine(K, intensity, length)
-    }
 }

@@ -38,14 +38,22 @@ class VoltageDropViewModel: ViewModel() {
         usage = usage
     )
     private val I = device.consumes()
-    private val L = Length(inKilometer = 0.02f)
 
-    private val delta_U = Line.voltageDropAtEndOfLine(K, I, L)
+    var L = Length(inKilometer = 0.02f)
+
+    fun delta_U(L: Length): VoltageDrop {
+        return Line.voltageDropAtEndOfLine(K, I, L)
+    }
 
     val lengthUnit = Length.unit
-    val lengthText = "${L.inKilometer} $lengthUnit"
+    fun lengthText(L: Length): String {
+        return "${L.inKilometer} $lengthUnit"
+    }
 
     val voltageDropUnit = VoltageDrop.unit
-    val voltageDropText = "${delta_U.inVolt} $voltageDropUnit"
+
+    fun voltageDropText(): String {
+        return "${delta_U(L).inVolt} $voltageDropUnit"
+    }
 
 }
