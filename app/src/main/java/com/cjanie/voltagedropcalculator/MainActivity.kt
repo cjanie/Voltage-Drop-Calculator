@@ -27,12 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
+import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
 import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Length
 import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
 import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
+import com.cjanie.voltagedropcalculator.ui.theme.redWarningColor
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.VoltageDropViewModel
 
@@ -130,14 +132,24 @@ class MainActivity : ComponentActivity() {
                                 fontWeight = FontWeight.Bold
                             )
 
-                            val infoText = "Todo info text - requires nominal tension provider"
+                            var nominalVoltageValue by remember {
+                                mutableStateOf(voltageDropViewModel.nominal_U)
+                            }
+                            val infoColor = voltageDropViewModel.warningColor()
+                            val infoText = voltageDropViewModel.infoText()
                             Card(
                                 painter = painterResource(id = R.drawable.ic_info_24),
                                 contentDescription = voltageDropViewModel.voltageDropUnit.toString(),
                                 texts = arrayOf(infoText),
-                                color = greenWarningColor,
+                                color = infoColor,
                                 fontWeight = FontWeight.Bold
                             )
+                            Slider(
+                                value = nominalVoltageValue.inVolt,
+                                onValueChange = {
+                                    nominalVoltageValue = Voltage(it)
+                                    voltageDropViewModel.nominal_U = nominalVoltageValue
+                                })
                         }
                     }
                 }
