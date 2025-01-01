@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
@@ -69,47 +71,78 @@ class MainActivity : ComponentActivity() {
                         Header(
                             text = getString(R.string.app_name)
                         )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(40.dp),
+                            verticalArrangement = Arrangement.SpaceAround
 
-                        val sectionText = "${voltageDropViewModel.sectionText}"
-                        val materialText = "${voltageDropViewModel.materialText}"
-                        Card(
-                            painter = painterResource(id = R.drawable.ic_blur_linear_24),
-                            contentDescription = voltageDropViewModel.sectionUnit.toString(),
-                            texts = arrayOf(sectionText, materialText)
-                        )
+                        ) {
 
-                        val deviceIconId = voltageDropViewModel.deviceIconId
-                        val usage = voltageDropViewModel.usage
-                        val intensityText = "${voltageDropViewModel.intensityText}"
-
-                        Card(
-                            painter = painterResource(id = deviceIconId),
-                            contentDescription = usage.toString(),
-                            texts = arrayOf(intensityText)
-                        )
-
-                        var lengthValue by remember { mutableStateOf(voltageDropViewModel.L) }
-                        val lengthText = "${voltageDropViewModel.lengthText(lengthValue)}"
-                        Card(
-                            painter = painterResource(id = R.drawable.ic_electrical_services_24),
-                            contentDescription = voltageDropViewModel.lengthUnit.toString(),
-                            texts = arrayOf(lengthText)
-                        )
-
-                        Slider(
-                            value = lengthValue.inKilometer,
-                            onValueChange = {
-                                lengthValue = Length(it)
-                                voltageDropViewModel.L = lengthValue
+                            // K
+                            var sectionValue by remember {
+                                mutableStateOf(voltageDropViewModel.S)
                             }
-                        )
+                            val sectionText = "${voltageDropViewModel.sectionText()}"
+                            val materialText = "${voltageDropViewModel.materialText}"
+                            Card(
+                                painter = painterResource(id = R.drawable.ic_blur_linear_24),
+                                contentDescription = voltageDropViewModel.sectionUnit.toString(),
+                                texts = arrayOf(materialText, sectionText)
+                            )
 
-                        val voltageDropText = "${voltageDropViewModel.voltageDropText()}"
-                        Card(
-                            painter = painterResource(id = R.drawable.ic_electric_bolt_24),
-                            contentDescription = voltageDropViewModel.voltageDropUnit.toString(),
-                            texts = arrayOf(voltageDropText)
-                        )
+                            Slider(
+                                value = sectionValue.inMillimeterSquare,
+                                onValueChange = {
+                                    sectionValue = Section(it)
+                                    voltageDropViewModel.S = sectionValue
+                                }
+                            )
+                            // I
+                            val deviceIconId = voltageDropViewModel.deviceIconId
+                            val usage = voltageDropViewModel.usage
+                            var intensityValue by remember {
+                                mutableStateOf(voltageDropViewModel.I)
+                            }
+                            val intensityText = "${voltageDropViewModel.intensityText()}"
+                            Card(
+                                painter = painterResource(id = deviceIconId),
+                                contentDescription = usage.toString(),
+                                texts = arrayOf(intensityText)
+                            )
+                            Slider(
+                                value = intensityValue.inAmpere,
+                                onValueChange = {
+                                    intensityValue = Intensity(it)
+                                    voltageDropViewModel.I = intensityValue
+                                })
+                            // L
+                            var lengthValue by remember { mutableStateOf(voltageDropViewModel.L) }
+                            val lengthText = "${voltageDropViewModel.lengthText()}"
+                            Card(
+                                painter = painterResource(id = R.drawable.ic_electrical_services_24),
+                                contentDescription = voltageDropViewModel.lengthUnit.toString(),
+                                texts = arrayOf(lengthText)
+                            )
+
+                            Slider(
+                                value = lengthValue.inKilometer,
+                                onValueChange = {
+                                    lengthValue = Length(it)
+                                    voltageDropViewModel.L = lengthValue
+                                }
+                            )
+
+                            // delta U
+                            val voltageDropText = "${voltageDropViewModel.voltageDropText()}"
+                            Card(
+                                painter = painterResource(id = R.drawable.ic_electric_bolt_24),
+                                contentDescription = voltageDropViewModel.voltageDropUnit.toString(),
+                                texts = arrayOf(voltageDropText)
+                            )
+
+
+                        }
 
                         var template by remember {
                             mutableStateOf(InstallationTemplate.TRUNCATED)
@@ -237,7 +270,8 @@ fun Card(painter: Painter, contentDescription: String, texts: Array<String>) {
         )
         for (text in texts) {
             Text(
-                text = text
+                text = text,
+                modifier = Modifier.padding(horizontal = 20.dp)
             )
         }
     }
