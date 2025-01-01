@@ -9,42 +9,30 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
-import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
 import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Length
 import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
-import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.VoltageDrop
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
-import com.cjanie.voltagedropcalculator.ui.composables.InstallationDrawing
-import com.cjanie.voltagedropcalculator.ui.composables.CompleteInstallationSetUpEdition
-import com.cjanie.voltagedropcalculator.ui.composables.InstallationTemplate
-import com.cjanie.voltagedropcalculator.ui.composables.TruncatedInstallationSetUpEdition
-import com.cjanie.voltagedropcalculator.ui.composables.VoltageDropResult
-import com.cjanie.voltagedropcalculator.ui.composables.commons.SubmitButton
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
-import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
-import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpStep
-import com.cjanie.voltagedropcalculator.ui.viewmodels.InstallationSetUpViewModel
-import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpStep
+import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.VoltageDropViewModel
 
@@ -138,120 +126,18 @@ class MainActivity : ComponentActivity() {
                             Card(
                                 painter = painterResource(id = R.drawable.ic_electric_bolt_24),
                                 contentDescription = voltageDropViewModel.voltageDropUnit.toString(),
-                                texts = arrayOf(voltageDropText)
+                                texts = arrayOf(voltageDropText),
+                                fontWeight = FontWeight.Bold
                             )
 
-
-                        }
-
-                        var template by remember {
-                            mutableStateOf(InstallationTemplate.TRUNCATED)
-                        }
-                        Button(onClick = {
-                            when (template) {
-                                InstallationTemplate.TRUNCATED -> template = InstallationTemplate.COMPLETE
-                                InstallationTemplate.COMPLETE -> template = InstallationTemplate.TRUNCATED
-                            }
-                        }) {
-
-                        }
-
-                        // Content: installation drawing
-                        // 2 modes: edit / result
-
-                        var truncatedInstallationSetUpStep: TruncatedInstallationSetUpStep? by remember {
-                            mutableStateOf(null)
-                        }
-
-                        var completeInstallationSetUpStep: CompleteInstallationSetUpStep? by remember {
-                            mutableStateOf(null)
-                        }
-
-                        var installation: CompleteInstallationSetUpViewModel.CompleteInstallationPresenter by remember {
-                            mutableStateOf(completeInstallationSetUpViewModel.updateInstallationPlaceHolder())
-                        }
-
-                        var truncatedInstallation: TruncatedInstallationSetUpViewModel.TruncatedInstallationPresenter by remember {
-                            mutableStateOf(truncatedInstallationSetUpViewModel.updateInstallationPlaceHolder())
-                        }
-
-                        if(truncatedInstallationSetUpStep != null) {
-                            TruncatedInstallationSetUpEdition(
-                                viewModel = truncatedInstallationSetUpViewModel,
-                                step = truncatedInstallationSetUpStep!!,
-                                next = { truncatedInstallationSetUpStep = null
-                                    truncatedInstallation = truncatedInstallationSetUpViewModel.updateInstallationPlaceHolder()
-                                }
+                            val infoText = "Todo info text - requires nominal tension provider"
+                            Card(
+                                painter = painterResource(id = R.drawable.ic_info_24),
+                                contentDescription = voltageDropViewModel.voltageDropUnit.toString(),
+                                texts = arrayOf(infoText),
+                                color = greenWarningColor,
+                                fontWeight = FontWeight.Bold
                             )
-                        }
-
-                        if (completeInstallationSetUpStep != null) {
-                            CompleteInstallationSetUpEdition(
-                                viewModel = completeInstallationSetUpViewModel,
-                                step = completeInstallationSetUpStep!!,
-                                next = { completeInstallationSetUpStep = null
-                                        installation = completeInstallationSetUpViewModel.updateInstallationPlaceHolder()
-                                }
-                            )
-                        }
-
-                        var voltageDropResult: InstallationSetUpViewModel.VoltageDropResultPresenter? by remember {
-                            mutableStateOf(null)
-                        }
-
-
-                        if (completeInstallationSetUpStep == null)
-                        ConstraintLayout(Modifier.fillMaxSize()) {
-                            val (drawing, result) = createRefs()
-
-                            InstallationDrawing(
-                                completeInstallationPresenter = installation,
-                                truncatedInstallationPresenter = truncatedInstallation,
-                                editionMode = voltageDropResult == null,
-                                setInstallationSetUpStep = fun(step: CompleteInstallationSetUpStep){
-                                    completeInstallationSetUpStep = step
-                                },
-                                installationTemplate = template,
-                                modifier = Modifier
-                                    .constrainAs(drawing) {
-                                        top.linkTo(parent.top)
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                        bottom.linkTo(result.top)
-                                        width = Dimension.fillToConstraints
-                                        height = Dimension.fillToConstraints
-                                    }
-                                    .fillMaxSize(),
-                                setTruncatedInstallationSetUpStep = fun (step: TruncatedInstallationSetUpStep) {
-                                    truncatedInstallationSetUpStep = step
-                                }
-                            )
-
-
-                            if(voltageDropResult != null) {
-                                VoltageDropResult(
-                                    voltageDropResultPresenter = voltageDropResult!!,
-                                    modifier = Modifier.constrainAs(result) {
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                        bottom.linkTo(parent.bottom)
-                                    }
-                                )
-                            } else {
-                                SubmitButton(
-                                    text = truncatedInstallationSetUpViewModel.calculateVoltageDropLabel,
-                                    onClick = { voltageDropResult = truncatedInstallationSetUpViewModel.voltageDropResult() },
-                                    enabled = truncatedInstallationSetUpViewModel.isSetUpComplete(),
-                                    modifier = Modifier
-                                        .constrainAs(result) {
-                                            start.linkTo(parent.start)
-                                            end.linkTo(parent.end)
-                                            bottom.linkTo(parent.bottom)
-                                        }
-                                        .padding(paddingMedium)
-                                )
-                            }
-
                         }
                     }
                 }
@@ -262,16 +148,30 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun Card(painter: Painter, contentDescription: String, texts: Array<String>) {
-    Row {
+fun Card(
+    painter: Painter,
+    contentDescription: String,
+    texts: Array<String>,
+    color: Color = Color.Unspecified,
+    fontWeight: FontWeight = FontWeight.Normal,
+    modifier: Modifier = Modifier,
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically
+    ) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = verticalAlignment
+    ) {
         Icon(
             painter = painter,
-            contentDescription = contentDescription
+            contentDescription = contentDescription,
+            tint = color
         )
         for (text in texts) {
             Text(
                 text = text,
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 20.dp),
+                color = color,
+                fontWeight = fontWeight
             )
         }
     }
