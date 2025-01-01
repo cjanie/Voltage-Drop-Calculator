@@ -1,8 +1,8 @@
 package com.cjanie.voltagedropcalculator
 
 import com.cjanie.voltagedropcalculator.businesslogic.models.conductor.Copper
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.PhaseShift
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 import junit.framework.TestCase.assertEquals
 
 

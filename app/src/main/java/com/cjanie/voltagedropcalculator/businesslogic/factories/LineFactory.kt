@@ -4,7 +4,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.models.use.Lighting
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineSinglePhase
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.LineThreePhase
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Use
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
@@ -12,7 +12,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Motor
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Length
 
 class LineFactory {
 

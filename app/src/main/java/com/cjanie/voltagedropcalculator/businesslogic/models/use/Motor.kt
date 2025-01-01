@@ -2,7 +2,7 @@ package com.cjanie.voltagedropcalculator.businesslogic.models.use
 
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.PhaseShift
 
 class Motor(electricitySupply: ElectricitySupply): Use(electricitySupply) {
     override val usage: Usage

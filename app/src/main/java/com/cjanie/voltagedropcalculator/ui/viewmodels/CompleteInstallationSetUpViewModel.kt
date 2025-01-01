@@ -13,8 +13,8 @@ import com.cjanie.voltagedropcalculator.businesslogic.models.use.Lighting
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Motor
 import com.cjanie.voltagedropcalculator.businesslogic.usecases.InstallationSetUpUseCase
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Length
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 import com.cjanie.voltagedropcalculator.ui.theme.placeHolderColor
 
 enum class CompleteInstallationSetUpStep {

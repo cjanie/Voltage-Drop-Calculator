@@ -1,4 +1,4 @@
-package com.cjanie.voltagedropcalculator.businesslogic.valueobjects
+package com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects
 
 import com.cjanie.voltagedropcalculator.businesslogic.enums.DimensionUnit
 

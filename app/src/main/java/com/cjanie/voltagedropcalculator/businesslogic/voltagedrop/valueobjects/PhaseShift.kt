@@ -1,4 +1,4 @@
-package com.cjanie.voltagedropcalculator.businesslogic.valueobjects
+package com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects
 
 import kotlin.math.pow
 import kotlin.math.sqrt

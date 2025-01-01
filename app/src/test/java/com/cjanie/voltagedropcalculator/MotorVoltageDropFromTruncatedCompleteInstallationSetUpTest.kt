@@ -10,11 +10,11 @@ import com.cjanie.voltagedropcalculator.businesslogic.models.use.Lighting
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Motor
 import com.cjanie.voltagedropcalculator.businesslogic.usecases.TruncatedInstallationSetUpUseCase
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Length
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.PhaseShift
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.VoltageDrop
 import junit.framework.TestCase.assertEquals
 
 import org.junit.Test

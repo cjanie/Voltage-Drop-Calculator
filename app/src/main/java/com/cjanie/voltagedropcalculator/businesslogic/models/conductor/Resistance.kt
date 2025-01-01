@@ -1,7 +1,7 @@
 package com.cjanie.voltagedropcalculator.businesslogic.models.conductor
 
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.PhaseShift
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 
 class Resistance(
     conductor: Conductor,

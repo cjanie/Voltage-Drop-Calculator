@@ -1,12 +1,11 @@
 package com.cjanie.voltagedropcalculator.businesslogic.voltagedrop
 
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.ConductorResistance
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.ConductorVoltageDropProperty
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.LinearReactance
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.LinearResistance
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.PhaseShift
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.ConductorResistance
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.ConductorVoltageDropProperty
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.LinearReactance
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.LinearResistance
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 import kotlin.math.pow
 import kotlin.math.sqrt
 

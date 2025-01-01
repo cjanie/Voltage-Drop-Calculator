@@ -1,7 +1,7 @@
 package com.cjanie.voltagedropcalculator.businesslogic.models.conductor
 
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 
 abstract class Conductor(val linearReactance: LinearReactance = defaultLinearReactance) {
 

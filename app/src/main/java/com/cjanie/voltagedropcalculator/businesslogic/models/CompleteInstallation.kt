@@ -3,9 +3,9 @@ package com.cjanie.voltagedropcalculator.businesslogic.models
 import com.cjanie.voltagedropcalculator.businesslogic.PhaseShiftInconsistancyException
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.models.use.Use
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.MaxVoltageDropLimit
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.MaxVoltageDropLimit
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.VoltageDrop
 
 class CompleteInstallation(
     val use: Use,

@@ -10,8 +10,8 @@ import com.cjanie.voltagedropcalculator.businesslogic.enums.Phasing
 import com.cjanie.voltagedropcalculator.businesslogic.factories.LineFactory
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Length
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 
 open class CableViewModel(application: Application) {
 

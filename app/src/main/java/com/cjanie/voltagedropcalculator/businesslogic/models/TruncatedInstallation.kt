@@ -5,7 +5,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.enums.ElectricitySupply
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.models.line.Line
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.VoltageDrop
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.VoltageDrop
 
 class TruncatedInstallation(
     val usage: Usage,

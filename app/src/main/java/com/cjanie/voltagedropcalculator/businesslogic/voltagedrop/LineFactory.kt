@@ -2,8 +2,8 @@ package com.cjanie.voltagedropcalculator.businesslogic.voltagedrop
 
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
 import com.cjanie.voltagedropcalculator.businesslogic.gateways.Device
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Length
-import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Section
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Length
+import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 
 class LineFactory {
 
