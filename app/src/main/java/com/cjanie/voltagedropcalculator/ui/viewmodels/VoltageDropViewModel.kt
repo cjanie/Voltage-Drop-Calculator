@@ -70,7 +70,7 @@ class VoltageDropViewModel: ViewModel() {
 
     val voltageDropUnit = VoltageDrop.unit
     fun voltageDropText(): String {
-        return "$voltageDropUnit ${voltageDropAtEndOfLine().inVolt}"
+        return "Voltage Drop $voltageDropUnit ${voltageDropAtEndOfLine().inVolt}"
     }
 
     fun warningColor(): Color {
@@ -78,13 +78,13 @@ class VoltageDropViewModel: ViewModel() {
     }
 
     fun nominalVoltageText(): String {
-        return "Nominal voltage ${Voltage.unit} ${nominal_U.inVolt}"
+        return "Nominal Voltage ${Voltage.unit} ${nominal_U.inVolt}"
     }
 
     fun voltageDropPercentageText(): String {
         val delta_U = voltageDropAtEndOfLine()
         val voltageDropPercentage = delta_U.percentage(nominal_U)
-        return "Max Voltage Drop % accepted ${VoltageDrop.maxPercentageAcceptable(usage)}. Current % $voltageDropPercentage."
+        return "For ${usage}: Max Voltage Drop accepted % ${VoltageDrop.maxPercentageAcceptable(usage)}. Current % $voltageDropPercentage."
     }
 
 

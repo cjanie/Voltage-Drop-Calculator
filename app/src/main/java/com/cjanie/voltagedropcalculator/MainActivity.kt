@@ -150,7 +150,6 @@ class MainActivity : ComponentActivity() {
                             Text(
                                 text = voltageDropViewModel.voltageDropPercentageText(),
                                 color = infoColor,
-                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
