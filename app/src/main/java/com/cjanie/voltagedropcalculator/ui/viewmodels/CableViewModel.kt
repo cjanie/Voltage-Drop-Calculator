@@ -25,7 +25,7 @@ open class CableViewModel(application: Application) {
 
         fun conductorToString(conductorMaterial: ConductorMaterial, application: Application): String {
             return when (conductorMaterial) {
-                ConductorMaterial.COPPER -> application.getString(R.string.conductor_copper)
+                ConductorMaterial.COPPER -> application.getString(R.string.copper)
             }
         }
 
@@ -33,21 +33,21 @@ open class CableViewModel(application: Application) {
             return "${
             if (section.inMillimeterSquare.toString().endsWith(".0"))
                 section.inMillimeterSquare.toInt() else section.inMillimeterSquare
-            } ${application.getString(R.string.conductor_section_unit)}"
+            } ${application.getString(R.string.millimeter_square_abbrev)}"
         }
 
         fun intensityToString(intensity: Intensity, application: Application): String {
             return "${
                 if (intensity.inAmpere.toString().endsWith(".0"))
                     intensity.inAmpere.toInt() else intensity.inAmpere
-            } ${application.getString(R.string.current_intensity_unit)}"
+            } ${application.getString(R.string.ampere_abbrev)}"
         }
 
         fun lengthToString(length: Length, application: Application): String {
             return "${
                 if (length.inKilometer.toString().endsWith(".0")) 
                     length.inKilometer.toInt() else length.inKilometer
-            } ${application.getString(R.string.line_length_unit)}"
+            } ${application.getString(R.string.kilometer_abbrev)}"
         }
 
     }
@@ -95,7 +95,7 @@ open class CableViewModel(application: Application) {
         .map { intensityToString(it, application) }.toTypedArray()
 
     val lengthLabel = application.getString(R.string.line_length_label)
-    val lengthUnit = application.getString(R.string.line_length_unit)
+    val lengthUnit = application.getString(R.string.kilometer_abbrev)
 
     var phasing: Phasing? = null
     var conductor: ConductorMaterial? = null

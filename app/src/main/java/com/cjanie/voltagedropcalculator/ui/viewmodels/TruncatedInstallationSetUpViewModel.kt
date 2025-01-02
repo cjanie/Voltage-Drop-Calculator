@@ -43,7 +43,7 @@ class TruncatedInstallationSetUpViewModel(private val application: Application) 
             return when (step) {
                 TruncatedInstallationSetUpStep.DEFINE_USAGE -> application.getString(R.string.define_installation_usage_label)
                 TruncatedInstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> application.getString(R.string.define_electricity_supply)
-                TruncatedInstallationSetUpStep.DEFINE_NOMINAL_TENSION -> application.getString(R.string.define_nominal_tension)
+                TruncatedInstallationSetUpStep.DEFINE_NOMINAL_TENSION -> application.getString(R.string.nominal_voltage)
                 TruncatedInstallationSetUpStep.DEFINE_INPUT_CABLE_VOLTAGE_DROP -> application.getString(R.string.define_input_cable_voltage_drop)
                 TruncatedInstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> application.getString(R.string.add_output_circuits_label)
                 TruncatedInstallationSetUpStep.DEFINE_USAGE -> application.getString(R.string.define_installation_usage_label)

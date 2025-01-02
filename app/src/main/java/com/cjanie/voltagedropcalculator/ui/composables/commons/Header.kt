@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.cjanie.voltagedropcalculator.ui.theme.copperColor
-import com.cjanie.voltagedropcalculator.ui.theme.headerHeight
 import com.cjanie.voltagedropcalculator.ui.theme.onCopperColor
 
 @Composable

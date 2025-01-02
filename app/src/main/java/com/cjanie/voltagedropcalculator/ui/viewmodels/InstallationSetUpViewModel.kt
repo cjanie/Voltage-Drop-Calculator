@@ -25,8 +25,8 @@ abstract class InstallationSetUpViewModel(application: Application) : AndroidVie
 
         fun usageToString(usage: Usage, application: Application): String {
             return when (usage) {
-                Usage.LIGHTING -> application.getString(R.string.functional_context_lighting)
-                Usage.MOTOR -> application.getString(R.string.functional_context_motor)
+                Usage.LIGHTING -> application.getString(R.string.usage_lighting)
+                Usage.MOTOR -> application.getString(R.string.usage_motor)
             }
         }
 
@@ -38,7 +38,7 @@ abstract class InstallationSetUpViewModel(application: Application) : AndroidVie
         }
 
         fun tensionToString(voltage: Voltage, application: Application): String {
-            return "${voltage.inVolt.toInt()} ${application.getString(R.string.tension_unit)}"
+            return "${voltage.inVolt.toInt()} ${application.getString(R.string.volt_abbrev)}"
         }
 
     }
@@ -155,7 +155,7 @@ abstract class InstallationSetUpViewModel(application: Application) : AndroidVie
         val isVoltageDropAcceptableWarningText = if (calculateVoltageDrop.isVoltageDropAcceptable)
             "${application.getString(R.string.voltage_drop_acceptable_result)}"
         else "${application.getString(R.string.voltage_drop_not_acceptable_result)}"
-        val maxVoltageDropLimitPercentageLabel = application.getString(R.string.max_voltage_drop_acceptable_percentage_label)
+        val maxVoltageDropLimitPercentageLabel = application.getString(R.string.max_voltage_drop_accepted)
         val maxVoltageDropLimitPercentageValue = "${calculateVoltageDrop.maxVoltageDropLimitPercentage.toInt()} ${application.getString(R.string.percentage_sign)}"
         val warningColor = if (calculateVoltageDrop.isVoltageDropAcceptable) greenWarningColor
         else redWarningColor

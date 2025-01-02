@@ -1,9 +1,12 @@
 package com.cjanie.voltagedropcalculator.ui.viewmodels
 
+import android.app.Application
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import com.cjanie.voltagedropcalculator.R
 import com.cjanie.voltagedropcalculator.businesslogic.enums.ConductorMaterial
+import com.cjanie.voltagedropcalculator.businesslogic.enums.DimensionUnit
+import com.cjanie.voltagedropcalculator.businesslogic.enums.OhmLawParameterUnit
 import com.cjanie.voltagedropcalculator.businesslogic.enums.Usage
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Intensity
 import com.cjanie.voltagedropcalculator.businesslogic.valueobjects.Voltage
@@ -14,7 +17,7 @@ import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.V
 import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
 import com.cjanie.voltagedropcalculator.ui.theme.redWarningColor
 
-class VoltageDropViewModel: ViewModel() {
+class VoltageDropViewModel(application: Application): AndroidViewModel(application) {
 
     val usage = Usage.LIGHTING
 
@@ -52,28 +55,33 @@ class VoltageDropViewModel: ViewModel() {
     }
 
     // Texts
-    val materialText = conductorMaterial.toString()
+
+    val app = getApplication<Application>()
+
+    val materialText = conductorMaterial()
 
     val sectionUnit = Section.unit
     fun sectionText(): String {
-        return "$sectionUnit ${S.inMillimeterSquare}"
+        return "${dimensionUnit(sectionUnit)} ${S.inMillimeterSquare}"
     }
-    val maxSection = Section(inMillimeterSquare = 500f)
+    val maxSection = Section(inMillimeterSquare = 300f)
 
     fun intensityText(): String {
-        return "${Intensity.unit} ${I.inAmpere}"
+        return "${unit(Intensity.unit)} ${I.inAmpere}"
     }
     val maxIntensity = Intensity(inAmpere = 1000f)
 
     val lengthUnit = Length.unit
     fun lengthText(): String {
-        return "$lengthUnit ${L.inKilometer}"
+        return "${dimensionUnit(lengthUnit)} ${L.inKilometer}"
     }
     val maxLength = Length(inKilometer = 1f)
 
     val voltageDropUnit = VoltageDrop.unit
+    
     fun voltageDropText(): String {
-        return "Voltage Drop $voltageDropUnit ${voltageDropAtEndOfLine().inVolt}"
+        val label = app.getString(R.string.voltage_drop)
+        return "${label} ${unit(voltageDropUnit)} ${voltageDropAtEndOfLine().inVolt}"
     }
 
     fun warningColor(): Color {
@@ -81,14 +89,51 @@ class VoltageDropViewModel: ViewModel() {
     }
 
     fun nominalVoltageText(): String {
-        return "Nominal Voltage ${Voltage.unit} ${nominal_U.inVolt}"
+
+        return "${app.getString(R.string.nominal_voltage)} ${unit(Voltage.unit)} ${nominal_U.inVolt}"
     }
     val maxVoltage = Voltage(inVolt = 1000f)
 
+    val percentageSign = app.getString(R.string.percentage_sign)
+
     fun voltageDropPercentageText(): String {
-        val delta_U = voltageDropAtEndOfLine()
-        val voltageDropPercentage = delta_U.percentage(nominal_U)
-        return "For ${usage}: Max Voltage Drop accepted % ${VoltageDrop.maxPercentageAcceptable(usage)}. Current % $voltageDropPercentage."
+        val voltageDropPercentageLabel = "${app.getString(R.string.voltage_drop)} $percentageSign"
+        val voltageDropPercentage = voltageDropAtEndOfLine().percentage(nominal_U)
+        return "$voltageDropPercentageLabel  $voltageDropPercentage"
+    }
+
+    fun maxVoltageDropAcceptedText(): String {
+        val maxVoltageDropLabel = "${usage()} ${app.getString(R.string.max_voltage_drop_accepted)} $percentageSign"
+        return "$maxVoltageDropLabel ${VoltageDrop.maxPercentageAcceptable(usage)}"
+    }
+
+    fun conductorMaterial(): String {
+        return when (conductorMaterial) {
+            ConductorMaterial.COPPER -> app.getString(R.string.copper_abbrev)
+        }
+    }
+
+    fun usage(): String {
+        return when (usage) {
+            Usage.LIGHTING -> app.getString(R.string.usage_lighting)
+            Usage.MOTOR -> app.getString(R.string.usage_motor)
+        }
+    }
+
+    // unit tools
+    fun unit(parameterUnit: OhmLawParameterUnit): String {
+        return when (parameterUnit) {
+            OhmLawParameterUnit.OHM -> app.getString(R.string.ohm)
+            OhmLawParameterUnit.VOLT -> app.getString(R.string.volt_abbrev)
+            OhmLawParameterUnit.AMPERE -> app.getString(R.string.ampere_abbrev)
+        }
+    }
+
+    fun dimensionUnit(dimensionUnit: DimensionUnit): String {
+        return when (dimensionUnit) {
+            DimensionUnit.KILOMETER -> app.getString(R.string.kilometer_abbrev)
+            DimensionUnit.MILLIMETER_SQUARE -> app.getString(R.string.millimeter_square_abbrev)
+        }
     }
 
 }

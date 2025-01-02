@@ -38,7 +38,7 @@ class CompleteInstallationSetUpViewModel(
                 CompleteInstallationSetUpStep.DEFINE_USAGE -> application.getString(R.string.define_installation_usage_label)
                 CompleteInstallationSetUpStep.ADD_INPUT_CABLE -> application.getString(R.string.add_input_cable_label)
                 CompleteInstallationSetUpStep.ADD_OUTPUT_CIRCUITS -> application.getString(R.string.add_output_circuits_label)
-                CompleteInstallationSetUpStep.DEFINE_NOMINAL_TENSION -> application.getString(R.string.define_nominal_tension)
+                CompleteInstallationSetUpStep.DEFINE_NOMINAL_TENSION -> application.getString(R.string.nominal_voltage)
                 CompleteInstallationSetUpStep.DEFINE_ELECTRICITY_SUPPLY -> application.getString(R.string.define_electricity_supply)
             }
         }

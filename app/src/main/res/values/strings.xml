@@ -7,11 +7,11 @@
     <string name="define_input_cable_voltage_drop">Define Input Cable Voltage Drop</string>
     <string name="add_output_circuits_label">Add Output Circuits</string>
     <string name="define_electricity_supply">Define Electricity Supply</string>
-    <string name="define_nominal_tension">Define nominal tension</string>
+    <string name="nominal_voltage">Nominal Voltage</string>
     <string name="skip">Skip</string>
     <string name="usage_label">Usage</string>
-    <string name="functional_context_lighting">Lighting</string>
-    <string name="functional_context_motor">Motor</string>
+    <string name="usage_lighting">Lighting</string>
+    <string name="usage_motor">Motor</string>
     <string name="electricity_supply_label">Electricity Supply</string>
     <string name="electricity_supply_public">Public</string>
     <string name="electricity_supply_private">Private</string>
@@ -19,23 +19,26 @@
     <string name="phasing_single_phase">Single-Phase</string>
     <string name="phasing_three_phase">Three-Phase</string>
     <string name="conductor_label">Conductor</string>
-    <string name="conductor_copper">Copper</string>
+    <string name="copper">Copper</string>
+    <string name="copper_abbrev">Cu</string>
     <string name="section_label">Section in Millimeter Square</string>
-    <string name="conductor_section_unit">mm²</string>
+    <string name="millimeter_square_abbrev">mm²</string>
+    <string name="ohm">Ohm</string>
     <string name="current_intensity_label">Current Intensity in Ampere</string>
-    <string name="current_intensity_unit">A</string>
+    <string name="ampere_abbrev">A</string>
     <string name="tension_label">Tension in Volt</string>
-    <string name="tension_unit">V</string>
+    <string name="volt_abbrev">V</string>
     <string name="input_cable_voltage_drop_in_volt_label">Input Cable Voltage Drop in Volt</string>
     <string name="line_length_label">Line Length in Kilometer</string>
-    <string name="line_length_unit">km</string>
+    <string name="kilometer_abbrev">Km</string>
 
     <string name="calculate_voltage_drop_label">Calculate Voltage Drop</string>
-
+    <string name="voltage_drop">Voltage Drop</string>
     <string name="voltage_drop_in_volt_label">Voltage Drop in Volt</string>
     <string name="voltage_drop_percentage_label">Voltage Drop Percentage</string>
     <string name="percentage_sign">%</string>
     <string name="voltage_drop_acceptable_result">Voltage Drop Result \n Acceptable</string>
     <string name="voltage_drop_not_acceptable_result">Voltage Drop Result \n Not acceptable</string>
-    <string name="max_voltage_drop_acceptable_percentage_label">Max Drop Acceptable</string>
+    <string name="max_voltage_drop_accepted">Max Drop Accepted</string>
+    <string name="actual">Actual</string>
 </resources>

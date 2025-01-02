@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -32,16 +35,16 @@ import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.L
 import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.Section
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
+import com.cjanie.voltagedropcalculator.ui.theme.Purple80
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
+import com.cjanie.voltagedropcalculator.ui.theme.iconSize
+import com.cjanie.voltagedropcalculator.ui.theme.paddingMedium
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.VoltageDropViewModel
 
 class MainActivity : ComponentActivity() {
-    
-    private val completeInstallationSetUpViewModel by lazy { CompleteInstallationSetUpViewModel(application) }
-    private val truncatedInstallationSetUpViewModel by lazy { TruncatedInstallationSetUpViewModel(application) }
 
-    private val voltageDropViewModel by lazy { VoltageDropViewModel()}
+    private val voltageDropViewModel by lazy { VoltageDropViewModel(application)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +65,7 @@ class MainActivity : ComponentActivity() {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(40.dp),
+                                .padding(paddingMedium),
                             verticalArrangement = Arrangement.SpaceAround
 
                         ) {
@@ -132,9 +135,11 @@ class MainActivity : ComponentActivity() {
                                 painter = painterResource(id = R.drawable.ic_electric_bolt_24),
                                 contentDescription = voltageDropViewModel.voltageDropUnit.toString(),
                                 texts = arrayOf(voltageDropText),
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = paddingMedium)
                             )
 
+                            // Info
                             var nominalVoltageValue by remember {
                                 mutableStateOf(voltageDropViewModel.nominal_U)
                             }
@@ -156,7 +161,14 @@ class MainActivity : ComponentActivity() {
                                 })
                             Text(
                                 text = voltageDropViewModel.voltageDropPercentageText(),
+                                fontWeight = FontWeight.Bold,
                                 color = infoColor,
+                                modifier = Modifier.padding(start = iconSize + paddingMedium)
+                            )
+                            Text(
+                                text = voltageDropViewModel.maxVoltageDropAcceptedText(),
+                                color = infoColor,
+                                modifier = Modifier.padding(start = iconSize + paddingMedium)
                             )
                         }
                     }
@@ -184,12 +196,13 @@ fun Card(
         Icon(
             painter = painter,
             contentDescription = contentDescription,
-            tint = color
+            tint = color,
+            modifier = Modifier.size(iconSize)
         )
         for (text in texts) {
             Text(
                 text = text,
-                modifier = Modifier.padding(horizontal = 20.dp),
+                modifier = Modifier.padding(horizontal = paddingMedium),
                 color = color,
                 fontWeight = fontWeight
             )
@@ -198,12 +211,19 @@ fun Card(
 }
 
 @Composable
-fun SliderWithScale(value: Float, maxValue: Float, onValueChange: (value: Float) -> Unit) {
+fun SliderWithScale(
+    value: Float,
+    maxValue: Float,
+    onValueChange: (value: Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Slider(
-        value = value / maxValue,
+        value = value,
         onValueChange = {
-            onValueChange(it * maxValue)
-        }
+            onValueChange(it)
+        },
+        valueRange = (0f..maxValue),
+        modifier = modifier
     )
 }
 @Preview(showBackground = true)
