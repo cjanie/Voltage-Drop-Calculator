@@ -33,8 +33,6 @@ import com.cjanie.voltagedropcalculator.businesslogic.voltagedrop.valueobjects.S
 import com.cjanie.voltagedropcalculator.ui.viewmodels.CompleteInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.composables.commons.Header
 import com.cjanie.voltagedropcalculator.ui.theme.VoltageDropCalculatorTheme
-import com.cjanie.voltagedropcalculator.ui.theme.greenWarningColor
-import com.cjanie.voltagedropcalculator.ui.theme.redWarningColor
 import com.cjanie.voltagedropcalculator.ui.viewmodels.TruncatedInstallationSetUpViewModel
 import com.cjanie.voltagedropcalculator.ui.viewmodels.VoltageDropViewModel
 
@@ -82,9 +80,9 @@ class MainActivity : ComponentActivity() {
                             )
 
                             Slider(
-                                value = sectionValue.inMillimeterSquare,
+                                value = sectionValue.inMillimeterSquare / 500f,
                                 onValueChange = {
-                                    sectionValue = Section(it)
+                                    sectionValue = Section(it * 500f)
                                     voltageDropViewModel.S = sectionValue
                                 }
                             )
@@ -101,9 +99,9 @@ class MainActivity : ComponentActivity() {
                                 texts = arrayOf(intensityText)
                             )
                             Slider(
-                                value = intensityValue.inAmpere,
+                                value = intensityValue.inAmpere / 1000,
                                 onValueChange = {
-                                    intensityValue = Intensity(it)
+                                    intensityValue = Intensity(it * 1000)
                                     voltageDropViewModel.I = intensityValue
                                 })
                             // L
@@ -136,20 +134,24 @@ class MainActivity : ComponentActivity() {
                                 mutableStateOf(voltageDropViewModel.nominal_U)
                             }
                             val infoColor = voltageDropViewModel.warningColor()
-                            val infoText = voltageDropViewModel.infoText()
+                            val nominalVoltageText = voltageDropViewModel.nominalVoltageText()
                             Card(
                                 painter = painterResource(id = R.drawable.ic_info_24),
                                 contentDescription = voltageDropViewModel.voltageDropUnit.toString(),
-                                texts = arrayOf(infoText),
+                                texts = arrayOf(nominalVoltageText),
+                                color = infoColor
+                            )
+                            Slider(
+                                value = nominalVoltageValue.inVolt / 1000f,
+                                onValueChange = {
+                                    nominalVoltageValue = Voltage(it * 1000f)
+                                    voltageDropViewModel.nominal_U = nominalVoltageValue
+                                })
+                            Text(
+                                text = voltageDropViewModel.voltageDropPercentageText(),
                                 color = infoColor,
                                 fontWeight = FontWeight.Bold
                             )
-                            Slider(
-                                value = nominalVoltageValue.inVolt,
-                                onValueChange = {
-                                    nominalVoltageValue = Voltage(it)
-                                    voltageDropViewModel.nominal_U = nominalVoltageValue
-                                })
                         }
                     }
                 }
