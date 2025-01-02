@@ -66,7 +66,6 @@ class MainActivity : ComponentActivity() {
                             verticalArrangement = Arrangement.SpaceAround
 
                         ) {
-
                             // K
                             var sectionValue by remember {
                                 mutableStateOf(voltageDropViewModel.S)
@@ -78,11 +77,12 @@ class MainActivity : ComponentActivity() {
                                 contentDescription = voltageDropViewModel.sectionUnit.toString(),
                                 texts = arrayOf(materialText, sectionText)
                             )
-
-                            Slider(
-                                value = sectionValue.inMillimeterSquare / 500f,
-                                onValueChange = {
-                                    sectionValue = Section(it * 500f)
+                            val maxSection = voltageDropViewModel.maxSection
+                            SliderWithScale(
+                                value = sectionValue.inMillimeterSquare,
+                                maxValue = maxSection.inMillimeterSquare,
+                                onValueChange = fun (value: Float) {
+                                    sectionValue = Section(inMillimeterSquare = value)
                                     voltageDropViewModel.S = sectionValue
                                 }
                             )
@@ -98,10 +98,12 @@ class MainActivity : ComponentActivity() {
                                 contentDescription = usage.toString(),
                                 texts = arrayOf(intensityText)
                             )
-                            Slider(
-                                value = intensityValue.inAmpere / 1000,
-                                onValueChange = {
-                                    intensityValue = Intensity(it * 1000)
+                            val maxIntensity = voltageDropViewModel.maxIntensity
+                            SliderWithScale(
+                                value = intensityValue.inAmpere,
+                                maxValue = maxIntensity.inAmpere,
+                                onValueChange = fun (value: Float) {
+                                    intensityValue = Intensity(inAmpere = value)
                                     voltageDropViewModel.I = intensityValue
                                 })
                             // L
@@ -112,14 +114,17 @@ class MainActivity : ComponentActivity() {
                                 contentDescription = voltageDropViewModel.lengthUnit.toString(),
                                 texts = arrayOf(lengthText)
                             )
+                            val maxLength = voltageDropViewModel.maxLength
 
-                            Slider(
+                            SliderWithScale(
                                 value = lengthValue.inKilometer,
-                                onValueChange = {
-                                    lengthValue = Length(it)
+                                maxValue = maxLength.inKilometer,
+                                onValueChange = fun (value: Float) {
+                                    lengthValue = Length(inKilometer = value)
                                     voltageDropViewModel.L = lengthValue
                                 }
                             )
+
 
                             // delta U
                             val voltageDropText = "${voltageDropViewModel.voltageDropText()}"
@@ -141,10 +146,12 @@ class MainActivity : ComponentActivity() {
                                 texts = arrayOf(nominalVoltageText),
                                 color = infoColor
                             )
-                            Slider(
-                                value = nominalVoltageValue.inVolt / 1000f,
-                                onValueChange = {
-                                    nominalVoltageValue = Voltage(it * 1000f)
+                            val maxVoltage = voltageDropViewModel.maxVoltage
+                            SliderWithScale(
+                                value = nominalVoltageValue.inVolt,
+                                maxValue = maxVoltage.inVolt,
+                                onValueChange = fun (value: Float) {
+                                    nominalVoltageValue = Voltage(inVolt = value)
                                     voltageDropViewModel.nominal_U = nominalVoltageValue
                                 })
                             Text(
@@ -190,6 +197,15 @@ fun Card(
     }
 }
 
+@Composable
+fun SliderWithScale(value: Float, maxValue: Float, onValueChange: (value: Float) -> Unit) {
+    Slider(
+        value = value / maxValue,
+        onValueChange = {
+            onValueChange(it * maxValue)
+        }
+    )
+}
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {

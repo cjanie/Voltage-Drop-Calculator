@@ -58,15 +58,18 @@ class VoltageDropViewModel: ViewModel() {
     fun sectionText(): String {
         return "$sectionUnit ${S.inMillimeterSquare}"
     }
+    val maxSection = Section(inMillimeterSquare = 500f)
 
     fun intensityText(): String {
         return "${Intensity.unit} ${I.inAmpere}"
     }
+    val maxIntensity = Intensity(inAmpere = 1000f)
 
     val lengthUnit = Length.unit
     fun lengthText(): String {
         return "$lengthUnit ${L.inKilometer}"
     }
+    val maxLength = Length(inKilometer = 1f)
 
     val voltageDropUnit = VoltageDrop.unit
     fun voltageDropText(): String {
@@ -80,13 +83,12 @@ class VoltageDropViewModel: ViewModel() {
     fun nominalVoltageText(): String {
         return "Nominal Voltage ${Voltage.unit} ${nominal_U.inVolt}"
     }
+    val maxVoltage = Voltage(inVolt = 1000f)
 
     fun voltageDropPercentageText(): String {
         val delta_U = voltageDropAtEndOfLine()
         val voltageDropPercentage = delta_U.percentage(nominal_U)
         return "For ${usage}: Max Voltage Drop accepted % ${VoltageDrop.maxPercentageAcceptable(usage)}. Current % $voltageDropPercentage."
     }
-
-
 
 }
